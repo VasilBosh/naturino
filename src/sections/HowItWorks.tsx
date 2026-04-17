@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Droplets, Calendar, RefreshCw, CheckCircle } from 'lucide-react';
+import { Droplets, Calendar } from 'lucide-react';
 
 export function HowItWorks() {
   const sectionRef = useRef<HTMLDivElement>(null);

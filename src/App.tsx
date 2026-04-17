@@ -1,11 +1,12 @@
+import ReactPixel from 'react-facebook-pixel';
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; // 1. Добавяме това
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { clarity } from 'react-microsoft-clarity'; // Добавяме Clarity библиотеката
 import { Hero } from './sections/Hero';
 import { Problem } from './sections/Problem';
 import { Solution } from './sections/Solution';
 import { PharmacistReview } from './sections/PharmacistReview';
 import { Benefits } from './sections/Benefits';
-import { HowItWorks } from './sections/HowItWorks';
 import { Ingredients } from './sections/Ingredients';
 import { SocialProof } from './sections/SocialProof';
 import { Guarantee } from './sections/Guarantee';
@@ -13,10 +14,10 @@ import { FAQ } from './sections/FAQ';
 import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
 import { StickyCTA } from './sections/StickyCTA';
-import { Terms } from './pages/Terms'; // 2. Трябва да създадеш такъв файл в src/pages/Terms.tsx
+import { Terms } from './Pages/Terms';
 import './App.css';
 
-// СЪЗДАВАМЕ ОТДЕЛЕН КОМПОНЕНТ ЗА ГЛАВНАТА СТРАНИЦА
+// КОМПОНЕНТ ЗА ГЛАВНАТА СТРАНИЦА
 function LandingPage() {
   const [showSticky, setShowSticky] = useState(false);
 
@@ -35,21 +36,34 @@ function LandingPage() {
       <Solution />
       <PharmacistReview />
       <Benefits />
-      {/* <HowItWorks /> */}
       <Ingredients />
       <SocialProof />
       <Guarantee />
       <FAQ />
       <Checkout />
-
-      
       {showSticky && <StickyCTA />}
     </>
   );
 }
 
-// ОСНОВНИЯТ APP СЕГА УПРАВЛЯВА ПЪТИЩАТА
+// ОСНОВНИЯТ APP КОМПОНЕНТ
 function App() {
+  useEffect(() => {
+    // 1. Инициализация на Facebook Pixel
+    const pixelId = import.meta.env.VITE_FB_PIXEL_ID;
+    if (pixelId) {
+      ReactPixel.init(pixelId, undefined, {
+        autoConfig: true,
+        debug: false,
+      });
+      ReactPixel.pageView();
+    }
+
+    // 2. Инициализация на Microsoft Clarity
+    // Използваме твоя проектен код: wd5vkf28a7
+    clarity.init('wd5vkf28a7');
+  }, []);
+  
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-white overflow-x-hidden">

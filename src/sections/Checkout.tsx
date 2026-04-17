@@ -1,5 +1,6 @@
+import ReactPixel from 'react-facebook-pixel';
 import { useEffect, useRef, useState } from 'react';
-import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight } from 'lucide-react'; 
+import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -37,21 +38,35 @@ export function Checkout() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const currentTotal = Number((19.90 * quantity).toFixed(2));
+    const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+    ReactPixel.track('Purchase', {
+      value: currentTotal,
+      currency: 'EUR', 
+      content_name: 'Naturino Kids',
+      content_type: 'product',
+      num_items: quantity
+    }, { eventID: eventId });
+
     setSubmitted(true);
 
     const orderData = {
       ...formData,
       quantity: quantity,
-      total: (19.90 * quantity).toFixed(2),
-      courier: courier === 'speedy' ? 'Speedy' : 'ЕКОНТ'
+      total: currentTotal,
+      courier: courier === 'speedy' ? 'Speedy' : 'ЕКОНТ',
+      currency: 'EUR',
+      eventId: eventId 
     };
 
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyE5rJasJW7RR8X-84y82NYf3uEGgpZ377w2mIHK5pcojJPhqqluOBqfmepKxSc1mX0/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
 
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(orderData),
     }).catch(error => console.error('Background sync error:', error));
     
@@ -221,6 +236,36 @@ export function Checkout() {
                   </div>
                 </div>
 
+                {/* --- QUANTITY SELECTOR (MOVED HERE) --- */}
+                <div className="flex flex-col gap-3 p-4 bg-white/60 rounded-2xl border border-amber-100 mt-2">
+                  <Label className="text-amber-900 text-sm font-bold flex items-center gap-2">
+                    <Package className="w-4 h-4 text-amber-600" /> Изберете количество:
+                  </Label>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 bg-white rounded-xl border border-amber-200 p-1 shadow-sm">
+                      <button 
+                        type="button" 
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))} 
+                        className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-amber-50 text-amber-600 transition-colors active:scale-95"
+                      >
+                        <Minus className="w-5 h-5" />
+                      </button>
+                      <span className="font-black text-xl text-slate-800 w-6 text-center">{quantity}</span>
+                      <button 
+                        type="button" 
+                        onClick={() => setQuantity(quantity + 1)} 
+                        className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-amber-50 text-amber-600 transition-colors active:scale-95"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
+                       <p className="text-amber-600 font-bold">19.90 €</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Total Summary Box */}
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 border border-amber-200 shadow-inner mt-2">
                   <div className="flex items-center justify-between mb-1">
@@ -237,14 +282,14 @@ export function Checkout() {
                   className="w-full h-16 px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-emerald-200 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4"
                 >
                   <ShoppingCart className="w-8 h-8" />
-                  ПОТВЪРДИ  ПОРЪЧКАТА
+                  ПОТВЪРДИ ПОРЪЧКАТА
                   <ArrowRight className="w-8 h-8 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </form>
           </div>
 
-          {/* Right Side - Benefits & Product Card */}
+          {/* Right Side - Benefits & Product Info */}
           <div className="reveal opacity-0 space-y-4 md:space-y-6">
             <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-6 md:p-8 border border-emerald-100 shadow-sm">
               <h3 className="text-emerald-900 font-bold mb-6 flex items-center gap-2">
@@ -272,33 +317,15 @@ export function Checkout() {
               </div>
             </div>
 
-            {/* КОРИГИРАНА КАРТА НА ПРОДУКТА (БЕЗ СЧУПЕНА ИКОНКА) */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
-              <div className="flex items-center gap-5">
-                <div className="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 flex-shrink-0 shadow-inner">
-                   <Package className="w-10 h-10 text-emerald-600" />
-                </div>
-                <div>
-                  <h4 className="font-black text-slate-900 text-lg uppercase tracking-tight">Naturino Kids</h4>
-                  <p className="text-emerald-600 font-bold text-xl">19.90€</p>
-                  <div className="flex items-center gap-3 mt-3">
-                     <button 
-                       type="button" 
-                       onClick={() => setQuantity(Math.max(1, quantity - 1))} 
-                       className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-emerald-300 transition-colors"
-                     >
-                       -
-                     </button>
-                     <span className="font-bold w-4 text-center">{quantity}</span>
-                     <button 
-                       type="button" 
-                       onClick={() => setQuantity(quantity + 1)} 
-                       className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-emerald-300 transition-colors"
-                     >
-                       +
-                     </button>
-                  </div>
-                </div>
+            {/* Product Card - Simplified since quantity is in the form */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
+              <div className="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 flex-shrink-0 shadow-inner">
+                  <Package className="w-10 h-10 text-emerald-600" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-900 text-lg uppercase tracking-tight">Naturino Kids</h4>
+                <p className="text-slate-500 text-sm italic">Натурален имуностимулатор</p>
+                <p className="text-emerald-600 font-bold text-xl mt-1">19.90 €</p>
               </div>
             </div>
           </div>
@@ -314,19 +341,10 @@ export function Checkout() {
             </div>
             <h3 className="text-2xl md:text-3xl font-black text-slate-900 text-center mb-4">Успешна поръчка!</h3>
             <p className="text-slate-600 text-center mb-8 text-lg leading-relaxed">Благодарим ви за доверието! Очаквайте обаждане от наш консултант много скоро.</p>
-            <button onClick={() => setSubmitted(false)} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg">ЗАТВОРИ</button>
+            <button onClick={() => setSubmitted(false)} className="w-full py-5 bg-emerald-500 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200">ЗАТВОРИ</button>
           </div>
         </div>
       )}
     </section>
-  );
-}
-
-function RotateCcw(props: any) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
-      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-      <path d="M3 3v5h5" />
-    </svg>
   );
 }

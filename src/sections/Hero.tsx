@@ -9,11 +9,19 @@ export function Hero() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fadeInUp');
+            // Използваме requestAnimationFrame за максимална производителност на мобилни устройства
+            requestAnimationFrame(() => {
+              entry.target.classList.add('animate-fadeInUp');
+            });
+            // Спираме да наблюдаваме елемента веднага щом се покаже веднъж
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { 
+        threshold: 0.01, // Реагира веднага при 1% видимост
+        rootMargin: '50px 0px' // Активира се 50px преди да влезе в полезрението
+      }
     );
 
     const elements = heroRef.current?.querySelectorAll('.reveal');
@@ -51,7 +59,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 container-custom min-h-screen flex flex-col">
-        {/* Header */}
+        {/* Header - No reveal class for instant visibility */}
         <header className="py-4 md:py-6 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
@@ -86,7 +94,7 @@ export function Hero() {
               <span>Бестселър 2024 • 4000+ доволни родители</span>
             </div>
 
-            {/* Headline */}
+            {/* Headline - Simplified animation class for stability */}
             <h2 className="reveal opacity-0 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
               Спри безкрайното<br />
               <span className="text-amber-300">боледуване на детето!</span>
@@ -142,24 +150,18 @@ export function Hero() {
           {/* Right Content - Product */}
           <div className="reveal opacity-0 flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px]">
             <div className="relative">
-              {/* Glow */}
               <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" />
-              
-              {/* Product Card */}
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20">
                 <img 
                   src="/images/product-main.jpg" 
                   alt="Naturino Kids - Натурална защита за Деца"
                   className="w-full h-auto rounded-xl md:rounded-2xl"
+                  loading="eager"
                 />
-                
-                {/* Price tag */}
                 <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-lg">
                   <p className="text-[10px] md:text-xs font-semibold">Само сега</p>
                   <p className="text-lg md:text-xl font-black">19.90€</p>
                 </div>
-
-                {/* Discount badge */}
                 <div className="absolute -top-2 -left-2 md:-top-3 md:-left-3 bg-red-500 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg shadow-lg">
                   <p className="text-[10px] md:text-xs font-bold">-50%</p>
                 </div>

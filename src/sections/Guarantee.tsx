@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ShieldCheck, RefreshCw, Award, ThumbsUp, FileCheck, BadgeCheck, ArrowRight, ShoppingCart } from 'lucide-react';
+import { ShieldCheck, RefreshCw, Award, ThumbsUp, FileCheck, BadgeCheck, ShoppingCart } from 'lucide-react';
 
 export function Guarantee() {
   const sectionRef = useRef<HTMLDivElement>(null);
