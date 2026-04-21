@@ -1,34 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Shield, Leaf, Star, Phone, ArrowDown, Award, ArrowRight, ShoppingCart } from 'lucide-react';
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Използваме requestAnimationFrame за максимална производителност на мобилни устройства
-            requestAnimationFrame(() => {
-              entry.target.classList.add('animate-fadeInUp');
-            });
-            // Спираме да наблюдаваме елемента веднага щом се покаже веднъж
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { 
-        threshold: 0.01, // Реагира веднага при 1% видимост
-        rootMargin: '50px 0px' // Активира се 50px преди да влезе в полезрението
-      }
-    );
-
-    const elements = heroRef.current?.querySelectorAll('.reveal');
-    elements?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
 
   const scrollToCheckout = () => {
     document.getElementById('checkout')?.scrollIntoView({ behavior: 'smooth' });
@@ -59,7 +33,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 container-custom min-h-screen flex flex-col">
-        {/* Header - No reveal class for instant visibility */}
+        {/* Header */}
         <header className="py-4 md:py-6 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
@@ -88,44 +62,44 @@ export function Hero() {
         <div className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16 py-8 lg:py-12">
           {/* Left Content */}
           <div className="flex-1 max-w-2xl text-center lg:text-left">
-            {/* Badge */}
-            <div className="reveal opacity-0 inline-flex items-center gap-2 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6">
+            {/* Badge - СТАБИЛЕН */}
+            <div className="inline-flex items-center gap-2 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6 shadow-lg">
               <Award className="w-3 h-3 md:w-4 md:h-4" />
               <span>Бестселър 2024 • 4000+ доволни родители</span>
             </div>
 
-            {/* Headline - Simplified animation class for stability */}
-            <h2 className="reveal opacity-0 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
+            {/* Headline - СТАБИЛЕН */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
               Спри безкрайното<br />
               <span className="text-amber-300">боледуване на детето!</span>
             </h2>
 
-            {/* Subheadline */}
-            <p className="reveal opacity-0 text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            {/* Subheadline - СТАБИЛЕН */}
+            <p className="text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
               <strong className="text-white">100% натурален имуностимулатор</strong> с 10 български билки. 
               Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов</strong>.
             </p>
 
-            {/* Benefits pills */}
-            <div className="reveal opacity-0 flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
+            {/* Benefits pills - СТАБИЛНИ */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
               {['Без консерванти', 'Без захар', 'Без оцветители'].map((item, i) => (
-                <div key={i} className="flex items-center gap-1.5 md:gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full">
+                <div key={i} className="flex items-center gap-1.5 md:gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/5">
                   <Shield className="w-3 h-3 md:w-4 md:h-4 text-amber-300" />
                   <span className="text-white text-xs md:text-sm font-medium">{item}</span>
                 </div>
               ))}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="reveal opacity-0 flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start mb-6 md:mb-8">
+            {/* CTA Buttons - СТАБИЛНИ */}
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start mb-6 md:mb-8">
               <button 
                 onClick={scrollToCheckout}
                 className="btn-cta-primary flex items-center justify-center gap-2"
               >
-                <ShoppingCart className="w-10 h-10" />
-                ПОРЪЧАЙ СЕГА
-                <span className="cta-price">19.90€</span>
-                <ArrowRight className="cta-arrow w-6 h-6" />
+                <ShoppingCart className="w-6 h-6 md:w-8 md:h-8" />
+                <span>ПОРЪЧАЙ СЕГА</span>
+                <span className="cta-price ml-2">19.90€</span>
+                <ArrowRight className="cta-arrow w-5 h-5 md:w-6 md:h-6" />
               </button>
               <button 
                 onClick={scrollToProblem}
@@ -136,34 +110,34 @@ export function Hero() {
               </button>
             </div>
 
-            {/* Rating */}
-            <div className="reveal opacity-0 flex items-center justify-center lg:justify-start gap-4 text-emerald-200 text-sm">
+            {/* Rating - СТАБИЛЕН */}
+            <div className="flex items-center justify-center lg:justify-start gap-4 text-emerald-200 text-sm">
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 md:w-5 md:h-5 text-amber-400 fill-amber-400" />
                 ))}
               </div>
-              <span className="text-xs md:text-sm">5.0/5 от 4000+ родители</span>
+              <span className="text-xs md:text-sm font-medium">5.0/5 от 4000+ родители</span>
             </div>
           </div>
 
-          {/* Right Content - Product */}
-          <div className="reveal opacity-0 flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px]">
+          {/* Right Content - Product (Запазваме лека анимация само тук, за да привлича погледа към продукта) */}
+          <div className="animate-fadeInRight flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px]">
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" />
-              <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20">
+              <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
                 <img 
                   src="/images/product-main.jpg" 
                   alt="Naturino Kids - Натурална защита за Деца"
                   className="w-full h-auto rounded-xl md:rounded-2xl"
                   loading="eager"
                 />
-                <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-lg">
-                  <p className="text-[10px] md:text-xs font-semibold">Само сега</p>
-                  <p className="text-lg md:text-xl font-black">19.90€</p>
+                <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20">
+                  <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
+                  <p className="text-lg md:text-xl font-black italic">19.90€</p>
                 </div>
-                <div className="absolute -top-2 -left-2 md:-top-3 md:-left-3 bg-red-500 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg shadow-lg">
-                  <p className="text-[10px] md:text-xs font-bold">-50%</p>
+                <div className="absolute -top-2 -left-2 md:-top-3 md:-left-3 bg-red-500 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg shadow-xl font-bold">
+                  <p className="text-[10px] md:text-xs uppercase">-50%</p>
                 </div>
               </div>
             </div>

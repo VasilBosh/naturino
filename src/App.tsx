@@ -1,3 +1,4 @@
+import { Stats } from './sections/Stats';
 import ReactPixel from 'react-facebook-pixel';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -32,6 +33,7 @@ function LandingPage() {
   return (
     <>
       <Hero />
+      <Stats />
       <Problem />
       <Solution />
       <PharmacistReview />

@@ -1,6 +1,6 @@
 import ReactPixel from 'react-facebook-pixel';
-import { useEffect, useRef, useState } from 'react';
-import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react'; 
+import { useEffect, useRef, useState, useMemo } from 'react';
+import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus, Ticket } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -15,6 +15,7 @@ export function Checkout() {
     city: '',
     officeAddress: '',
     notes: '',
+    promoCode: '', // НОВО
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -36,10 +37,15 @@ export function Checkout() {
     return () => observer.disconnect();
   }, []);
 
+  // ЛОГИКА ЗА ЦЕНАТА И ПРОМО КОДА
+  const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO11';
+  const pricePerUnit = isPromoValid ? 17.91 : 19.90; // 10% отстъпка от 19.90 е 17.91
+  const totalPrice = (pricePerUnit * quantity).toFixed(2);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const currentTotal = Number((19.90 * quantity).toFixed(2));
+    const currentTotal = Number(totalPrice);
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
     ReactPixel.track('Purchase', {
@@ -56,9 +62,11 @@ export function Checkout() {
       ...formData,
       quantity: quantity,
       total: currentTotal,
-      courier: courier === 'speedy' ? 'Speedy' : 'ЕКОНТ',
+      courier: courier === 'speedy' ? 'Speedy' : (courier === 'econt' ? 'ЕКОНТ' : 'Неизбран'),
       currency: 'EUR',
-      eventId: eventId 
+      eventId: eventId, 
+      SK: 'id:9307307573',
+      promoApplied: isPromoValid ? 'YES (PROMO11)' : 'NO'
     };
 
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
@@ -77,10 +85,9 @@ export function Checkout() {
       city: '',
       officeAddress: '',
       notes: '',
+      promoCode: '',
     });
   };
-
-  const totalPrice = (19.90 * quantity).toFixed(2);
 
   return (
     <section 
@@ -201,7 +208,7 @@ export function Checkout() {
                   </div>
                 </div>
 
-                {/* City & Office Address */}
+                {/* City & Delivery Address */}
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="city" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
@@ -221,22 +228,38 @@ export function Checkout() {
                   <div>
                     <Label htmlFor="officeAddress" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-amber-600" />
-                      Адрес на офис <span className="text-red-500">*</span>
+                      Адрес за доставка<span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="officeAddress"
                       type="text"
                       required
-                      placeholder={courier ? `Име на офис на ${courier === 'speedy' ? 'Speedy' : 'Еконт'}` : 'Първо изберете куриер'}
+                      placeholder={courier ? `Личен адрес или офис на ${courier === 'speedy' ? 'Speedy' : 'Еконт'}` : 'Личен адрес или офис на куриер'}
                       value={formData.officeAddress}
                       onChange={(e) => setFormData({ ...formData, officeAddress: e.target.value })}
-                      disabled={!courier}
-                      className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm disabled:bg-slate-50 disabled:cursor-not-allowed"
+                      className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
                     />
                   </div>
                 </div>
 
-                {/* --- QUANTITY SELECTOR (MOVED HERE) --- */}
+                {/* NEW: Promo Code Field */}
+                <div>
+                  <Label htmlFor="promoCode" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                    <Ticket className="w-4 h-4 text-amber-600" />
+                    Промо код
+                  </Label>
+                  <Input
+                    id="promoCode"
+                    type="text"
+                    placeholder="Имате ли код за отстъпка?"
+                    value={formData.promoCode}
+                    onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
+                    className={`h-12 text-base rounded-xl transition-all shadow-sm ${isPromoValid ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-amber-200'}`}
+                  />
+                  {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -10%!</p>}
+                </div>
+
+                {/* QUANTITY SELECTOR */}
                 <div className="flex flex-col gap-3 p-4 bg-white/60 rounded-2xl border border-amber-100 mt-2">
                   <Label className="text-amber-900 text-sm font-bold flex items-center gap-2">
                     <Package className="w-4 h-4 text-amber-600" /> Изберете количество:
@@ -261,7 +284,10 @@ export function Checkout() {
                     </div>
                     <div className="text-right">
                        <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
-                       <p className="text-amber-600 font-bold">19.90 €</p>
+                       <p className={`font-bold ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
+                         {isPromoValid ? <span className="line-through text-slate-300 mr-1 text-xs">19.90</span> : null}
+                         {pricePerUnit} €
+                       </p>
                     </div>
                   </div>
                 </div>
@@ -270,7 +296,7 @@ export function Checkout() {
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 border border-amber-200 shadow-inner mt-2">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-slate-600 font-medium">Общо за плащане:</span>
-                    <span className="text-2xl font-black text-amber-600">{totalPrice} €</span>
+                    <span className={`text-2xl font-black ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>{totalPrice} €</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
                     <Check className="w-3 h-3" /> Наложен платеж (при преглед)
@@ -317,7 +343,6 @@ export function Checkout() {
               </div>
             </div>
 
-            {/* Product Card - Simplified since quantity is in the form */}
             <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
               <div className="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 flex-shrink-0 shadow-inner">
                   <Package className="w-10 h-10 text-emerald-600" />
@@ -332,7 +357,7 @@ export function Checkout() {
         </div>
       </div>
 
-      {/* --- SUCCESS POP-UP --- */}
+      {/* SUCCESS POP-UP */}
       {submitted && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fadeIn" onClick={() => setSubmitted(false)}>
           <div className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-md w-full shadow-2xl relative animate-scaleIn" onClick={(e) => e.stopPropagation()}>
