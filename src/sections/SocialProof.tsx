@@ -99,15 +99,25 @@ export function SocialProof() {
         {/* Video Grid (2x2) */}
         <div className="reveal opacity-0 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-16 max-w-4xl mx-auto">
           {videoSources.map((src, index) => (
-            <div key={index} className="relative aspect-square rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-              <iframe
-                loading="lazy"
-                title={`Gumlet video player ${index + 1}`}
-                src={src}
-                style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
-                referrerPolicy="origin"
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
-              ></iframe>
+            <div key={index} className="flex flex-col items-center">
+              <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+                <iframe
+                  loading="lazy"
+                  title={`Gumlet video player ${index + 1}`}
+                  src={src}
+                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+                  referrerPolicy="origin"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
+                ></iframe>
+              </div>
+              {/* Added Rating Stars under each video */}
+              <div className="mt-4 text-center">
+                <div className="flex justify-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-500 text-sm">★</span>
+                  ))}
+                </div>
+              </div>
             </div>
           ))}
         </div>
