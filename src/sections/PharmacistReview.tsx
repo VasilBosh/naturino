@@ -30,19 +30,27 @@ export function PharmacistReview() {
       <div className="container-custom">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           
-          {/* Изображение с бадж */}
+          {/* Видео блок с интегриран подпис */}
           <div className="reveal opacity-0 relative order-2 lg:order-1">
             <div className="absolute -top-4 -right-4 z-10 bg-amber-400 text-slate-900 text-[10px] md:text-xs font-black px-4 py-2 rounded-lg shadow-lg uppercase tracking-wider">
               Препоръчан от експерти
             </div>
             
-            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl border-8 border-white">
-              <img 
-                src="images/pharmacist.jpg" 
-                alt="Магистър-фармацевт" 
-                className="w-full h-auto object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-900/90 to-transparent p-4 md:p-10">
+            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl border-8 border-white bg-emerald-900">
+              {/* Gumlet Video Embed */}
+              <div style={{ position: 'relative', aspectRatio: '1/1' }}>
+                <iframe
+                  loading="lazy"
+                  title="Gumlet video player"
+                  src="https://play.gumlet.io/embed/69f06036a3dc19951f0ff028"
+                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+                  referrerPolicy="origin"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
+                ></iframe>
+              </div>
+
+              {/* Текстът под видеото, оставащ вътре в бялата рамка */}
+              <div className="p-6 md:p-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-emerald-600">
                     <CheckCircle2 className="w-6 h-6" />

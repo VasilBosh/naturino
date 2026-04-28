@@ -1,5 +1,5 @@
 import ReactPixel from 'react-facebook-pixel';
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState} from 'react';
 import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus, Ticket } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,7 @@ export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
   const [courier, setCourier] = useState<'speedy' | 'econt' | null>(null);
+  const [courierError, setCourierError] = useState(false); // НОВО: за визуалната грешка
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -39,22 +40,29 @@ export function Checkout() {
 
   // ЛОГИКА ЗА ЦЕНАТА И ПРОМО КОДА
   const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO11';
-  const pricePerUnit = isPromoValid ? 17.91 : 19.90; // 10% отстъпка от 19.90 е 17.91
+  const pricePerUnit = isPromoValid ? 18.50 : 19.90; // 7% отстъпка от 19.90 е 18.50
   const totalPrice = (pricePerUnit * quantity).toFixed(2);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Проверка за избран куриер с визуален ефект вместо alert
+    if (!courier) {
+      setCourierError(true);
+      setTimeout(() => setCourierError(false), 20000); // Изключва ефекта след 10 сек
+      return;
+    }
+
     const currentTotal = Number(totalPrice);
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
     ReactPixel.track('Purchase', {
       value: currentTotal,
-      currency: 'EUR', 
+      currency: 'EUR',
       content_name: 'Naturino Kids',
       content_type: 'product',
-      num_items: quantity
-    }, { eventID: eventId });
+      num_items: quantity,
+      eventID: eventId });
 
     setSubmitted(true);
 
@@ -87,6 +95,7 @@ export function Checkout() {
       notes: '',
       promoCode: '',
     });
+    setCourier(null); // Нулиране на куриера след успешна поръчка
   };
 
   return (
@@ -183,11 +192,13 @@ export function Checkout() {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      onClick={() => setCourier('speedy')}
+                      onClick={() => { setCourier('speedy'); setCourierError(false); }}
                       className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                         courier === 'speedy'
                           ? 'border-amber-500 bg-white shadow-lg shadow-amber-200 ring-2 ring-amber-500/20'
-                          : 'border-amber-100 hover:border-amber-300 bg-white/60 text-slate-500'
+                          : courierError 
+                            ? 'border-red-500 bg-red-50 animate-pulse' 
+                            : 'border-amber-100 hover:border-amber-300 bg-white/60 text-slate-500'
                       }`}
                     >
                       <span className="text-2xl">🚚</span>
@@ -195,17 +206,20 @@ export function Checkout() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setCourier('econt')}
+                      onClick={() => { setCourier('econt'); setCourierError(false); }}
                       className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                         courier === 'econt'
                           ? 'border-amber-500 bg-white shadow-lg shadow-amber-200 ring-2 ring-amber-500/20'
-                          : 'border-amber-100 hover:border-amber-300 bg-white/60 text-slate-500'
+                          : courierError 
+                            ? 'border-red-500 bg-red-50 animate-pulse' 
+                            : 'border-amber-100 hover:border-amber-300 bg-white/60 text-slate-500'
                       }`}
                     >
                       <span className="text-2xl">📦</span>
                       <span className={`font-bold text-sm ${courier === 'econt' ? 'text-amber-900' : ''}`}>ЕКОНТ</span>
                     </button>
                   </div>
+                  {courierError && <p className="text-[10px] text-red-500 font-bold mt-1 ml-1 animate-bounce">Моля, изберете куриер!</p>}
                 </div>
 
                 {/* City & Delivery Address */}
@@ -256,7 +270,7 @@ export function Checkout() {
                     onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
                     className={`h-12 text-base rounded-xl transition-all shadow-sm ${isPromoValid ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-amber-200'}`}
                   />
-                  {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -10%!</p>}
+                  {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -7%!</p>}
                 </div>
 
                 {/* QUANTITY SELECTOR */}
