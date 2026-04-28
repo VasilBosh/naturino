@@ -61,6 +61,13 @@ export function SocialProof() {
     },
   ];
 
+  const videoSources = [
+    "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3",
+    "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3",
+    "https://play.gumlet.io/embed/69f0b6f0a3dc19951f1982e9",
+    "https://play.gumlet.io/embed/69f0ba7f4d5bf5db18d7f83f"
+  ];
+
   const stats = [
     { value: '4000+', label: 'Доволни родители' },
     { value: '4.9/5', label: 'Среден рейтинг' },
@@ -72,7 +79,7 @@ export function SocialProof() {
     <section 
       ref={sectionRef}
       id="testimonials"
-      className="section-padding bg-slate-50"
+      className="section-padding bg-slate-50 overflow-hidden"
     >
       <div className="container-custom">
         {/* Header */}
@@ -89,8 +96,24 @@ export function SocialProof() {
           </p>
         </div>
 
+        {/* Video Grid (2x2) */}
+        <div className="reveal opacity-0 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-16 max-w-4xl mx-auto">
+          {videoSources.map((src, index) => (
+            <div key={index} className="relative aspect-square rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+              <iframe
+                loading="lazy"
+                title={`Gumlet video player ${index + 1}`}
+                src={src}
+                style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+                referrerPolicy="origin"
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
+              ></iframe>
+            </div>
+          ))}
+        </div>
+
         {/* Stats */}
-        <div className="reveal opacity-0 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10 md:mb-12">
+        <div className="reveal opacity-0 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-16">
           {stats.map((stat, index) => (
             <div 
               key={index}
@@ -102,38 +125,49 @@ export function SocialProof() {
           ))}
         </div>
 
-        {/* Testimonials Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div 
-              key={index}
-              className="reveal opacity-0 card-hover bg-white rounded-xl md:rounded-2xl p-5 md:p-6 shadow-sm border border-slate-100"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className="flex items-center gap-1 mb-3 md:mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                ))}
-              </div>
-              <div className="relative mb-4 md:mb-5">
-                <Quote className="absolute -top-2 -left-1 w-6 h-6 md:w-8 md:h-8 text-emerald-100" />
-                <p className="text-slate-700 text-sm md:text-base leading-relaxed pl-4 md:pl-6">
-                  {testimonial.content}
-                </p>
-              </div>
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base">
-                  {testimonial.name.charAt(0)}
+        {/* Testimonials Slider (Auto-marquee) */}
+        <div className="reveal opacity-0 relative">
+          <div className="flex gap-6 animate-scroll hover:[animation-play-state:paused] w-max">
+            {[...testimonials, ...testimonials].map((testimonial, index) => (
+              <div 
+                key={index}
+                className="w-[300px] md:w-[400px] bg-white rounded-xl md:rounded-2xl p-5 md:p-6 shadow-sm border border-slate-100 flex-shrink-0"
+              >
+                <div className="flex items-center gap-1 mb-3 md:mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  ))}
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-900 text-sm md:text-base">{testimonial.name}</p>
-                  <p className="text-slate-500 text-xs md:text-sm">{testimonial.role}</p>
+                <div className="relative mb-4 md:mb-5">
+                  <Quote className="absolute -top-2 -left-1 w-6 h-6 md:w-8 md:h-8 text-emerald-100" />
+                  <p className="text-slate-700 text-sm md:text-base leading-relaxed pl-4 md:pl-6">
+                    {testimonial.content}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm md:text-base">{testimonial.name}</p>
+                    <p className="text-slate-500 text-xs md:text-sm">{testimonial.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-50% - 12px)); }
+        }
+        .animate-scroll {
+          animation: scroll 40s linear infinite;
+        }
+      `}} />
     </section>
   );
 }
