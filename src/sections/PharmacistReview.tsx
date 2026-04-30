@@ -42,7 +42,7 @@ export function PharmacistReview() {
                 <iframe
                   loading="lazy"
                   title="Gumlet video player"
-                  src="https://play.gumlet.io/embed/69f06036a3dc19951f0ff028"
+                  src="https://play.gumlet.io/embed/69f06036a3dc19951f0ff028?autoplay=true&muted=true&preload=true&playsinline=1"
                   style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
                   referrerPolicy="origin"
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"

@@ -1,15 +1,34 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react'; // Добавен useEffect
 import { Shield, Leaf, Star, Phone, ArrowDown, Award, ArrowRight, ShoppingCart } from 'lucide-react';
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
 
+  // Оптимизация за Gumlet: Подготвяме връзката веднага
+  useEffect(() => {
+    const domains = ['https://video.gumlet.io', 'https://cdn.gumlet.com'];
+    domains.forEach(domain => {
+      // Предварително решаване на DNS
+      const dnsPrefetch = document.createElement('link');
+      dnsPrefetch.rel = 'dns-prefetch';
+      dnsPrefetch.href = domain;
+      document.head.appendChild(dnsPrefetch);
+
+      // Предварително установяване на сигурна връзка
+      const preconnect = document.createElement('link');
+      preconnect.rel = 'preconnect';
+      preconnect.href = domain;
+      preconnect.crossOrigin = "anonymous";
+      document.head.appendChild(preconnect);
+    });
+  }, []);
+
   const scrollToCheckout = () => {
     document.getElementById('checkout')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const scrollToProblem = () => {
-    document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToSocialProof = () => {
+    document.getElementById('social-proof')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -62,25 +81,21 @@ export function Hero() {
         <div className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16 py-8 lg:py-12">
           {/* Left Content */}
           <div className="flex-1 max-w-2xl text-center lg:text-left">
-            {/* Badge - СТАБИЛЕН */}
             <div className="inline-flex items-center gap-2 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6 shadow-lg">
               <Award className="w-3 h-3 md:w-4 md:h-4" />
               <span>Бестселър 2024 • 4000+ доволни родители</span>
             </div>
 
-            {/* Headline - СТАБИЛЕН */}
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
               Спри безкрайното<br />
               <span className="text-amber-300">боледуване на детето!</span>
             </h2>
 
-            {/* Subheadline - СТАБИЛЕН */}
             <p className="text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
               <strong className="text-white">100% натурален имуностимулатор</strong> с 10 български билки. 
               Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов</strong>.
             </p>
 
-            {/* Benefits pills - СТАБИЛНИ */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
               {['Без консерванти', 'Без захар', 'Без оцветители'].map((item, i) => (
                 <div key={i} className="flex items-center gap-1.5 md:gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/5">
@@ -90,27 +105,30 @@ export function Hero() {
               ))}
             </div>
 
-            {/* CTA Buttons - СТАБИЛНИ */}
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start mb-6 md:mb-8">
+            {/* Обвиващият контейнер */}
+            <div className="flex flex-col gap-5 items-center lg:items-start mb-6 md:mb-8">
               <button 
                 onClick={scrollToCheckout}
-                className="btn-cta-primary flex items-center justify-center gap-2"
+                className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[400px]"
               >
                 <ShoppingCart className="w-6 h-6 md:w-8 md:h-8" />
                 <span>ПОРЪЧАЙ СЕГА</span>
                 <span className="cta-price ml-2">19.90€</span>
                 <ArrowRight className="cta-arrow w-5 h-5 md:w-6 md:h-6" />
               </button>
+              
               <button 
-                onClick={scrollToProblem}
-                className="btn-cta-secondary flex items-center justify-center gap-2"
-              >
-                Научи повече
-                <ArrowRight className="cta-arrow w-5 h-5" />
+                onClick={scrollToSocialProof}
+                className="btn-cta-secondary w-full max-w-[400px] flex items-center justify-center gap-2 whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
+              > 
+                <ArrowRight className="w-5 h-5 opacity-70" />
+                <span className="font-bold text-sm md:text-base uppercase tracking-tight">
+                    Виж какво казват родителите
+                </span>
+                <ArrowRight className="w-5 h-5 opacity-70 rotate-180" />
               </button>
             </div>
 
-            {/* Rating - СТАБИЛЕН */}
             <div className="flex items-center justify-center lg:justify-start gap-4 text-emerald-200 text-sm">
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
@@ -121,7 +139,7 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right Content - Product (Запазваме лека анимация само тук, за да привлича погледа към продукта) */}
+          {/* Right Content */}
           <div className="animate-fadeInRight flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px]">
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" />
@@ -144,7 +162,6 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce hidden md:block">
           <ArrowDown className="w-6 h-6 text-white/40" />
         </div>

@@ -49,7 +49,7 @@ export function Checkout() {
     // Проверка за избран куриер с визуален ефект вместо alert
     if (!courier) {
       setCourierError(true);
-      setTimeout(() => setCourierError(false), 20000); // Изключва ефекта след 10 сек
+      setTimeout(() => setCourierError(false), 5000); // Изключва ефекта след 5 сек
       return;
     }
 
@@ -137,7 +137,7 @@ export function Checkout() {
                 <div>
                   <Label htmlFor="fullName" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
                     <User className="w-4 h-4 text-amber-600" />
-                    Вашите три имена <span className="text-red-500">*</span>
+                    Име и Фамилия <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="fullName"
@@ -169,8 +169,9 @@ export function Checkout() {
                   </div>
                   <div>
                     <Label htmlFor="email" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                     
                       <Mail className="w-4 h-4 text-amber-600" />
-                      Имейл
+                        Имейл
                     </Label>
                     <Input
                       id="email"
@@ -180,6 +181,10 @@ export function Checkout() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
                     />
+                    {/* Текстът отива ТУК – под полето */}
+                    <p className="text-[11px] text-slate-400 font-normal italic mt-1 ml-1 leading-tight">
+                        За промоции и статус на поръчката
+                    </p>
                   </div>
                 </div>
 

@@ -61,11 +61,12 @@ export function SocialProof() {
     },
   ];
 
+  // Добавен параметър preload=1 за по-бърз старт в Gumlet
   const videoSources = [
-    "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3",
-    "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3",
-    "https://play.gumlet.io/embed/69f0b6f0a3dc19951f1982e9",
-    "https://play.gumlet.io/embed/69f0ba7f4d5bf5db18d7f83f"
+    "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3?preload=1",
+    "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3?preload=1",
+    "https://play.gumlet.io/embed/69f0b6f0a3dc19951f1982e9?preload=1",
+    "https://play.gumlet.io/embed/69f0ba7f4d5bf5db18d7f83f?preload=1"
   ];
 
   const stats = [
@@ -78,7 +79,7 @@ export function SocialProof() {
   return (
     <section 
       ref={sectionRef}
-      id="testimonials"
+      id="social-proof"
       className="section-padding bg-slate-50 overflow-hidden"
     >
       <div className="container-custom">
@@ -102,12 +103,12 @@ export function SocialProof() {
             <div key={index} className="flex flex-col items-center">
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                 <iframe
-                  loading="lazy"
+                  loading="eager" 
                   title={`Gumlet video player ${index + 1}`}
                   src={src}
                   style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
                   referrerPolicy="origin"
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture;"
                 ></iframe>
               </div>
               {/* Added Rating Stars under each video */}
