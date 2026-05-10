@@ -2,7 +2,6 @@ import { Stats } from './sections/Stats';
 import ReactPixel from 'react-facebook-pixel';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { clarity } from 'react-microsoft-clarity'; // Добавяме Clarity библиотеката
 import { Hero } from './sections/Hero';
 import { Problem } from './sections/Problem';
 import { Solution } from './sections/Solution';
@@ -62,11 +61,22 @@ function App() {
       ReactPixel.pageView();
     }
 
-    // 2. Инициализация на Microsoft Clarity
-    // Използваме твоя проектен код: wd5vkf28a7
-    clarity.init('wd5vkf28a7');
-  }, []);
-  
+    // 2. Инициализация на Microsoft Clarity (Чист метод)
+    const win = window as any;
+    if (!win.clarity) {
+      win.clarity = function() {
+        (win.clarity.q = win.clarity.q || []).push(arguments);
+      };
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = "https://www.clarity.ms/tag/wd5vkf28a7";
+      const firstScript = document.getElementsByTagName('script')[0];
+      if (firstScript && firstScript.parentNode) {
+        firstScript.parentNode.insertBefore(script, firstScript);
+      }
+    }
+  }, []); // <--- Правилно затваряне на useEffect
+
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-white overflow-x-hidden">
