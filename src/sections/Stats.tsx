@@ -40,8 +40,8 @@ export const Stats = () => {
       <div className="relative z-10 container mx-auto px-4 max-w-6xl text-white">
         {/* Заглавие на блока - Вече с Amber цвета от твоя Hero */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-black text-amber-400 tracking-tight leading-tight mb-4">
-            🏆 НАЙ-ИЗБИРАНАТА ЗАЩИТА В БЪЛГАРИЯ! 🏆
+          <h2 className="text-2xl md:text-4xl font-black text-amber-400 tracking-wide leading-relaxed mb-6 uppercase">
+            🏆 №1 ИЗБОРА НА МАЙКИТЕ В БЪЛГАРИЯ ЗА ЗДРАВИ ДЕЦА! 🏆
           </h2>
           <p className="text-lg md:text-xl text-emerald-50 font-medium max-w-2xl mx-auto opacity-90">
             Хиляди родители вече решиха проблема с болничните от градината.

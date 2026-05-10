@@ -157,9 +157,7 @@ export function Solution() {
           <p className="reveal opacity-0 text-base md:text-lg text-slate-600 leading-relaxed">
 
             Уникална комбинация от <strong>10 български билки и плодове</strong>,
-
             която подсилва имунната система по естествен начин.
-
             Без химия, без странични ефекти.
 
           </p>

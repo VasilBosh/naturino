@@ -16,6 +16,7 @@ import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
 import { StickyCTA } from './sections/StickyCTA';
 import { Terms } from './Pages/Terms';
+import { Privacy } from './Pages/Privacy';
 import './App.css';
 
 // КОМПОНЕНТ ЗА ГЛАВНАТА СТРАНИЦА
@@ -75,6 +76,9 @@ function App() {
           
           {/* Път за условията за ползване */}
           <Route path="/terms" element={<Terms />} />
+          
+          {/* Път за политиката за поверителност */}
+          <Route path="/privacy" element={<Privacy />} />
         </Routes>
         <Footer />
       </div>

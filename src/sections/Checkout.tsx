@@ -1,4 +1,4 @@
-import ReactPixel from 'react-facebook-pixel';
+/* import ReactPixel from 'react-facebook-pixel'; */
 import { useEffect, useRef, useState} from 'react';
 import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus, Ticket } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
@@ -55,14 +55,25 @@ export function Checkout() {
 
     const currentTotal = Number(totalPrice);
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-
-    ReactPixel.track('Purchase', {
+    
+    // Оптимизиран Тракинг
+  if (typeof window !== 'undefined' && (window as any).fbq) {
+    // Пращаме Advanced Matching данни при Purchase за по-добро разпознаване
+    (window as any).fbq('track', 'Purchase', {
       value: currentTotal,
-      currency: 'EUR',
+      currency: 'EUR', 
       content_name: 'Naturino Kids',
       content_type: 'product',
       num_items: quantity,
-      eventID: eventId });
+      // Добавяме хеширани данни за по-висока точност (Match Quality)
+      external_id: eventId,
+      em: formData.email ? formData.email.toLowerCase().trim() : '',
+      ph: formData.phone.replace(/\s+/g, ''),
+      fn: formData.fullName.split(' ')[0].toLowerCase().trim(),
+      ln: formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim()
+    }, { eventID: eventId });
+  }
+
 
     setSubmitted(true);
 

@@ -149,9 +149,11 @@ export function Footer() {
                 Условия за ползване
               
                 </Link>
-              <a href="#" className="text-slate-500 hover:text-emerald-400 transition-colors text-xs md:text-sm">
+                  
+              <Link to="/privacy" 
+              className="text-slate-500 hover:text-emerald-400 transition-colors text-xs md:text-sm">
                 Политика за поверителност
-              </a>
+              </Link>
             </div>
           </div>
         </div>

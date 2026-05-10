@@ -166,6 +166,24 @@ export function Hero() {
           <ArrowDown className="w-6 h-6 text-white/40" />
         </div>
       </div>
+                {/* Премахваме opacity-0 и добавяме малко padding и относителна позиция, за да излезе над фоновете */}
+<div className="relative z-10 container-custom pb-20 text-center lg:text-left text-white/90">
+  <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
+    <p className="mb-4">
+      Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
+      която подсилва имунната система по естествен начин.
+      Без химия, без странични ефекти.
+    </p>
+
+    <p className="font-bold">
+      <strong className="text-amber-300">Знаете ли защо е толкова ефективен? </strong>
+      Защото работи в синергия с естествените защитни механизми на тялото, а не ги потиска.
+      Когато продуктът е естествен, тялото го приема като храна, а не като лекарство, 
+      поради това и резултатите са толкова бързи и трайни. 
+      <strong className="text-amber-300"> Това е ключът към здравето и щастието на вашето дете!</strong>
+    </p>
+  </div>
+</div>
     </section>
   );
 }
