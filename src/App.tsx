@@ -51,8 +51,9 @@ function LandingPage() {
 // ОСНОВНИЯТ APP КОМПОНЕНТ
 function App() {
   useEffect(() => {
-    // 1. Инициализация на Facebook Pixel
+    // 1. Инициализация на Facebook Pixel чрез .env файла
     const pixelId = import.meta.env.VITE_FB_PIXEL_ID;
+    
     if (pixelId) {
       ReactPixel.init(pixelId, undefined, {
         autoConfig: true,
@@ -61,7 +62,7 @@ function App() {
       ReactPixel.pageView();
     }
 
-    // 2. Инициализация на Microsoft Clarity (Чист метод)
+    // 2. Инициализация на Microsoft Clarity
     const win = window as any;
     if (!win.clarity) {
       win.clarity = function() {
@@ -75,19 +76,21 @@ function App() {
         firstScript.parentNode.insertBefore(script, firstScript);
       }
     }
-  }, []); // <--- Правилно затваряне на useEffect
+  }, []);
+
+  // Слушател за промяна на URL адреса (за тракинг на /terms и /privacy)
+  useEffect(() => {
+    if (import.meta.env.VITE_FB_PIXEL_ID) {
+      ReactPixel.pageView();
+    }
+  }, [window.location.pathname]);
 
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-white overflow-x-hidden">
         <Routes>
-          {/* Път за главната страница */}
           <Route path="/" element={<LandingPage />} />
-          
-          {/* Път за условията за ползване */}
           <Route path="/terms" element={<Terms />} />
-          
-          {/* Път за политиката за поверителност */}
           <Route path="/privacy" element={<Privacy />} />
         </Routes>
         <Footer />
@@ -95,5 +98,4 @@ function App() {
     </BrowserRouter>
   );
 }
-
 export default App;

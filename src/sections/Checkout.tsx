@@ -79,6 +79,7 @@ export function Checkout() {
 
     const orderData = {
       ...formData,
+      phone: formData.phone.replace(/\s+/g, ''), // Почистваме телефона за скрипта
       quantity: quantity,
       total: currentTotal,
       courier: courier === 'speedy' ? 'Speedy' : (courier === 'econt' ? 'ЕКОНТ' : 'Неизбран'),
@@ -90,10 +91,10 @@ export function Checkout() {
 
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
 
+    // КОРИГИРАН FETCH (премахнато no-cors)
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(orderData),
     }).catch(error => console.error('Background sync error:', error));
     
@@ -180,9 +181,9 @@ export function Checkout() {
                   </div>
                   <div>
                     <Label htmlFor="email" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
-                     
+                      
                       <Mail className="w-4 h-4 text-amber-600" />
-                        Имейл
+                         Имейл
                     </Label>
                     <Input
                       id="email"
@@ -313,11 +314,11 @@ export function Checkout() {
                       </button>
                     </div>
                     <div className="text-right">
-                       <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
-                       <p className={`font-bold ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
-                         {isPromoValid ? <span className="line-through text-slate-300 mr-1 text-xs">19.90</span> : null}
-                         {pricePerUnit} €
-                       </p>
+                        <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
+                        <p className={`font-bold ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
+                          {isPromoValid ? <span className="line-through text-slate-300 mr-1 text-xs">19.90</span> : null}
+                          {pricePerUnit} €
+                        </p>
                     </div>
                   </div>
                 </div>
