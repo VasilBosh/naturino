@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Quote, CheckCircle2 } from 'lucide-react';
 
 export function PharmacistReview() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  // Държи сметка дали потребителят е доближил секцията, за да зареди видеото
+  const [loadVideo, setLoadVideo] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -10,10 +12,11 @@ export function PharmacistReview() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate-fadeInUp');
+            setLoadVideo(true); // Потребителят е близо, пускаме зареждането
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '400px 0px' } // Започва зареждането 400px преди секцията да влезе в екрана
     );
 
     const elements = sectionRef.current?.querySelectorAll('.reveal');
@@ -39,14 +42,22 @@ export function PharmacistReview() {
             <div className="relative overflow-hidden rounded-[2rem] shadow-2xl border-8 border-white bg-emerald-900">
               {/* Gumlet Video Embed */}
               <div style={{ position: 'relative', aspectRatio: '1/1' }}>
-                <iframe
-                  loading="lazy"
-                  title="Gumlet video player"
-                  src="https://play.gumlet.io/embed/69f06036a3dc19951f0ff028?autoplay=true&muted=true&preload=true&playsinline=1"
-                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
-                  referrerPolicy="origin"
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
-                ></iframe>
+                {loadVideo ? (
+                  <iframe
+                    loading="lazy"
+                    title="Gumlet video player"
+                    // Премахнат е първоначалният тежък preload, активира се динамично чрез React
+                    src="https://play.gumlet.io/embed/69f06036a3dc19951f0ff028?autoplay=true&muted=true&playsinline=1"
+                    style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+                    referrerPolicy="origin"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write;"
+                  ></iframe>
+                ) : (
+                  // Лек плейсхолдър с пулсираща анимация, докато потребителят скролира до тук
+                  <div className="absolute inset-0 bg-emerald-950 animate-pulse flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full border-4 border-emerald-500/30 border-t-emerald-400 animate-spin" />
+                  </div>
+                )}
               </div>
 
               {/* Текстът под видеото, оставащ вътре в бялата рамка */}
@@ -88,7 +99,7 @@ export function PharmacistReview() {
             </div>
 
             <ul className="space-y-3">
-              {['Одобрен от фармацевтите в Аптеки Апостолов', 'Препоръчан от педиатри', 'Без странични ефекти'].map((item, i) => (
+              {['Одобрен от фармацевтите in Аптеки Апостолов', 'Препоръчан от педиатри', 'Без странични ефекти'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-slate-700 font-large font-bold">
                   <CheckCircle2 className="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" />
                   <span className="text-sm md:text-base">{item}</span>
