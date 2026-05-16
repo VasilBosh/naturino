@@ -13,6 +13,7 @@ import { Guarantee } from './sections/Guarantee';
 import { FAQ } from './sections/FAQ';
 import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
+import { FloatingChat } from './sections/FloatingChat';
 import { StickyCTA } from './sections/StickyCTA';
 import { Terms } from './Pages/Terms';
 import { Privacy } from './Pages/Privacy';
@@ -32,6 +33,7 @@ function LandingPage() {
 
   return (
     <>
+      <FloatingChat />
       <Hero />
       <Stats />
       <Problem />
