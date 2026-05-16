@@ -1,25 +1,42 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Star, Quote, MessageCircle } from 'lucide-react';
 
 export function SocialProof() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  // Държи сметка дали потребителят е доближил секцията или е задействал зареждането
+  const [shouldLoadVideos, setShouldLoadVideos] = useState(false);
 
   useEffect(() => {
+    // 1. Активиране, ако потребителят скролира близо до секцията
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate-fadeInUp');
+            setShouldLoadVideos(true); // Пускаме видеата
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '300px 0px' } // Започва да зарежда 300px преди да се види на екрана
     );
 
     const elements = sectionRef.current?.querySelectorAll('.reveal');
     elements?.forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
+    // 2. Активиране веднага, ако се кликне бутона в Hero секцията (преди скролът да е завършил)
+    const handleHeroButtonClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a[href="#social-proof"]') || target.closest('button')) {
+        setShouldLoadVideos(true);
+      }
+    };
+
+    window.addEventListener('click', handleHeroButtonClick);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('click', handleHeroButtonClick);
+    };
   }, []);
 
   const testimonials = [
@@ -61,12 +78,12 @@ export function SocialProof() {
     },
   ];
 
-  // Добавен параметър preload=1 за по-бърз старт в Gumlet
+  // Премахнато preload=1 за да не "души" началната скорост на сайта
   const videoSources = [
-    "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3?preload=1",
-    "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3?preload=1",
-    "https://play.gumlet.io/embed/69f0b6f0a3dc19951f1982e9?preload=1",
-    "https://play.gumlet.io/embed/69f0ba7f4d5bf5db18d7f83f?preload=1"
+    "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3",
+    "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3",
+    "https://play.gumlet.io/embed/69f0b6f0a3dc19951f1982e9",
+    "https://play.gumlet.io/embed/69f0ba7f4d5bf5db18d7f83f"
   ];
 
   const stats = [
@@ -101,15 +118,20 @@ export function SocialProof() {
         <div className="reveal opacity-0 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-16 max-w-4xl mx-auto">
           {videoSources.map((src, index) => (
             <div key={index} className="flex flex-col items-center">
-              <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-                <iframe
-                  loading="eager" 
-                  title={`Gumlet video player ${index + 1}`}
-                  src={src}
-                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
-                  referrerPolicy="origin"
-                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture;"
-                ></iframe>
+              <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-slate-200">
+                {shouldLoadVideos ? (
+                  <iframe
+                    loading="lazy" 
+                    title={`Gumlet video player ${index + 1}`}
+                    src={src}
+                    style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+                    referrerPolicy="origin"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture;"
+                  ></iframe>
+                ) : (
+                  // Плейсхолдър с лек цвят, докато се активира скриптът при първия клик/скрол
+                  <div className="absolute inset-0 bg-slate-100 animate-pulse" />
+                )}
               </div>
               {/* Added Rating Stars under each video */}
               <div className="mt-4 text-center">

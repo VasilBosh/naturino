@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'; // Добавен useEffect
+import { useRef, useEffect } from 'react';
 import { Shield, Leaf, Star, Phone, ArrowDown, Award, ArrowRight, ShoppingCart } from 'lucide-react';
 
 export function Hero() {
@@ -29,6 +29,13 @@ export function Hero() {
 
   const scrollToSocialProof = () => {
     document.getElementById('social-proof')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Предварително активиране на зареждането на видеата, щом потребителят докосне или доближи бутона
+  const triggerVideoPreload = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('preload-videos'));
+    }
   };
 
   return (
@@ -119,6 +126,8 @@ export function Hero() {
               
               <button 
                 onClick={scrollToSocialProof}
+                onMouseEnter={triggerVideoPreload}
+                onTouchStart={triggerVideoPreload}
                 className="btn-cta-secondary w-full max-w-[400px] flex items-center justify-center gap-2 whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
               > 
                 <ArrowRight className="w-5 h-5 opacity-70" />
@@ -149,6 +158,8 @@ export function Hero() {
                   alt="Naturino Kids - Натурална защита за Деца"
                   className="w-full h-auto rounded-xl md:rounded-2xl"
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="sync"
                 />
                 <div className="absolute -bottom-2 -right-2 md:-bottom-3 md:-right-3 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20">
                   <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
@@ -166,24 +177,25 @@ export function Hero() {
           <ArrowDown className="w-6 h-6 text-white/40" />
         </div>
       </div>
-                {/* Премахваме opacity-0 и добавяме малко padding и относителна позиция, за да излезе над фоновете */}
-<div className="relative z-10 container-custom pb-20 text-center lg:text-left text-white/90">
-  <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
-    <p className="mb-4">
-      Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
-      която подсилва имунната система по естествен начин.
-      Без химия, без странични ефекти.
-    </p>
 
-    <p className="font-bold">
-      <strong className="text-amber-300">Знаете ли защо е толкова ефективен? </strong>
-      Защото работи в синергия с естествените защитни механизми на тялото, а не ги потиска.
-      Когато продуктът е естествен, тялото го приема като храна, а не като лекарство, 
-      поради това и резултатите са толкова бързи и трайни. 
-      <strong className="text-amber-300"> Това е ключът към здравето и щастието на вашето дете!</strong>
-    </p>
-  </div>
-</div>
+      {/* Текстова секция в дъното на Hero */}
+      <div className="relative z-10 container-custom pb-20 text-center lg:text-left text-white/90">
+        <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
+          <p className="mb-4">
+            Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
+            която подсилва имунната система по естествен начин.
+            Без химия, без странични ефекти.
+          </p>
+
+          <p className="font-bold">
+            <strong className="text-amber-300">Знаете ли защо е толкова ефективен? </strong>
+            Защото работи в синергия с естествените защитни механизми на тялото, а не ги потиска.
+            Когато продуктът е естествен, тялото го приема как храна, а не как лекарство, 
+            поради това и резултатите са толкова бързи и трайни. 
+            <strong className="text-amber-300"> Това е ключът към здравето и щастието на вашето дете!</strong>
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
