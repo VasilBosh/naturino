@@ -65,7 +65,7 @@ export function PharmacistReview() {
           </div>
 
           {/* Текст и Цитат */}
-          <div className="reveal opacity-0 space-y-6 md:space-y-8 order-1 lg:order-2">
+          <div className="text-center reveal opacity-0 space-y-6 md:space-y-8 order-1 lg:order-2">
             <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-bold">
               <CheckCircle2 className="w-4 h-4" />
               Професионално Одобрение
