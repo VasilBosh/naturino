@@ -5,7 +5,7 @@ export function FloatingChat() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-24 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-20 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
       {/* Опциите (Messenger и Viber) */}
       <div 
         className={`flex flex-col items-center gap-3 transition-all duration-300 ease-in-out transform ${
@@ -19,10 +19,10 @@ export function FloatingChat() {
           href="https://m.me/61578127216995"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0084FF] text-white shadow-lg hover:scale-110 transition-transform"
+          className="flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-[#0084FF] text-white shadow-lg hover:scale-110 transition-transform"
           aria-label="Messenger"
         >
-          <svg className="h-7 w-7 fill-current" viewBox="0 0 24 24">
+          <svg className="h-7 w-7 md:h-9 md:w-9 fill-current" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.14 2 11.25c0 2.91 1.45 5.49 3.72 7.12V22l3.44-1.89c.89.25 1.83.39 2.84.39 5.52 0 10-4.14 10-9.25S17.52 2 12 2zm1.09 11.96l-2.55-2.72-4.97 2.72 5.46-5.8 2.61 2.72 4.91-2.72-5.46 5.8z"/>
           </svg>
         </a>
@@ -35,14 +35,15 @@ export function FloatingChat() {
           className="flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
           aria-label="Viber"
         >
-          <img src="images/viber.png" alt="Viber" className="h-12 w-auto block" />
+          {/* Сега иконката е по-голяма на компютър (md:h-20), но запазва формата си */}
+          <img src="images/viber.png" alt="Viber" className="h-12 md:h-16 w-auto block object-contain" />
         </a>
       </div>
 
       {/* Основно 3D балонче - С комбинирана мазна анимация (Плуване + Поклащане) */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="flex h-12 w-12 items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex h-16 w-16 md:h-16 md:w-16 items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           // Създаваме динамична анимация на място (inline)
           animation: !isMenuOpen ? 'combined-float-wiggle 10s ease-in-out infinite' : 'none'
@@ -50,8 +51,8 @@ export function FloatingChat() {
         aria-label="Toggle menu"
       >
         {isMenuOpen ? (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#33bb5a] text-white transition-transform duration-300 rotate-90">
-            <X className="w-6 h-6 stroke-[2.5]" />
+          <div className="flex h-7 w-7 md:h-7 md:w-7 items-center justify-center rounded-full bg-[#ff6446] text-white transition-transform duration-300 rotate-90">
+            <X className="w-6 h-6 md:w-6 md:h-6 stroke-[2.5]" />
           </div>
         ) : (
           <img src="images/message.png" alt="Чат" className="h-full w-full object-contain block" />
