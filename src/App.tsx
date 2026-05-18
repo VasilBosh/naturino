@@ -1,5 +1,6 @@
-import { Stats } from './sections/Stats';
 import ReactPixel from 'react-facebook-pixel';
+import TrustBadges from './sections/TrustBadges';
+import { Stats } from './sections/Stats';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Hero } from './sections/Hero';
@@ -44,6 +45,7 @@ function LandingPage() {
       <SocialProof />
       <Guarantee />
       <FAQ />
+      <TrustBadges />
       <Checkout />
       {showSticky && <StickyCTA />}
     </>
