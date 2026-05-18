@@ -110,7 +110,7 @@ export function Problem() {
                 "Ние сме семейство от Казанлък с две деца, което премина през едно от най-трудните изпитания за всеки родител – <strong className="text-emerald-700">постоянно боледуващо дете и безкрайни притеснения</strong>. Опитахме всичко – сиропи, витамини, различни подходи, но резултатите бяха временни или липсваха."
               </p>
               <p className="text-sm md:text-base lg:text-lg text-slate-700 leading-relaxed italic">
-                "Това ни подтикна да потърсим по-дълбо решение и да създадем <strong className="text-emerald-700">натурален продукт</strong>, на който истински вярваме и който днес помага на много други семейства."
+                "Това ни подтикна да потърсим по-дълбоко решение и да създадем <strong className="text-emerald-700">натурален продукт</strong>, на който истински вярваме и който днес помага на много други семейства."
               </p>
               <div className="mt-6 flex items-center justify-center md:justify-start gap-3">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base shrink-0">

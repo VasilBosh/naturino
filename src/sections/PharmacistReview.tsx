@@ -87,8 +87,8 @@ export function PharmacistReview() {
               </div>
             </div>
 
-            <ul className="space-y-3">
-              {['Одобрен от фармацевтите in Аптеки Апостолов', 'Препоръчан от педиатри', 'Без странични ефекти'].map((item, i) => (
+            <ul className="space-y-3 text-left max-w-md mx-auto sm:mx-0">
+              {['Одобрен от фармацевтите в Аптеки Апостолов', 'Препоръчан от педиатри', 'Без странични ефекти'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-slate-700 font-large font-bold">
                   <CheckCircle2 className="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" />
                   <span className="text-sm md:text-base">{item}</span>
