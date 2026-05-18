@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { Shield, Leaf, Star, Phone, ArrowDown, Award, ArrowRight, ShoppingCart } from 'lucide-react';
+import { Shield, Leaf, Star, Phone, ArrowDown, Award, ShoppingCart } from 'lucide-react';
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -113,28 +113,28 @@ export function Hero() {
             </div>
 
             {/* Обвиващият контейнер */}
-            <div className="flex flex-col gap-5 items-center lg:items-start mb-6 md:mb-8">
+            <div className="flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
+              {/* Първият бутон - Поръчай сега */}
               <button 
                 onClick={scrollToCheckout}
-                className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[400px]"
+                className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[340px]"
               >
-                <ShoppingCart className="w-6 h-6 md:w-8 md:h-8" />
+                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
                 <span>ПОРЪЧАЙ СЕГА</span>
-                <span className="cta-price ml-2">19.90€</span>
-                <ArrowRight className="cta-arrow w-5 h-5 md:w-6 md:h-6" />
+                <span className="cta-price ml-1">19.90€</span>
               </button>
               
+              {/* Вторият бутон - Виж какво казват родителите */}
               <button 
                 onClick={scrollToSocialProof}
                 onMouseEnter={triggerVideoPreload}
                 onTouchStart={triggerVideoPreload}
-                className="btn-cta-secondary w-full max-w-[400px] flex items-center justify-center gap-2 whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
+                className="btn-cta-secondary w-full max-w-[340px] flex items-center justify-center whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
               > 
-                <ArrowRight className="w-5 h-5 opacity-70" />
-                <span className="font-bold text-sm md:text-base uppercase tracking-tight">
+                {/* Премахнахме и двете икони ArrowRight оттук */}
+                <span className="font-bold text-sm sm:text-sm uppercase tracking-tight">
                     Виж какво казват родителите
                 </span>
-                <ArrowRight className="w-5 h-5 opacity-70 rotate-180" />
               </button>
             </div>
 
