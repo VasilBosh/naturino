@@ -41,40 +41,46 @@ export function SocialProof() {
 
   const testimonials = [
     {
-      name: 'Мария Петрова',
+      name: 'Мария Личева',
       role: 'Майка на 5-годишно дете',
-      content: 'Откакто давам Naturino Kids на дъщеря ми, тя боледува много по-рядко. Преди беше постоянно болна, а сега е пълна с енергия!',
+      content: 'Откакто давам Naturino Kids на дъщеря ми, тя боледува много по-рядко. Преди беше постоянно болна, а сега е пълна с енергия! Препоръчвам го на всички родители!',
       rating: 5,
+      avatar: 'https://randomuser.me/api/portraits/women/13.jpg',
     },
     {
-      name: 'Иван Стоянов',
+      name: 'Иван Пенчев',
       role: 'Баща на близнаци',
-      content: 'Пробвахме много продукти, но този наистина работи. Децата ми вече не пропускат детска градина заради болести. Препоръчвам!',
+      content: 'Пробвахме много уж натурални продукти, но без трайни резултати. Благодаря на Пламена за уникалния продукт. Децата ми вече не пропускат детска градина заради болести. Препоръчвам!',
       rating: 5,
+      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
     },
     {
       name: 'Анна Димитрова',
       role: 'Майка на 3-годишно дете',
-      content: 'Лекарят ни препоръча Naturino Kids и сме много доволни. Естествен продукт, който наистина помага на имунитета.',
+      content: 'Педиатърката ни препоръча Naturino Kids и сме много доволни. Естествен продукт, който наистина помага на имунитета. Давам го редовно и виждам голяма разлика в здравето на сина ми. Препоръчвам го на всички родители, които търсят натурална подкрепа за децата си!',
       rating: 5,
+      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
     },
     {
-      name: 'Петър Иванов',
+      name: 'Петър Филчев',
       role: 'Баща на 7-годишно дете',
-      content: 'Синът ми беше постоянно с хрема и кашлица. След 2 месеца с Naturino Kids разликата е огромна. Благодаря!',
+      content: 'Синът ми беше постоянно с хрема и кашлица. След 1 месец с Naturino Kids разликата е огромна. Лесно се дозира, както ми препоръчаха по телефона директно под езика и резултатите дойдоха много бързо. Благодаря!',
       rating: 5,
+      avatar: 'https://randomuser.me/api/portraits/men/7.jpg',
     },
     {
-      name: 'Елена Николова',
+      name: 'Елена Николова - Данова',
       role: 'Майка на две деца',
-      content: 'Давам го и на двете си деца вече половин година. Резултатите са невероятни - здрави и жизнени деца!',
+      content: 'Давам го и на двете си деца вече половин година. Резултатите са невероятни - здрави и жизнени деца без следа от болести! Препоръчвам го на всички родители!',
       rating: 5,
+      avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
     },
     {
-      name: 'Георги Петров',
+      name: 'Георги Стефанов Миланов',
       role: 'Баща на 4-годишно дете',
-      content: 'Фармацевтът в Аптеки Апостолов ни препоръча този продукт. Много сме доволни от ефекта!',
+      content: 'Фармацевтът в Аптеки Апостолов ни препоръча този продукт. Супер е че е достъпен и там. Много сме доволни от ефекта и благодаря на Пламена от Натурино за уникалния продукт!',
       rating: 5,
+      avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
     },
   ];
 
@@ -87,7 +93,7 @@ export function SocialProof() {
   ];
 
   const stats = [
-    { value: '4000+', label: 'Доволни родители' },
+    { value: '4,760+', label: 'Доволни родители' },
     { value: '4.9/5', label: 'Среден рейтинг' },
     { value: '95%', label: 'Препоръчват продукта' },
     { value: '10', label: 'Натурални билки' },
@@ -178,9 +184,11 @@ export function SocialProof() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base">
-                    {testimonial.name.charAt(0)}
-                  </div>
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.name}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-emerald-100"
+                  />
                   <div>
                     <p className="font-semibold text-slate-900 text-sm md:text-base">{testimonial.name}</p>
                     <p className="text-slate-500 text-xs md:text-sm">{testimonial.role}</p>
