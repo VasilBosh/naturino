@@ -326,7 +326,7 @@ export function Checkout() {
                 {/* Total Summary Box */}
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 border border-amber-200 shadow-inner mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-slate-600 font-medium">Общо за плащане:</span>
+                    <span className="text-slate-600 font-medium">Общо:</span>
                     <span className={`text-2xl font-black ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>{totalPrice} €</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
@@ -348,6 +348,16 @@ export function Checkout() {
 
           {/* Right Side - Benefits & Product Info */}
           <div className="reveal opacity-0 space-y-4 md:space-y-6">
+            
+            {/* ⬇️ НОВ КОД — КУРИЕР ЛОГА ⬇️ */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-center gap-4 md:gap-6">
+                <img src="/logo/speedy-logo.png" alt="Speedy" className="h-12 md:h-16 w-auto object-contain" />
+                <img src="/logo/ekont-logo.png" alt="Еконт" className="h-11 md:h-16 w-auto object-contain" />
+              </div>
+            </div>
+            {/* ⬆️ КРАЙ ⬆️ */}
+          
             <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-6 md:p-8 border border-emerald-100 shadow-sm">
               <h3 className="text-emerald-900 font-bold mb-6 flex items-center gap-2">
                 <Shield className="w-5 h-5" /> Защо да ни се доверите?
@@ -384,15 +394,6 @@ export function Checkout() {
                 <p className="text-emerald-600 font-bold text-xl mt-1">19.90 €</p>
               </div>
             </div>
-                      {/* ⬇️ НОВ КОД — КУРИЕР ЛОГА ⬇️ */}
-            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-              <div className="flex items-center justify-center gap-4 md:gap-6">
-                <img src="/logo/speedy-logo.png" alt="Speedy" className="h-12 md:h-16 w-auto object-contain" />
-                <img src="/logo/ekont-logo.png" alt="Еконт" className="h-12 md:h-16 w-auto object-contain" />
-              </div>
-            </div>
-            {/* ⬆️ КРАЙ ⬆️ */}
-
           </div>
         </div>
       </div>

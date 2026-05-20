@@ -1,6 +1,7 @@
 import ReactPixel from 'react-facebook-pixel';
 import TrustBadges from './sections/TrustBadges';
 import TrustHero from './sections/TrustHero';
+import { Story } from './sections/Story';
 import { Stats } from './sections/Stats';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -38,12 +39,13 @@ function LandingPage() {
       <FloatingChat />
       <Hero />
       <TrustHero />
-      <Stats />
       <Problem />
       <Solution />
       <PharmacistReview />
       <Benefits />
       <Ingredients />
+      <Story />
+      <Stats />
       <SocialProof />
       <Guarantee />
       <FAQ />
