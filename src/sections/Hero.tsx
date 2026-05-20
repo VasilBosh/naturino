@@ -163,11 +163,11 @@ export function Hero() {
                 />
 
                                 {/* ⬇️ НОВ КОД — СЛОЖИ ТУК ⬇️ */}
-                  <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4 border border-white/20">
+                  <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
                     <div className="flex items-center justify-center gap-3 mb-2">
-                      <img src="/logo/speedy-logo.png" alt="Speedy" className="h-7 md:h-8 w-auto object-contain bg-white rounded-lg px-2 py-1" />
+                      <img src="/logo/speedy-logo.png" alt="Speedy" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                       <span className="text-white/60 text-xs">или</span>
-                      <img src="/logo/ekont-logo.png" alt="Еконт" className="h-7 md:h-8 w-auto object-contain bg-white rounded-lg px-2 py-1" />
+                      <img src="/logo/ekont-logo.png" alt="Еконт" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                     </div>
                     <div className="text-center space-y-1">
                       <p className="text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2">
@@ -181,7 +181,7 @@ export function Hero() {
                   </div>
                   {/* ⬆️ КРАЙ НА НОВИЯ КОД ⬆️ */}
 
-                <div className="absolute -right-2 md:bottom-38 md:-right-3 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20" style={{ bottom: '124px' }}>
+                <div className="absolute -right-4 md:bottom-50 md:-right-5 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20" style={{ bottom: '124px' }}>
                   <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
                   <p className="text-lg md:text-xl font-black italic">19.90€</p>
                 </div>
