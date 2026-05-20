@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
-  const [courier, setCourier] = useState<'speedy' | 'econt' | null>(null);
+  const [courier, setCourier] = useState<'speedy' | 'econt'>('speedy');
   const [courierError, setCourierError] = useState(false); // НОВО: за визуалната грешка
   const [formData, setFormData] = useState({
     fullName: '',
@@ -107,7 +107,7 @@ export function Checkout() {
       notes: '',
       promoCode: '',
     });
-    setCourier(null); // Нулиране на куриера след успешна поръчка
+    setCourier('speedy'); // Нулиране на куриера след успешна поръчка
   };
 
   return (
@@ -384,6 +384,15 @@ export function Checkout() {
                 <p className="text-emerald-600 font-bold text-xl mt-1">19.90 €</p>
               </div>
             </div>
+                      {/* ⬇️ НОВ КОД — КУРИЕР ЛОГА ⬇️ */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-center gap-4 md:gap-6">
+                <img src="/logo/speedy-logo.png" alt="Speedy" className="h-12 md:h-16 w-auto object-contain" />
+                <img src="/logo/ekont-logo.png" alt="Еконт" className="h-12 md:h-16 w-auto object-contain" />
+              </div>
+            </div>
+            {/* ⬆️ КРАЙ ⬆️ */}
+
           </div>
         </div>
       </div>
