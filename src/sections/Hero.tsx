@@ -99,7 +99,7 @@ export function Hero() {
             </h2>
 
             <p className="text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              <strong className="text-white">100% натурален имуностимулатор</strong> с 10 български билки. 
+              <strong className="text-white">100% натурални билкови капки</strong> с 10 български билки. 
               Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов</strong>.
             </p>
 
