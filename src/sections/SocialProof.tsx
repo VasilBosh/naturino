@@ -371,7 +371,7 @@ export function SocialProof() {
                 <div>
                   <div className="bg-[#f0f2f5] px-3 py-2 rounded-2xl text-slate-800">
                     <span className="font-bold text-[#050505] block mb-0.5 hover:underline cursor-pointer">Радостина Хаджиева</span>
-                    Потвърждавам за състава! Аз лично питах Пламена на съобщение, защото моето е със силен рефлукс и атопичен дерматит. Няма никаква захар, чист извлек е. Малкият го пие с кеф и кожата му е супер, а имунитета се заздрави видимо.
+                    Потвърждавам за състава! Аз лично питах Пламена на съобщение, защото моето много лесно хващаше вируси и стомахчето му е чувствително. Няма никаква захар, чист извлек е. Малката го пие с кеф и вече трети месец не е отсъствала от яслата, а имунитета и се заздрави видимо. Пламена ми каза, че го дава да децата и вече година и половина без да го спират и мисля и аз да процедирам така.
                   </div>
                   <div className="text-slate-500 text-[12px] mt-1 pl-2 font-semibold">
                     <span className="hover:underline cursor-pointer text-slate-600">Like</span> · <span className="hover:underline cursor-pointer text-slate-600">Reply</span> · <span>1w</span>
