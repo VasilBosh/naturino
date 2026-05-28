@@ -1,6 +1,7 @@
 import ReactPixel from 'react-facebook-pixel';
 import TrustBadges from './sections/TrustBadges';
 import ComparisonSection from './sections/ComparisonSection';
+import IntentPopup from './sections/IntentPopup';
 import TrustHero from './sections/TrustHero';
 import { Story } from './sections/Story';
 import { Stats } from './sections/Stats';
@@ -53,7 +54,9 @@ function LandingPage() {
       <FAQ />     
       <TrustBadges />
       <Checkout />
+      <IntentPopup />
       {showSticky && <StickyCTA />}
+      
     </>
   );
 }

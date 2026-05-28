@@ -38,8 +38,34 @@ export function Checkout() {
     return () => observer.disconnect();
   }, []);
 
+  // Слушател за автоматично попълване на кода от попъпа - ново добавено
+  const [validPopupCode, setValidPopupCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleAutoDiscount = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const popupCode = customEvent.detail;
+      if (popupCode) {
+        const cleanCode = popupCode.trim().toUpperCase();
+        setValidPopupCode(cleanCode); // Запаметяваме истинския код (напр. NAT7-YVYV)
+        setFormData((prev) => ({ ...prev, promoCode: cleanCode }));
+      }
+    };
+
+    window.addEventListener('NaturinoApplyDiscount', handleAutoDiscount);
+    return () => window.removeEventListener('NaturinoApplyDiscount', handleAutoDiscount);
+  }, []);
+
   // ЛОГИКА ЗА ЦЕНАТА И ПРОМО КОДА
-  const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO11';
+  //const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO11';
+
+  const cleanPromoInput = formData.promoCode.trim().toUpperCase();
+  const isStaticPromo = cleanPromoInput === 'PROMO11';
+  // Проверяваме дали написаното съвпада ТОЧНО с кода, дошъл от попъпа
+  const isDynamicPromo = validPopupCode ? cleanPromoInput === validPopupCode : false;
+  const isPromoValid = isStaticPromo || isDynamicPromo;
+
+
   const pricePerUnit = isPromoValid ? 18.50 : 19.90; // 7% отстъпка от 19.90 е 18.50
   const totalPrice = (pricePerUnit * quantity).toFixed(2);
 
@@ -77,6 +103,7 @@ export function Checkout() {
 
     setSubmitted(true);
 
+    localStorage.setItem('naturino_buyer', 'true');
     const orderData = {
       ...formData,
       phone: formData.phone.replace(/\s+/g, ''), // Почистваме телефона за скрипта

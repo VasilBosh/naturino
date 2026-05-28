@@ -65,10 +65,10 @@ export const ComparisonSection: React.FC = () => {
             ⚠️ Родителски избор 
           </span>
           <h2 className="text-3xl md:text-5xl font-black mt-4 tracking-tight max-w-3xl mx-auto leading-tight bg-gradient-to-r from-emerald-700 via-amber-600 to-emerald-600 bg-clip-text text-transparent animate-pulse">
-            Спри! Замислял ли си се какво НАИСТИНА влиза в тялото на детето ти?
+            Спри за 5 секунди и прочети! Замислял ли си се какво НАИСТИНА влиза в тялото на детето ти?
           </h2>
           <p className="mt-4 text-slate-500 font-medium text-sm md:text-base max-w-xl mx-auto">
-            Повечето продукти обещават бързо здраве, но крият компромиси. Избери категория и сравни за 5 секунди:
+            Повечето продукти обещават бързо здраве, но крият рискове. Избери категория и сравни за 5 секунди:
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export const ComparisonSection: React.FC = () => {
           
           {/* Визуален индикатор/Подкана за кликане */}
           <div className="flex justify-center items-center gap-1 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-3">
-            <span>👉</span> Кликни, за да тестваш и сравниш <span>👇</span>
+            <span>👉</span> Кликни, за да видиш и сравниш <span>👇</span>
           </div>
 
           {/* Бутони (Табове) - Вече ясно личи, че са бутони */}
