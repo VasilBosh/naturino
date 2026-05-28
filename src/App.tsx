@@ -1,5 +1,6 @@
 import ReactPixel from 'react-facebook-pixel';
 import TrustBadges from './sections/TrustBadges';
+import ComparisonSection from './sections/ComparisonSection';
 import TrustHero from './sections/TrustHero';
 import { Story } from './sections/Story';
 import { Stats } from './sections/Stats';
@@ -41,6 +42,7 @@ function LandingPage() {
       <TrustHero />
       <Problem />
       <Solution />
+      <ComparisonSection />
       <PharmacistReview />
       <Benefits />
       <Ingredients />
@@ -48,7 +50,7 @@ function LandingPage() {
       <Stats />
       <SocialProof />
       <Guarantee />
-      <FAQ />
+      <FAQ />     
       <TrustBadges />
       <Checkout />
       {showSticky && <StickyCTA />}
