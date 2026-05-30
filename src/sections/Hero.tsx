@@ -255,7 +255,7 @@ export function Hero() {
                         <div className="flex items-center justify-center w-10 h-3.5 rounded-full">
                           <span className="text-white text-[14px] leading-none">❤️😮</span>
                         </div>
-                        <span className="text-gray-500 font-semibold text-[11px]">982</span>
+                        <span className="text-gray-500 font-semibold text-[11px]">82</span>
                       </div>
                     </div>
 
