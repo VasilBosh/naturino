@@ -153,9 +153,24 @@ export function Checkout() {
           <h2 className="reveal opacity-0 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 md:mb-6 leading-tight">
             Готови ли сте да помогнете на <span className="text-emerald-600">детето си</span>?
           </h2>
-          <p className="reveal opacity-0 text-base md:text-lg text-slate-600">
-            Попълнете формата по-долу и ние ще се свържем с вас за потвърждение
-          </p>
+          <div className="reveal opacity-0 text-base md:text-lg text-slate-600 leading-relaxed text-center max-w-3xl mx-auto">
+  
+            {/* 1. Представяне на огромния бонус със специфичен син цвят за Facebook */}
+            <span className="block text-slate-950 font-medium text-left sm:text-center">
+              🎁 <strong className="text-rose-600 font-bold">Огромен БОНУС:</strong> С поръчката днес получавате безплатен достъп до нашата затворена <span className="text-[#1877F2] font-semibold">Facebook</span> общност за родители. Това е безопасно място за споделяне на опит и бързи решения за всичко — от детско здраве и хранене, до тайни за бърза адаптация в детските градини.
+            </span>
+            
+            {/* 2. Розовата кутия като акцент как се получава бонусът */}
+            <span className="block mt-4 text-rose-600 font-semibold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100/80 text-center max-w-2xl mx-auto text-sm md:text-base leading-relaxed shadow-sm">
+              При обаждането за потвърждение на поръчката лично ще ви попитаме дали желаете да ви добавим веднага в групата.
+            </span>
+
+            {/* 3. Финалният призив за действие - плавно и нежно пулсиращ в розов цвят */}
+            <p className="mt-8 text-base md:text-lg font-bold text-rose-600 animate-pulse border-t border-slate-100 pt-6 transition-all duration-1000">
+              Попълнете формата по-долу, за да завършите поръчката си. 👇
+            </p>
+
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 max-w-5xl mx-auto">
