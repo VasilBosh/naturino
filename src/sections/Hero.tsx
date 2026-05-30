@@ -90,7 +90,7 @@ export function Hero() {
         </header>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16 w-full">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-12 xl:gap-16 w-full">
           
           {/* Left Content */}
           <div className="flex-1 max-w-2xl text-center lg:text-left transform-gpu">
@@ -118,7 +118,75 @@ export function Hero() {
               ))}
             </div>
 
-            <div className="flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
+                        {/* MOBILE PRODUCT */}
+            <div className="block lg:hidden mb-6">
+              <div className="relative max-w-[330px] mx-auto">
+                
+                <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl" />
+
+                <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-2xl">
+                  
+                  <img
+                    src="/images/product-main.jpg"
+                    alt="Naturino Kids"
+                    className="w-full h-auto rounded-xl"
+                  />
+
+                  <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3">
+                    <div className="flex items-center justify-center gap-3 mb-2">
+                      <img
+                        src="/logo/speedy-logo.png"
+                        alt="Speedy"
+                        className="h-7 w-auto object-contain bg-white rounded px-2 py-1"
+                      />
+
+                      <span className="text-white/60 text-xs">
+                        или
+                      </span>
+
+                      <img
+                        src="/logo/ekont-logo.png"
+                        alt="Еконт"
+                        className="h-7 w-auto object-contain bg-white rounded px-2 py-1"
+                      />
+                    </div>
+
+                    <div className="text-center space-y-1">
+                      <p className="text-white font-bold text-xs flex items-center justify-center gap-2">
+                        <span className="text-emerald-400 text-base">✓</span>
+                        Плащате при получаване
+                      </p>
+
+                      <p className="text-white/70 text-[11px]">
+                        🚚 Доставка 1-2 работни дни
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    className="absolute -right-4 bg-amber-400 text-emerald-900 px-3 py-1.5 rounded-xl shadow-xl"
+                    style={{ bottom: '124px' }}
+                  >
+                    <p className="text-[10px] font-semibold uppercase">
+                      Само сега
+                    </p>
+
+                    <p className="text-lg font-black italic">
+                      19.90€
+                    </p>
+                  </div>
+
+                  <div className="absolute -top-2 -left-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-xl font-bold">
+                    <p className="text-[10px] uppercase">
+                      -50%
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div className="order-3 lg:order-none flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
               <button 
                 onClick={scrollToCheckout}
                 className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[340px]"
@@ -141,7 +209,7 @@ export function Hero() {
             </div>
 
             {/* ЗОНА С РЕЙТИНГ И ОТЗИВ (Вертикално подредени за максимална стабилност) */}
-            <div className="flex flex-col items-center lg:items-start gap-4">
+            <div className="order-4 lg:order-none flex flex-col items-center lg:items-start gap-4">
               
               {/* Рейтинг Звездички */}
               <div className="flex items-center gap-4 text-emerald-200 text-sm">
@@ -176,18 +244,18 @@ export function Hero() {
                       </h4>
                       
                       {/* Текст */}
-                      <p className="text-[11px] md:text-xs leading-relaxed text-slate-800">
+                      <p className="text-[11.5px] md:text-xs leading-relaxed text-slate-800">
                         Момичета, капките на Пламена буквално ни спасиха от безкрайния ад. 
                         След 3 седмици прием спряхме боледуванията,за което съм безкрайно благодарна.
                         Препоръчвам с две ръце! Благодаря ви Пламена. 🥰 🌿
                       </p>
 
                       {/* Брояч на лайкове (Реакции) */}
-                      <div className="absolute bottom-2 -right-1 flex items-center gap-1 bg-white border border-gray-100 rounded-full py-0.5 px-1.5 shadow-md text-[10px] select-none">
+                      <div className="absolute bottom-1 -right-2 flex items-center gap-1 bg-white border border-gray-100 rounded-full py-0.5 px-1.5 shadow-md text-[10px] select-none">
                         <div className="flex items-center justify-center w-10 h-3.5 rounded-full">
                           <span className="text-white text-[14px] leading-none">❤️😮</span>
                         </div>
-                        <span className="text-gray-500 font-semibold text-[12px]">817</span>
+                        <span className="text-gray-500 font-semibold text-[11px]">982</span>
                       </div>
                     </div>
 
@@ -207,8 +275,8 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right Content */}
-          <div className="flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px] transform-gpu">
+          {/* Right Content Desktop Only */}
+          <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px] transform-gpu">
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
