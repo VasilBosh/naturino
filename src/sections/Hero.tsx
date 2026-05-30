@@ -1,20 +1,16 @@
-import { useRef, useEffect } from 'react';
-import { Shield, Leaf, Star, Phone, ArrowDown, Award, ShoppingCart } from 'lucide-react';
+import { useEffect } from 'react';
+import { Shield, Leaf, Star, Phone, Award, ShoppingCart } from 'lucide-react';
 
 export function Hero() {
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  // Оптимизация за Gumlet: Подготвяме връзката веднага
+  // Оптимизация за Gumlet
   useEffect(() => {
     const domains = ['https://video.gumlet.io', 'https://cdn.gumlet.com'];
     domains.forEach(domain => {
-      // Предварително решаване на DNS
       const dnsPrefetch = document.createElement('link');
       dnsPrefetch.rel = 'dns-prefetch';
       dnsPrefetch.href = domain;
       document.head.appendChild(dnsPrefetch);
 
-      // Предварително установяване на сигурна връзка
       const preconnect = document.createElement('link');
       preconnect.rel = 'preconnect';
       preconnect.href = domain;
@@ -31,7 +27,6 @@ export function Hero() {
     document.getElementById('social-proof')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Предварително активиране на зареждането на видеата, щом потребителят докосне или доближи бутона
   const triggerVideoPreload = () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('preload-videos'));
@@ -39,28 +34,38 @@ export function Hero() {
   };
 
   return (
-    <section 
-      ref={heroRef}
-      className="relative min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden"
-    >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl" />
+    // ПРЕНАПИСАН КЛАС: Премахнато min-h-screen, добавено контролирано отстояние (py-12 md:py-20)
+    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20">
+      
+      {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div 
+          className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl animate-float" 
+          style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+        />
+        <div 
+          className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-float" 
+          style={{ animationDelay: '1s', willChange: 'transform', transform: 'translateZ(0)' }}
+        />
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl" 
+          style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+        />
       </div>
 
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 opacity-5">
+      {/* GRID PATTERN OVERLAY */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none z-0" style={{ transform: 'translateZ(0)' }}>
         <div className="absolute inset-0" style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
           backgroundSize: '50px 50px'
         }} />
       </div>
 
-      <div className="relative z-10 container-custom min-h-screen flex flex-col">
+      {/* ОСНОВЕН СТАБИЛЕН КОНТЕЙНЕР */}
+      <div className="relative z-10 container-custom w-full flex flex-col gap-8 md:gap-12 lg:gap-16">
+        
         {/* Header */}
-        <header className="py-4 md:py-6 flex items-center justify-between">
+        <header className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
               <Leaf className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
@@ -85,12 +90,13 @@ export function Hero() {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16 py-8 lg:py-12">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16 w-full">
+          
           {/* Left Content */}
-          <div className="flex-1 max-w-2xl text-center lg:text-left">
+          <div className="flex-1 max-w-2xl text-center lg:text-left transform-gpu">
             <div className="inline-flex items-center gap-2 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6 shadow-lg">
               <Award className="w-3 h-3 md:w-4 md:h-4" />
-              <span>Бестселър 2024 • 4000+ доволни родители</span>
+              <span>Бестселър 2024 • 4,700+ доволни родители</span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
@@ -112,46 +118,99 @@ export function Hero() {
               ))}
             </div>
 
-            {/* Обвиващият контейнер */}
             <div className="flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
-              {/* Първият бутон - Поръчай сега */}
               <button 
                 onClick={scrollToCheckout}
                 className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[340px]"
               >
                 <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-                <span>ПОРЪЧАЙ СЕГА</span>
+                <span>ВЗЕМИ СЕГА ➡️</span>
                 <span className="cta-price ml-1">19.90€</span>
               </button>
               
-              {/* Вторият бутон - Виж какво казват родителите */}
               <button 
                 onClick={scrollToSocialProof}
                 onMouseEnter={triggerVideoPreload}
                 onTouchStart={triggerVideoPreload}
                 className="btn-cta-secondary w-full max-w-[340px] flex items-center justify-center whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
               > 
-                {/* Премахнахме и двете икони ArrowRight оттук */}
-                <span className="font-bold text-sm sm:text-sm uppercase tracking-tight">
-                    Виж какво казват родителите
+                <span className="font-bold text-sm uppercase tracking-tight">
+                  ВИЖ РЕАЛНИТЕ РЕЗУЛТАТИ 👇
                 </span>
               </button>
             </div>
 
-            <div className="flex items-center justify-center lg:justify-start gap-4 text-emerald-200 text-sm">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 md:w-5 md:h-5 text-amber-400 fill-amber-400" />
-                ))}
+            {/* ЗОНА С РЕЙТИНГ И ОТЗИВ (Вертикално подредени за максимална стабилност) */}
+            <div className="flex flex-col items-center lg:items-start gap-4">
+              
+              {/* Рейтинг Звездички */}
+              <div className="flex items-center gap-4 text-emerald-200 text-sm">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 md:w-5 md:h-5 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <span className="text-xs md:text-sm font-medium">5.0/5 от 4,700+ родители</span>
               </div>
-              <span className="text-xs md:text-sm font-medium">5.0/5 от 4000+ родители</span>
+
+              {/* Коментарът от Facebook (Скалиран и позициониран правилно под тях) */}
+              <div className="w-full max-w-[360px] bg-white rounded-2xl p-3 md:p-4 shadow-xl border border-white/10 text-left mt-1 transform-gpu">
+                <div className="flex items-start gap-2.5">
+                  
+                  {/* Снимка на потребителя */}
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-gray-200 mt-0.5">
+                    <img 
+                      src="https://images.unsplash.com/photo-1687456338383-656a5fc1ea5e?w=100&auto=format&fit=crop&q=80" 
+                      alt="Невена Караиванова" 
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Основно съдържание на коментара */}
+                  <div className="flex-1 relative pb-2">
+                    <div className="bg-[#f0f2f5] rounded-xl px-3 py-2 text-gray-900">
+                      {/* Име */}
+                      <h4 className="font-bold text-xs md:text-sm text-gray-900 mb-0.5 hover:underline cursor-pointer">
+                        Невена Караиванова
+                      </h4>
+                      
+                      {/* Текст */}
+                      <p className="text-[11px] md:text-xs leading-relaxed text-slate-800">
+                        Момичета, капките на Пламена буквално ни спасиха от безкрайния ад. 
+                        След 3 седмици прием спряхме боледуванията,за което съм безкрайно благодарна.
+                        Препоръчвам с две ръце! Благодаря ви Пламена. 🥰 🌿
+                      </p>
+
+                      {/* Брояч на лайкове (Реакции) */}
+                      <div className="absolute bottom-2 -right-1 flex items-center gap-1 bg-white border border-gray-100 rounded-full py-0.5 px-1.5 shadow-md text-[10px] select-none">
+                        <div className="flex items-center justify-center w-10 h-3.5 rounded-full">
+                          <span className="text-white text-[14px] leading-none">❤️😮</span>
+                        </div>
+                        <span className="text-gray-500 font-semibold text-[12px]">817</span>
+                      </div>
+                    </div>
+
+                    {/* Бутони под коментара */}
+                    <div className="flex items-center gap-2.5 mt-1 ml-2 text-[10px] font-bold text-gray-500/90">
+                      <button className="hover:underline cursor-pointer">Like</button>
+                      <span>·</span>
+                      <button className="hover:underline cursor-pointer">Reply</button>
+                      <span>·</span>
+                      <span className="font-normal text-gray-400">1w</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
             </div>
           </div>
 
           {/* Right Content */}
-          <div className="animate-fadeInRight flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px]">
+          <div className="flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px] transform-gpu">
             <div className="relative">
-              <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" />
+              <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
                 <img 
                   src="/images/product-main.jpg" 
@@ -162,26 +221,24 @@ export function Hero() {
                   decoding="sync"
                 />
 
-                                {/* ⬇️ НОВ КОД — СЛОЖИ ТУК ⬇️ */}
-                  <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
-                    <div className="flex items-center justify-center gap-3 mb-2">
-                      <img src="/logo/speedy-logo.png" alt="Speedy" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
-                      <span className="text-white/60 text-xs">или</span>
-                      <img src="/logo/ekont-logo.png" alt="Еконт" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <p className="text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2">
-                        <span className="text-emerald-400 text-base">✓</span>
-                        Плащате при получаване
-                      </p>
-                      <p className="text-white/70 text-[11px] md:text-xs">
-                        🚚 4,700+ семейства вече получиха. Доставка 1-2 работни дни
-                      </p>
-                    </div>
+                <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <img src="/logo/speedy-logo.png" alt="Speedy" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
+                    <span className="text-white/60 text-xs">или</span>
+                    <img src="/logo/ekont-logo.png" alt="Еконт" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                   </div>
-                  {/* ⬆️ КРАЙ НА НОВИЯ КОД ⬆️ */}
+                  <div className="text-center space-y-1">
+                    <p className="text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2">
+                      <span className="text-emerald-400 text-base">✓</span>
+                      Плащате при получаване
+                    </p>
+                    <p className="text-white/70 text-[11px] md:text-xs">
+                      🚚 4,700+ семейства вече получиха. Доставка 1-2 работни дни
+                    </p>
+                  </div>
+                </div>
 
-                <div className="absolute -right-4 md:bottom-50 md:-right-5 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20" style={{ bottom: '124px' }}>
+                <div className="absolute -right-4 md:-right-5 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20" style={{ bottom: '124px' }}>
                   <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
                   <p className="text-lg md:text-xl font-black italic">19.90€</p>
                 </div>
@@ -191,30 +248,27 @@ export function Hero() {
               </div>
             </div>
           </div>
+
         </div>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce hidden md:block">
-          <ArrowDown className="w-6 h-6 text-white/40" />
+        {/* Текстова секция - СЕГА Е СВЪРЗАНА ЕСТЕСТВЕНО КЪМ ГОРНИТЕ ЕЛЕМЕНТИ */}
+        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-4">
+          <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
+            <p className="mb-4">
+              Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
+              която подсилва имунната система по естествен начин.
+              Без химия, без странични ефекти.
+            </p>
+            <p className="font-bold">
+              <strong className="text-amber-300">Знаете ли защо е толкова ефективен? </strong>
+              Защото работи в синергия с естествените защитни механизми на тялото, а не ги потиска.
+              Когато продуктът е естествен, тялото го приема като храна, а не като лекарство, 
+              поради това и резултатите са толкова бързи и трайни. 
+              <strong className="text-amber-300"> Това е ключът към здравето и щастието на вашето дете!</strong>
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Текстова секция в дъното на Hero */}
-      <div className="relative z-10 container-custom pb-20 text-center lg:text-left text-white/90">
-        <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
-          <p className="mb-4">
-            Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
-            която подсилва имунната система по естествен начин.
-            Без химия, без странични ефекти.
-          </p>
-
-          <p className="font-bold">
-            <strong className="text-amber-300">Знаете ли защо е толкова ефективен? </strong>
-            Защото работи в синергия с естествените защитни механизми на тялото, а не ги потиска.
-            Когато продуктът е естествен, тялото го приема като храна, а не като лекарство, 
-            поради това и резултатите са толкова бързи и трайни. 
-            <strong className="text-amber-300"> Това е ключът към здравето и щастието на вашето дете!</strong>
-          </p>
-        </div>
       </div>
     </section>
   );
