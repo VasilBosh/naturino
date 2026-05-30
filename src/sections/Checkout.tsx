@@ -166,8 +166,8 @@ export function Checkout() {
             </span>
 
             {/* 3. Финалният призив за действие - плавно и нежно пулсиращ в розов цвят */}
-            <p className="mt-8 text-base md:text-lg font-bold text-rose-600 animate-pulse border-t border-slate-100 pt-6 transition-all duration-1000">
-              Попълнете формата по-долу, за да завършите поръчката си. 👇
+            <p className="mt-8 text-base md:text-lg font-bold text-green-700 animate-pulse border-t border-slate-100 pt-6 transition-all duration-10000">
+              Попълнете формата по-долу, за да завършите поръчката си 👇<div>Ще се свържем с вас за потвърждение ✅</div>
             </p>
 
           </div>
