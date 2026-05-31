@@ -57,10 +57,10 @@ export function Checkout() {
   }, []);
 
   // ЛОГИКА ЗА ЦЕНАТА И ПРОМО КОДА
-  //const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO11';
+  //const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO9307307573'; // Сравняваме с фиксирания код
 
   const cleanPromoInput = formData.promoCode.trim().toUpperCase();
-  const isStaticPromo = cleanPromoInput === 'PROMO11'; // Сравняваме с фиксирания код
+  const isStaticPromo = cleanPromoInput === 'PROMO9307307573'; // Сравняваме с фиксирания код
   // Проверяваме дали написаното съвпада ТОЧНО с кода, дошъл от попъпа
   const isDynamicPromo = validPopupCode ? cleanPromoInput === validPopupCode : false;
   const isPromoValid = isStaticPromo || isDynamicPromo;
@@ -113,7 +113,7 @@ export function Checkout() {
       currency: 'EUR',
       eventId: eventId, 
       SK: 'id:9307307573',
-      promoApplied: isPromoValid ? 'YES (PROMO11)' : 'NO'
+      promoApplied: isPromoValid ? 'YES (PROMO9307307573)' : 'NO'
     };
 
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
