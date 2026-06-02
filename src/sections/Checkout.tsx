@@ -82,8 +82,13 @@ export function Checkout() {
     const currentTotal = Number(totalPrice);
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
-    // Оптимизиран Тракинг
+    // Оптимизиран Тракинг с филтър за тестови поръчки
   if (typeof window !== 'undefined' && (window as any).fbq) {
+    const isTestOrder = formData.fullName.toLowerCase().includes('test');
+    
+    if (isTestOrder) {
+      console.log('⚠️ Тестова поръчка засечена в Checkout! Прескачаме браузърния Facebook Pixel Event за Purchase.');
+    } else {
     // Пращаме Advanced Matching данни при Purchase за по-добро разпознаване
     (window as any).fbq('track', 'Purchase', {
       value: currentTotal,
@@ -99,7 +104,7 @@ export function Checkout() {
       ln: formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim()
     }, { eventID: eventId });
   }
-
+}
 
     setSubmitted(true);
 
