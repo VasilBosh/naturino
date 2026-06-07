@@ -132,7 +132,6 @@ export function Hero() {
                     className="w-full h-auto rounded-xl"
                     loading="eager"
                     fetchPriority="high"
-                    decoding="async"
                   />
 
 
@@ -324,7 +323,7 @@ export function Hero() {
                   className="w-full h-auto rounded-xl md:rounded-2xl"
                   loading="eager"
                   fetchPriority="high"
-                  decoding="async"
+                  decoding="sync"
                 />
 
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
