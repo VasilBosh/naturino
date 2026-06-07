@@ -160,15 +160,45 @@ export function Checkout() {
           </h2>
           <div className="reveal opacity-0 text-base md:text-lg text-slate-600 leading-relaxed text-center max-w-3xl mx-auto">
   
-            {/* 1. Представяне на огромния бонус със специфичен син цвят за Facebook */}
-            <span className="block text-slate-950 font-medium text-left sm:text-center">
-              🎁 <strong className="text-rose-600 font-bold">Огромен БОНУС:</strong> С поръчката днес получавате безплатен достъп до нашата затворена <span className="text-[#1877F2] font-semibold">Facebook</span> общност за родители. Това е безопасно място за споделяне на опит и бързи решения за всичко — от детско здраве и хранене, до тайни за бърза адаптация в детските градини.
-            </span>
-            
-            {/* 2. Розовата кутия като акцент как се получава бонусът */}
-            <span className="block mt-4 text-rose-600 font-semibold bg-rose-50 px-4 py-3 rounded-xl border border-rose-100/80 text-center max-w-2xl mx-auto text-sm md:text-base leading-relaxed shadow-sm">
-              При обаждането за потвърждение на поръчката лично ще ви попитаме дали желаете да ви добавим веднага в групата.
-            </span>
+            <div className="mt-2 bg-gradient-to-br from-rose-50 to-white rounded-3xl border border-rose-200 p-5 shadow-lg">
+
+  <div className="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full font-black text-sm mb-5">
+    🎁 ДВОЕН БОНУС ЗА ВСЯКА МАЙКА
+  </div>
+
+  <div className="space-y-4">
+
+    {/* Консултация */}
+    <div className="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm">
+      <h4 className="font-black text-lg text-emerald-700">
+        💬 10-минутна консултация с Пламена
+      </h4>
+
+      <p className="text-slate-600 mt-2 text-sm md:text-base">
+        Лични насоки и отговори на всички ваши въпроси.
+      </p>
+    </div>
+
+                {/* Facebook група */}
+                <div className="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm">
+                  <h4 className="font-black text-lg text-[#1877F2]">
+                    👩‍👩‍👧 Затворена общност за родители
+                  </h4>
+                  <div className="mt-3 space-y-2 text-sm font-medium text-slate-700">
+                    <p>✔ Съвети и подкрепа от други майки</p>
+                    <p>✔ Бързи решения при вируси и боледуване</p>
+                    <p>✔ Идеи за хранене и силен имунитет</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 bg-rose-50 rounded-2xl p-4 border border-rose-100">
+                <p className="text-center font-bold text-rose-600 leading-relaxed">
+                  ❤️ Няма да сте сами в най-трудните моменти.
+                  <br />
+                  При потвърждение на поръчката ще ви попитаме дали желаете да ви добавим напълно безплатно.
+                </p>
+              </div>
+            </div>
 
             {/* 3. Финалният призив за действие - плавно и нежно пулсиращ в розов цвят */}
             <p className="mt-8 text-base md:text-lg font-bold text-green-700 animate-pulse border-t border-slate-100 pt-6 transition-all duration-10000">
@@ -194,7 +224,7 @@ export function Checkout() {
               <div className="space-y-4 md:space-y-5 relative z-10">
                 {/* Full Name */}
                 <div>
-                  <Label htmlFor="fullName" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                  <Label htmlFor="fullName" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                     <User className="w-4 h-4 text-amber-600" />
                     Име и Фамилия <span className="text-red-500">*</span>
                   </Label>
@@ -212,7 +242,7 @@ export function Checkout() {
                 {/* Phone & Email */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="phone" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                    <Label htmlFor="phone" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                       <Phone className="w-4 h-4 text-amber-600" />
                       Телефон <span className="text-red-500">*</span>
                     </Label>
@@ -227,7 +257,7 @@ export function Checkout() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                    <Label htmlFor="email" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                       
                       <Mail className="w-4 h-4 text-amber-600" />
                          Имейл
@@ -249,7 +279,7 @@ export function Checkout() {
 
                 {/* Courier Selection */}
                 <div>
-                  <Label className="text-amber-900 text-sm font-bold mb-3 block flex items-center gap-1.5">
+                  <Label className="text-amber-900 text-sm font-bold mb-3 flex items-center gap-1.5">
                     <Truck className="w-4 h-4 text-amber-600" />
                     Изберете куриер <span className="text-red-500">*</span>
                   </Label>
@@ -289,7 +319,7 @@ export function Checkout() {
                 {/* City & Delivery Address */}
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="city" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                    <Label htmlFor="city" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-amber-600" />
                       Град <span className="text-red-500">*</span>
                     </Label>
@@ -304,7 +334,7 @@ export function Checkout() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="officeAddress" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                    <Label htmlFor="officeAddress" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-amber-600" />
                       Адрес за доставка<span className="text-red-500">*</span>
                     </Label>
@@ -322,7 +352,7 @@ export function Checkout() {
 
                 {/* NEW: Promo Code Field */}
                 <div>
-                  <Label htmlFor="promoCode" className="text-amber-900 text-sm font-bold mb-1.5 block flex items-center gap-1.5">
+                  <Label htmlFor="promoCode" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                     <Ticket className="w-4 h-4 text-amber-600" />
                     Промо код
                   </Label>
@@ -437,7 +467,7 @@ export function Checkout() {
               </div>
               <div>
                 <h4 className="font-black text-slate-900 text-lg uppercase tracking-tight">Naturino Kids</h4>
-                <p className="text-slate-500 text-sm italic">Натурален имуностимулатор</p>
+                <p className="text-slate-500 text-sm italic">100% Натурален билков екстракт</p>
                 <p className="text-emerald-600 font-bold text-xl mt-1">19.90 €</p>
               </div>
             </div>

@@ -45,7 +45,7 @@ export function StickyCTA() {
           <div className="flex items-center gap-2 md:gap-4">
             <div className="hidden sm:block">
               <p className="text-slate-500 text-xs md:text-sm">Naturino Kids</p>
-              <p className="font-bold text-slate-900 text-sm md:text-base">Имуностимулатор</p>
+              <p className="font-bold text-slate-900 text-sm md:text-base">100% Билков екстракт</p>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-400 line-through text-sm md:text-base">39.80€</span>

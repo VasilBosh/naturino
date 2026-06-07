@@ -19,7 +19,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-4 md:mb-6">
-              100% натурален имуностимулатор с 10 български билки за силен имунитет на вашето дете.
+              100% натурален билков екстракт с 10 български билки за силен имунитет на вашето дете.
             </p>
             <div className="flex items-center gap-3">
               <a 

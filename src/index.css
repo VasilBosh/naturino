@@ -75,3 +75,16 @@
   animation: fadeInUp 0.6s ease-out forwards !important;
   opacity: 1 !important;
 }
+@keyframes bonusFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-7px) scale(1.015);
+  }
+}
+
+.animate-bonus {
+  animation: bonusFloat 3s ease-in-out infinite;
+  will-change: transform;
+}

@@ -99,12 +99,12 @@ export function Hero() {
               <span>Бестселър 2024 • 4,700+ доволни родители</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 md:mb-6 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 md:mb-20 leading-tight">
               Спри безкрайното<br />
               <span className="text-amber-300">боледуване на детето!</span>
             </h2>
 
-            <p className="text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-2 leading-relaxed max-w-xl mx-auto lg:mx-0">
               <strong className="text-white">100% натурални билкови капки</strong> с 10 български билки. 
               Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов</strong>.
             </p>
@@ -183,6 +183,40 @@ export function Hero() {
                   </div>
 
                 </div>
+              </div>
+            </div>
+
+            {/* MOBILE BONUS CARD */}
+            <div className="block lg:hidden mt-5 mb-6 animate-bonus max-w-[340px] mx-auto">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-2xl border-2 border-white/25 text-center">
+
+                <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
+                  🎁 Подарък за всяка майка
+                </div>
+
+                <h3 className="text-emerald-950 font-black text-xl leading-tight">
+                  10-минутна консултация с Пламена
+                </h3>
+
+                <div className="mt-4 space-y-2 text-left text-sm text-emerald-950 font-semibold">
+                  <p>✔ Как да постигнете максимален ефект</p>
+                  <p>✔ Какво да очаквате още в началото</p>
+                  <p>✔ Лични насоки за вашето дете</p>
+                </div>
+
+                <div className="w-40 h-[2px] bg-emerald-900/20 mx-auto my-4"></div>
+
+                <div className="text-base text-emerald-900">
+                  Стойност:
+                  <span className="line-through text-xl font-black text-red-600 ml-1">
+                    50€
+                  </span>
+                </div>
+
+                <p className="font-black text-red-700 text-2xl mt-2">
+                  Днес: БЕЗПЛАТНО
+                </p>
+
               </div>
             </div>
 
@@ -276,7 +310,7 @@ export function Hero() {
           </div>
 
           {/* Right Content Desktop Only */}
-          <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[420px] transform-gpu">
+          <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[320px] lg:max-w-[420px] transform-gpu lg:translate-y-40">
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
@@ -315,12 +349,43 @@ export function Hero() {
                 </div>
               </div>
             </div>
-          </div>
+                  {/* BONUS CARD */}
+            <div className="mt-5 animate-bonus">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-2xl border-2 border-white/25 text-center">
 
+                <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-base font-black uppercase mb-3 shadow-lg">
+                  🎁 Подарък за всяка майка
+                </div>
+
+                <h3 className="text-emerald-950 font-black text-lg leading-tight">
+                  10-минутна консултация с Пламена
+                </h3>
+
+                <div className="mt-3 space-y-1 text-left text-sm text-emerald-950 font-semibold">
+                  <p>✔ Как да постигнете максимален ефект</p>
+                  <p>✔ Какво да очаквате през първите седмици</p>
+                  <p>✔ Лични насоки за вашето дете</p>
+                </div>
+
+                <div className="mt-3 text-base text-emerald-900">
+                  <div className="w-60 h-[2px] bg-emerald-900/20 mx-auto my-2"></div>
+                  Стойност: <span className="line-through text-xl font-black text-red-600">50€</span>
+                </div>
+
+                <p className="font-black text-red-700 text-xl mt-1">
+                  Днес: БЕЗПЛАТНО
+                </p>
+
+              </div>
+            </div>
+            {/* BONUS CARD end*/}
+          
+          
+          </div>
         </div>
 
         {/* Текстова секция - СЕГА Е СВЪРЗАНА ЕСТЕСТВЕНО КЪМ ГОРНИТЕ ЕЛЕМЕНТИ */}
-        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-4">
+        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-2">
           <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
             <p className="mb-4">
               Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
