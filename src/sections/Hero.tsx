@@ -130,7 +130,11 @@ export function Hero() {
                     src="/images/product-main.jpg"
                     alt="Naturino Kids"
                     className="w-full h-auto rounded-xl"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                   />
+
 
                   <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3">
                     <div className="flex items-center justify-center gap-3 mb-2">
@@ -320,7 +324,7 @@ export function Hero() {
                   className="w-full h-auto rounded-xl md:rounded-2xl"
                   loading="eager"
                   fetchPriority="high"
-                  decoding="sync"
+                  decoding="async"
                 />
 
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
