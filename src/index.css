@@ -59,32 +59,20 @@
   }
 }
 
-/* Дефинираме анимацията тук, за да сме сигурни, че се изпълнява правилно */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out forwards !important;
-  opacity: 1 !important;
-}
-@keyframes bonusFloat {
+
+@keyframes bonusCtaPulse {
   0%, 100% {
-    transform: translateY(0) scale(1);
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
   }
+
   50% {
-    transform: translateY(-7px) scale(1.015);
+    transform: scale(1.025);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
   }
 }
 
-.animate-bonus {
-  animation: bonusFloat 3s ease-in-out infinite;
-  will-change: transform;
+.bonus-cta-pulse {
+  animation: bonusCtaPulse 1.8s ease-in-out infinite;
 }

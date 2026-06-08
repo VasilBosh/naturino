@@ -40,11 +40,11 @@ export function Hero() {
       {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div 
-          className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl animate-float" 
+          className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-2xl" 
           style={{ willChange: 'transform', transform: 'translateZ(0)' }}
         />
         <div 
-          className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-float" 
+          className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/10 rounded-full blur-2xl" 
           style={{ animationDelay: '1s', willChange: 'transform', transform: 'translateZ(0)' }}
         />
         <div 
@@ -190,8 +190,8 @@ export function Hero() {
             </div>
 
             {/* MOBILE BONUS CARD */}
-            <div className="block lg:hidden mt-5 mb-6 animate-bonus max-w-[340px] mx-auto">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-2xl border-2 border-white/25 text-center">
+            <div className="block lg:hidden mt-5 mb-6 max-w-[340px] mx-auto">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center bonus-cta-pulse">
 
                 <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
                   🎁 Подарък за всяка майка
@@ -315,7 +315,7 @@ export function Hero() {
           {/* Right Content Desktop Only */}
           <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[320px] lg:max-w-[420px] transform-gpu lg:translate-y-40">
             <div className="relative">
-              <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-3xl animate-pulse-glow" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
+              <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
                 <img 
                   src="/images/product-main.jpg" 
@@ -353,8 +353,8 @@ export function Hero() {
               </div>
             </div>
                   {/* BONUS CARD */}
-            <div className="mt-5 animate-bonus">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-2xl border-2 border-white/25 text-center">
+            <div className="mt-5">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center bonus-cta-pulse">
 
                 <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-base font-black uppercase mb-3 shadow-lg">
                   🎁 Подарък за всяка майка
