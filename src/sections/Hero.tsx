@@ -189,40 +189,6 @@ export function Hero() {
               </div>
             </div>
 
-            {/* MOBILE BONUS CARD */}
-            <div className="block lg:hidden mt-5 mb-6 max-w-[340px] mx-auto">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center bonus-cta-pulse">
-
-                <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
-                  🎁 Подарък за всяка майка
-                </div>
-
-                <h3 className="text-emerald-950 font-black text-xl leading-tight">
-                  10-минутна консултация с Пламена
-                </h3>
-
-                <div className="mt-4 space-y-2 text-left text-sm text-emerald-950 font-semibold">
-                  <p>✔ Как да постигнете максимален ефект</p>
-                  <p>✔ Какво да очаквате още в началото</p>
-                  <p>✔ Лични насоки за вашето дете</p>
-                </div>
-
-                <div className="w-40 h-[2px] bg-emerald-900/20 mx-auto my-4"></div>
-
-                <div className="text-base text-emerald-900">
-                  Стойност:
-                  <span className="line-through text-xl font-black text-red-600 ml-1">
-                    50€
-                  </span>
-                </div>
-
-                <p className="font-black text-red-700 text-2xl mt-2">
-                  Днес: БЕЗПЛАТНО
-                </p>
-
-              </div>
-            </div>
-
             <div className="order-3 lg:order-none flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
               <button 
                 onClick={scrollToCheckout}
@@ -240,7 +206,7 @@ export function Hero() {
                 className="btn-cta-secondary w-full max-w-[340px] flex items-center justify-center whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
               > 
                 <span className="font-bold text-sm uppercase tracking-tight">
-                  ВИЖ РЕАЛНИТЕ РЕЗУЛТАТИ 👇
+                  ВИЖ РЕАЛНИТЕ РЕЗУЛТАТИТЕ 👇
                 </span>
               </button>
             </div>
@@ -311,6 +277,40 @@ export function Hero() {
 
             </div>
           </div>
+
+                      {/* MOBILE BONUS CARD */}
+            <div className="block lg:hidden mt-5 mb-6 max-w-[340px] mx-auto">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center bonus-cta-pulse">
+
+                <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
+                  🎁 Подарък за всяка майка
+                </div>
+
+                <h3 className="text-emerald-950 font-black text-xl leading-tight">
+                  10-минутна консултация с Пламена
+                </h3>
+
+                <div className="mt-4 space-y-2 text-left text-sm text-emerald-950 font-semibold">
+                  <p>✔ Как да постигнете максимален ефект</p>
+                  <p>✔ Какво да очаквате още в началото</p>
+                  <p>✔ Лични насоки за вашето дете</p>
+                </div>
+
+                <div className="w-40 h-[2px] bg-emerald-900/20 mx-auto my-4"></div>
+
+                <div className="text-base text-emerald-900">
+                  Стойност:
+                  <span className="line-through text-xl font-black text-red-600 ml-1">
+                    50€
+                  </span>
+                </div>
+
+                <p className="font-black text-red-700 text-2xl mt-2">
+                  Днес: БЕЗПЛАТНО
+                </p>
+
+              </div>
+            </div>
 
           {/* Right Content Desktop Only */}
           <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[320px] lg:max-w-[420px] transform-gpu lg:translate-y-40">
@@ -388,7 +388,7 @@ export function Hero() {
         </div>
 
         {/* Текстова секция - СЕГА Е СВЪРЗАНА ЕСТЕСТВЕНО КЪМ ГОРНИТЕ ЕЛЕМЕНТИ */}
-        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-2 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
+        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
           <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed px-4 lg:px-0">
             <p className="mb-4">
               Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
