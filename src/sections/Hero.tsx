@@ -206,7 +206,7 @@ export function Hero() {
                 className="btn-cta-secondary w-full max-w-[340px] flex items-center justify-center whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
               > 
                 <span className="font-bold text-sm uppercase tracking-tight">
-                  ВИЖ РЕАЛНИТЕ РЕЗУЛТАТИТЕ 👇
+                  ВИЖ РЕАЛНИТЕ РЕЗУЛТАТИ 👇
                 </span>
               </button>
             </div>

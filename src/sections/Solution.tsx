@@ -104,7 +104,7 @@ export function Solution() {
               <div className="space-y-4 text-left">
                 <div className="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 md:p-5">
                   <p className="text-[15px] md:text-base leading-7 text-slate-700">
-                    Naturino Kids е изграден на базата на уникалния механизъм на системата
+                    Naturino Kids е изграден на базата на уникалния механизъм
                     <strong className="text-emerald-700"> BioHerb™-10</strong>.
                   </p>
                 </div>
@@ -112,7 +112,7 @@ export function Solution() {
                 <div className="rounded-2xl bg-amber-50 border border-amber-100 p-4 md:p-5">
                   <p className="text-[15px] md:text-base leading-7 text-slate-700">
                     Тази система е уникална заради изключително редкия
-                    <strong className="text-amber-700"> планински лимон (Chaenomeles maulei)</strong> —
+                    <strong className="text-amber-700"> Планински лимон (Chaenomeles maulei)</strong> —
                     плод, съдържащ до <strong>5 пъти повече витамин C</strong> от обикновения лимон
                     и до <strong>10 пъти повече витамин P</strong> от ябълките.
                   </p>
