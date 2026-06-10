@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 export const Stats = () => {
   const stats = useMemo(() => {
@@ -44,7 +44,7 @@ export const Stats = () => {
             🏆 №1 ИЗБОРА НА МАЙКИТЕ В БЪЛГАРИЯ ЗА ЗДРАВИ ДЕЦА! 🏆
           </h2>
           <p className="text-lg md:text-xl text-emerald-50 font-medium max-w-2xl mx-auto opacity-90">
-            Хиляди родители вече решиха проблема с болничните от градината.
+            Хиляди родители вече решиха проблема с болничните от градината. А ти какво чакaш? Присъедини се към тях и осигури на детето си здравословно детство с Naturino Kids!
           </p>
           <div className="h-1.5 w-24 bg-amber-400 mx-auto rounded-full mt-6 shadow-lg"></div>
         </div>

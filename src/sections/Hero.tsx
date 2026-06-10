@@ -104,7 +104,7 @@ export function Hero() {
               <span className="text-amber-300">боледуване на детето!</span>
             </h2>
 
-            <p className="text-base sm:text-lg md:text-xl text-emerald-100 mb-6 md:mb-2 leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-base sm:text-lg md:text-2xl text-emerald-100 mb-6 md:mb-2 lg:pt-0 lg:-mt-12 leading-relaxed max-w-xl mx-auto lg:mx-0">
               <strong className="text-white">100% натурални билкови капки</strong> с 10 български билки. 
               Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов</strong>.
             </p>
@@ -391,7 +391,7 @@ export function Hero() {
         <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
           <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-base leading-relaxed px-4 lg:px-0">
             <p className="mb-4">
-              Naturino Kids е изграден на базата на уникалния механизъм на системата{" "}
+              Naturino Kids е изграден на базата на уникалния механизъм{" "}
               <strong className="text-amber-300">BioHerb™-10.</strong>
             </p>
             <p className="mb-4">
@@ -403,7 +403,7 @@ export function Hero() {
               от ябълките. Именно той осигурява{" "}
               <strong className="text-amber-300">над 98% усвояемост</strong>{" "}
               на останалите девет билки, подбрани по специална фитотерапевтична таблица
-              и съобразени с детския организъм до най-малките.
+              и съобразени с детския организъм.
             </p>
             <p>
               Затова Naturino Kids е един от малкото продукти на пазара

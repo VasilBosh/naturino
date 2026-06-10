@@ -104,7 +104,7 @@ export function Guarantee() {
 >
                 <ShoppingCart className="w-10 h-10" /> {/* По-малка икона */}
                 <span className="font-bold">ПОРЪЧАЙ СЕГА</span>
-                <span className="cta-price text-xl px-2 px-1">19.90€</span>
+                <span className="cta-price text-xl px-2">19.90€</span>
                 
             </button>
 

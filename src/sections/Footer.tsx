@@ -90,8 +90,8 @@ export function Footer() {
                 <Mail className="w-4 h-4 md:w-5 md:h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-slate-400 text-xs md:text-sm">Имейл</p>
-                  <a href="mailto:naturinokids@gmail.com" className="text-white hover:text-emerald-400 transition-colors text-sm md:text-base break-all">
-                    naturinokids@gmail.com
+                  <a href="mailto:info@naturinokids.bg" className="text-white hover:text-emerald-400 transition-colors text-sm md:text-base break-all">
+                    info@naturinokids.bg
                   </a>
                 </div>
               </li>

@@ -37,7 +37,7 @@ export function Privacy() {
               </p>
               <div className="grid sm:grid-cols-2 gap-4 text-sm font-medium text-slate-700">
                 <p>Адрес: гр. Казанлък, жк. Изток 48, №23</p>
-                <p>Email: naturinokids@gmail.com</p>
+                <p>Email: info@naturinokids.bg</p>
               </div>
             </section>
 
@@ -100,7 +100,7 @@ export function Privacy() {
                 <li>Ограничаване на обработването.</li>
               </ul>
               <p className="mt-4 text-sm font-semibold text-slate-700">
-                За да упражните тези права, моля свържете се с нас на: naturinokids@gmail.com
+                За да упражните тези права, моля свържете се с нас на: info@naturinokids.bg
               </p>
             </section>
 

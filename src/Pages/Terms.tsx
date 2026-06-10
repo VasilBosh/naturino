@@ -37,7 +37,7 @@ export function Terms() {
                 <p><strong>ЕИК/Булстат:</strong> 208228805</p>
                 <p><strong>Адрес:</strong> гр. Казанлък, жк. Изток 48, №23</p>
                 <p><strong>Телефон:</strong> 0896 783 751</p>
-                <p><strong>Имейл:</strong> naturinokids@gmail.com</p>
+                <p><strong>Имейл:</strong> info@naturinokids.bg</p>
               </div>
             </section>
 
