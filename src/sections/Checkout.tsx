@@ -22,13 +22,9 @@ export function Checkout() {
   const [addToCartFired, setAddToCartFired] = useState(false);
   const touchedCountRef = useRef(0);
 
-  const handleFieldTouch = () => {
-  if (addToCartFired) return;
-
-  touchedCountRef.current += 1;
-  const newCount = touchedCountRef.current;
-
-  if (newCount === 1) {
+  const handleFocus = () => {
+  if (touchedCountRef.current === 0) {
+    touchedCountRef.current = 1;
     if ((window as any).fbq) {
       (window as any).fbq('track', 'InitiateCheckout', {
         content_name: 'Naturino Kids',
@@ -39,6 +35,13 @@ export function Checkout() {
       });
     }
   }
+};
+
+const handleFieldTouch = () => {
+  if (addToCartFired) return;
+
+  touchedCountRef.current += 1;
+  const newCount = touchedCountRef.current;
 
   if (newCount >= 2) {
     if ((window as any).fbq) {
@@ -289,6 +292,7 @@ export function Checkout() {
                     value={formData.fullName}
                     onChange={(e) => {setFormData({ ...formData, fullName: e.target.value }); handleFieldTouch(); } }
                     className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
+                    onFocus={handleFocus}
                   />
                 </div>
 
@@ -307,6 +311,7 @@ export function Checkout() {
                       value={formData.phone}
                       onChange={(e) => {setFormData({ ...formData, phone: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFocus}
                     />
                   </div>
                   <div>
@@ -322,6 +327,7 @@ export function Checkout() {
                       value={formData.email}
                       onChange={(e) => {setFormData({ ...formData, email: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFocus}
                     />
                     {/* Текстът отива ТУК – под полето */}
                     <p className="text-[11px] text-slate-400 font-normal italic mt-1 ml-1 leading-tight">
@@ -384,6 +390,7 @@ export function Checkout() {
                       value={formData.city}
                       onChange={(e) => { setFormData({ ...formData, city: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFocus}
                     />
                   </div>
                   <div>
@@ -399,6 +406,7 @@ export function Checkout() {
                       value={formData.officeAddress}
                       onChange={(e) => { setFormData({ ...formData, officeAddress: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFocus}
                     />
                   </div>
                 </div>
@@ -415,6 +423,7 @@ export function Checkout() {
                     placeholder="Имате ли код за отстъпка?"
                     value={formData.promoCode}
                     onChange={(e) => { setFormData({ ...formData, promoCode: e.target.value }); handleFieldTouch(); }}
+                    onFocus={handleFocus}
                     className={`h-12 text-base rounded-xl transition-all shadow-sm ${isPromoValid ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-amber-200'}`}
                   />
                   {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -7%!</p>}
