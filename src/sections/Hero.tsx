@@ -387,21 +387,32 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Текстова секция - СЕГА Е СВЪРЗАНА ЕСТЕСТВЕНО КЪМ ГОРНИТЕ ЕЛЕМЕНТИ */}
+        {/* Текстова секция */}
         <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
-          <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed px-4 lg:px-0">
+          <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-base leading-relaxed px-4 lg:px-0">
             <p className="mb-4">
-              Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
-              която подсилва имунната система по естествен начин.
-              Без химия, без странични ефекти.
+              Naturino Kids е изграден на базата на уникалния механизъм на системата{" "}
+              <strong className="text-amber-300">BioHerb™-10.</strong>
             </p>
-            <p className="font-bold">
-              <strong className="text-amber-300">Знаете ли защо е толкова ефективен? </strong>
-              Защото работи в синергия с естествените защитни механизми на тялото, а не ги потиска.
-              Когато продуктът е естествен, тялото го приема като храна, а не като лекарство, 
-              поради това и резултатите са толкова бързи и трайни. 
-              <strong className="text-amber-300"> Това е ключът към здравето и щастието на вашето дете!</strong>
+            <p className="mb-4">
+              Тази система е уникална заради изключително редкия Планински лимон{" "}
+              <em>(Chaenomeles maulei)</em> — плод, съдържащ до{" "}
+              <strong className="text-amber-300">5 пъти повече витамин C</strong>{" "}
+              от обикновения лимон и до{" "}
+              <strong className="text-amber-300">10 пъти повече витамин P</strong>{" "}
+              от ябълките. Именно той осигурява{" "}
+              <strong className="text-amber-300">над 98% усвояемост</strong>{" "}
+              на останалите девет билки, подбрани по специална фитотерапевтична таблица
+              и съобразени с детския организъм до най-малките.
             </p>
+            <p>
+              Затова Naturino Kids е един от малкото продукти на пазара
+              подходящ за деца от{" "}
+              <strong className="text-amber-300">18 месеца</strong>{" "}
+              — 100% натурален, изследван и регистриран в{" "}
+              <strong className="text-amber-300">Българската агенция по безопасност на храните.</strong>
+            </p>
+          
           </div>
         </div>
 
