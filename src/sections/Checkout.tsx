@@ -20,41 +20,38 @@ export function Checkout() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [addToCartFired, setAddToCartFired] = useState(false);
-  const [              , setTouchedFields] = useState(0);
+  const touchedCountRef = useRef(0);
 
   const handleFieldTouch = () => {
   if (addToCartFired) return;
-  
-  setTouchedFields(prev => {
-    const newCount = prev + 1;
 
-    if (newCount === 1) {
-      if ((window as any).fbq) {
-        (window as any).fbq('track', 'InitiateCheckout', {
-          content_name: 'Naturino Kids',
-          content_type: 'product',
-          value: pricePerUnit,
-          currency: 'EUR',
-          num_items: quantity,
-        });
-      }
+  touchedCountRef.current += 1;
+  const newCount = touchedCountRef.current;
+
+  if (newCount === 1) {
+    if ((window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout', {
+        content_name: 'Naturino Kids',
+        content_type: 'product',
+        value: pricePerUnit,
+        currency: 'EUR',
+        num_items: quantity,
+      });
     }
+  }
 
-    if (newCount === 2) {
-      if ((window as any).fbq) {
-        (window as any).fbq('track', 'AddToCart', {
-          content_name: 'Naturino Kids',
-          content_type: 'product',
-          value: pricePerUnit,
-          currency: 'EUR',
-          num_items: quantity,
-        });
-      }
-      setAddToCartFired(true);
+  if (newCount >= 2) {
+    if ((window as any).fbq) {
+      (window as any).fbq('track', 'AddToCart', {
+        content_name: 'Naturino Kids',
+        content_type: 'product',
+        value: pricePerUnit,
+        currency: 'EUR',
+        num_items: quantity,
+      });
     }
-
-    return newCount;
-  });
+    setAddToCartFired(true);
+  }
 };
 
 
@@ -290,9 +287,8 @@ export function Checkout() {
                     required
                     placeholder="Име и фамилия"
                     value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    onChange={(e) => {setFormData({ ...formData, fullName: e.target.value }); handleFieldTouch(); } }
                     className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
-                    onFocus={handleFieldTouch}
                   />
                 </div>
 
@@ -309,9 +305,8 @@ export function Checkout() {
                       required
                       placeholder="08xxxxxxxx"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) => {setFormData({ ...formData, phone: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
-                      onFocus={handleFieldTouch}
                     />
                   </div>
                   <div>
@@ -325,9 +320,8 @@ export function Checkout() {
                       type="email"
                       placeholder="example@mail.com"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) => {setFormData({ ...formData, email: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
-                      onFocus={handleFieldTouch}
                     />
                     {/* Текстът отива ТУК – под полето */}
                     <p className="text-[11px] text-slate-400 font-normal italic mt-1 ml-1 leading-tight">
@@ -388,9 +382,8 @@ export function Checkout() {
                       required
                       placeholder="Вашият град"
                       value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, city: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
-                      onFocus={handleFieldTouch}
                     />
                   </div>
                   <div>
@@ -404,9 +397,8 @@ export function Checkout() {
                       required
                       placeholder={courier ? `Личен адрес или офис на ${courier === 'speedy' ? 'Speedy' : 'Еконт'}` : 'Личен адрес или офис на куриер'}
                       value={formData.officeAddress}
-                      onChange={(e) => setFormData({ ...formData, officeAddress: e.target.value })}
+                      onChange={(e) => { setFormData({ ...formData, officeAddress: e.target.value }); handleFieldTouch(); }}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
-                      onFocus={handleFieldTouch}
                     />
                   </div>
                 </div>
@@ -422,9 +414,8 @@ export function Checkout() {
                     type="text"
                     placeholder="Имате ли код за отстъпка?"
                     value={formData.promoCode}
-                    onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, promoCode: e.target.value }); handleFieldTouch(); }}
                     className={`h-12 text-base rounded-xl transition-all shadow-sm ${isPromoValid ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-amber-200'}`}
-                    onFocus={handleFieldTouch}
                   />
                   {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -7%!</p>}
                 </div>
