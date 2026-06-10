@@ -63,14 +63,14 @@ export function Solution() {
       <div className="container-custom">
         {/* Header */}
         <div className="text-center max-w-4xl mx-auto mb-10 md:mb-16">
-          <div className="reveal opacity-0 inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6">
+          <div className="reveal opacity-0 inline-flex items-center gap-2 bg-emerald-100 text-emerald-600 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6">
             <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
             <span>Решението, което търсите</span>
           </div>
 
-          <h2 className="reveal opacity-0 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 md:mb-6">
-            Naturino Kids —<br className="hidden sm:block" />
-            <span className="gradient-text">Натуралният щит на детето</span>
+          <h2 className="reveal opacity-0 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-emerald-800 mb-4 md:mb-6">
+            Защо Naturino Kids - <br />
+            <span className="gradient-text">е по-различен от масовите продукти на пазара?</span>
           </h2>
 
           <p className="reveal opacity-0 text-base md:text-lg text-slate-600 leading-relaxed">
@@ -89,7 +89,7 @@ export function Solution() {
               <div className="flex justify-center mb-4">
                 <div className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-white text-xs sm:text-sm font-black tracking-wide shadow-lg shadow-emerald-300/50">
                   <Sparkles className="w-4 h-4 animate-pulse" />
-                  УНИКАЛЕН МЕХАНИЗЪМ
+                  УНИКАЛЕНИЯ МЕХАНИЗЪМ НА NATURINO KIDS
                 </div>
               </div>
 

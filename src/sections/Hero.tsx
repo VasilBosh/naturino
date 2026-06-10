@@ -388,8 +388,8 @@ export function Hero() {
         </div>
 
         {/* Текстова секция - СЕГА Е СВЪРЗАНА ЕСТЕСТВЕНО КЪМ ГОРНИТЕ ЕЛЕМЕНТИ */}
-        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-2">
-          <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed">
+        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-2 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
+          <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-lg leading-relaxed px-4 lg:px-0">
             <p className="mb-4">
               Уникална комбинация от <strong className="text-amber-300">10 български билки и плодове</strong>,
               която подсилва имунната система по естествен начин.
