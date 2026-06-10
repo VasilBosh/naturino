@@ -21,14 +21,21 @@ export function Checkout() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-  if (typeof window !== 'undefined' && (window as any).fbq) {
-    (window as any).fbq('track', 'ViewContent', {
-      content_name: 'Naturino Kids',
-      content_type: 'product',
-      value: 19.90,
-      currency: 'EUR',
-    });
-  }
+  const tryFireViewContent = () => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'ViewContent', {
+        content_name: 'Naturino Kids',
+        content_type: 'product',
+        value: 19.90,
+        currency: 'EUR',
+      });
+    } else {
+      // fbq още не е готов, опитай след 500ms
+      setTimeout(tryFireViewContent, 500);
+    }
+  };
+
+  tryFireViewContent();
 }, []);
 
   useEffect(() => {
