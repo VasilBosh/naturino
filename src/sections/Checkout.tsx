@@ -19,6 +19,44 @@ export function Checkout() {
     promoCode: '', // НОВО
   });
   const [submitted, setSubmitted] = useState(false);
+  const [addToCartFired, setAddToCartFired] = useState(false);
+  const [              , setTouchedFields] = useState(0);
+
+  const handleFieldTouch = () => {
+  if (addToCartFired) return;
+  
+  setTouchedFields(prev => {
+    const newCount = prev + 1;
+
+    if (newCount === 1) {
+      if ((window as any).fbq) {
+        (window as any).fbq('track', 'InitiateCheckout', {
+          content_name: 'Naturino Kids',
+          content_type: 'product',
+          value: pricePerUnit,
+          currency: 'EUR',
+          num_items: quantity,
+        });
+      }
+    }
+
+    if (newCount === 2) {
+      if ((window as any).fbq) {
+        (window as any).fbq('track', 'AddToCart', {
+          content_name: 'Naturino Kids',
+          content_type: 'product',
+          value: pricePerUnit,
+          currency: 'EUR',
+          num_items: quantity,
+        });
+      }
+      setAddToCartFired(true);
+    }
+
+    return newCount;
+  });
+};
+
 
   useEffect(() => {
   const tryFireViewContent = () => {
@@ -254,6 +292,7 @@ export function Checkout() {
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
+                    onFocus={handleFieldTouch}
                   />
                 </div>
 
@@ -272,6 +311,7 @@ export function Checkout() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFieldTouch}
                     />
                   </div>
                   <div>
@@ -287,6 +327,7 @@ export function Checkout() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFieldTouch}
                     />
                     {/* Текстът отива ТУК – под полето */}
                     <p className="text-[11px] text-slate-400 font-normal italic mt-1 ml-1 leading-tight">
@@ -349,6 +390,7 @@ export function Checkout() {
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFieldTouch}
                     />
                   </div>
                   <div>
@@ -364,6 +406,7 @@ export function Checkout() {
                       value={formData.officeAddress}
                       onChange={(e) => setFormData({ ...formData, officeAddress: e.target.value })}
                       className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                      onFocus={handleFieldTouch}
                     />
                   </div>
                 </div>
@@ -381,6 +424,7 @@ export function Checkout() {
                     value={formData.promoCode}
                     onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
                     className={`h-12 text-base rounded-xl transition-all shadow-sm ${isPromoValid ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-amber-200'}`}
+                    onFocus={handleFieldTouch}
                   />
                   {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -7%!</p>}
                 </div>
