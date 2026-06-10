@@ -26,7 +26,7 @@ export function Problem() {
     {
       icon: <ShieldAlert className="w-6 h-6 md:w-7 md:h-7 text-red-500 group-hover:scale-110 transition-transform duration-300" />,
       bg: 'bg-red-50',
-      title: 'Капанът „3 дни там, 2 седмици вкъщи“',
+      title: 'Капанът „3 дни градина, 2 седмици вкъщи. Отново и отново...“',
       description: 'Пак болнични, пак звънене на шефа със свито сърце и неудобство пред колегите. Имаш чувството, че кариерата и майчинството ти се сриват едновременно.',
     },
     {
