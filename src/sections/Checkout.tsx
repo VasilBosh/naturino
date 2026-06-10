@@ -21,6 +21,17 @@ export function Checkout() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
+  if (typeof window !== 'undefined' && (window as any).fbq) {
+    (window as any).fbq('track', 'ViewContent', {
+      content_name: 'Naturino Kids',
+      content_type: 'product',
+      value: 19.90,
+      currency: 'EUR',
+    });
+  }
+}, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
