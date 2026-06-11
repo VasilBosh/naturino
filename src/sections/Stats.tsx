@@ -32,7 +32,7 @@ export const Stats = () => {
               От стартирането
             </p>
             <div className="text-4xl md:text-5xl font-black text-amber-400 mb-2">
-              6,000+
+              4,700+
             </div>
             <p className="text-sm text-emerald-100/70 font-medium">доволни семейства</p>
           </div>

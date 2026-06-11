@@ -93,7 +93,7 @@ export function Guarantee() {
                   </div>
                   <div>
                     <h3 className="text-white font-bold text-base md:text-lg mb-1">Доверие от родители</h3>
-                    <p className="text-emerald-200 text-sm md:text-base">4000+ доволни семейства вече избраха Naturino Kids</p>
+                    <p className="text-emerald-200 text-sm md:text-base">4,700+ доволни семейства вече избраха Naturino Kids</p>
                   </div>
                 </div>
               </div>
