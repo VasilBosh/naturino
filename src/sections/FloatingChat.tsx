@@ -43,7 +43,7 @@ export function FloatingChat() {
       {/* Основно 3D балонче - С комбинирана мазна анимация (Плуване + Поклащане) */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="flex h-16 w-16 md:h-16 md:w-16 items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex h-16 w-36 md:h-16 md:w-48 items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           // Създаваме динамична анимация на място (inline)
           animation: !isMenuOpen ? 'combined-float-wiggle 10s ease-in-out infinite' : 'none'
