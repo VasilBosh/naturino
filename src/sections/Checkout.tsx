@@ -26,6 +26,15 @@ export function Checkout() {
   if (touchedCountRef.current === 0) {
     touchedCountRef.current = 1;
     if ((window as any).fbq) {
+      // 1. Инициализираме пиксела наново, подавайки Advanced Matching параметрите (Това изчиства грешката в Meta!)
+      (window as any).fbq('init', '782116818234210', {
+        em: formData.email ? formData.email.toLowerCase().trim() : '',
+        ph: formData.phone ? formData.phone.replace(/\s+/g, '') : '',
+        fn: formData.fullName ? formData.fullName.split(' ')[0].toLowerCase().trim() : '',
+        ln: formData.fullName && formData.fullName.split(' ').length > 1 ? formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim() : ''
+      });
+
+      // 2. След това пускаме стандартното събитие
       (window as any).fbq('track', 'InitiateCheckout', {
         content_name: 'Naturino Kids',
         content_type: 'product',
@@ -155,9 +164,9 @@ const handleFieldTouch = () => {
       // Добавяме хеширани данни за по-висока точност (Match Quality)
       external_id: eventId,
       em: formData.email ? formData.email.toLowerCase().trim() : '',
-      ph: formData.phone.replace(/\s+/g, ''),
-      fn: formData.fullName.split(' ')[0].toLowerCase().trim(),
-      ln: formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim()
+      ph: formData.phone ? formData.phone.replace(/\s+/g, '') : '',
+      fn: formData.fullName ? formData.fullName.split(' ')[0].toLowerCase().trim() : '',
+      ln: formData.fullName && formData.fullName.split(' ').length > 1 ? formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim() : ''
     }, { eventID: eventId });
   }
 }
