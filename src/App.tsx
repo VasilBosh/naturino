@@ -1,4 +1,6 @@
+
 import ReactPixel from 'react-facebook-pixel';
+import Sertifikat from './sections/Sertifikat';
 import TrustBadges from './sections/TrustBadges';
 import ComparisonSection from './sections/ComparisonSection';
 import IntentPopup from './sections/IntentPopup';
@@ -47,6 +49,7 @@ function LandingPage() {
       <PharmacistReview />
       <Benefits />
       <Ingredients />
+      <Sertifikat />
       <Story />
       <Stats />
       <SocialProof />
