@@ -1,4 +1,4 @@
-/* import ReactPixel from 'react-facebook-pixel'; */
+import ReactPixel from 'react-facebook-pixel'; 
 import { useEffect, useRef, useState} from 'react';
 import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus, Ticket } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
@@ -22,20 +22,30 @@ export function Checkout() {
   const [addToCartFired, setAddToCartFired] = useState(false);
   const touchedCountRef = useRef(0);
 
-  const handleFocus = () => {
-  if (touchedCountRef.current === 0) {
-    touchedCountRef.current = 1;
-    if ((window as any).fbq) {
-      // 1. Инициализираме пиксела наново, подавайки Advanced Matching параметрите (Това изчиства грешката в Meta!)
-      (window as any).fbq('init', '782116818234210', {
-        em: formData.email ? formData.email.toLowerCase().trim() : '',
-        ph: formData.phone ? formData.phone.replace(/\s+/g, '') : '',
-        fn: formData.fullName ? formData.fullName.split(' ')[0].toLowerCase().trim() : '',
-        ln: formData.fullName && formData.fullName.split(' ').length > 1 ? formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim() : ''
-      });
+  const PIXEL_ID = import.meta.env.VITE_FB_PIXEL_ID;
 
-      // 2. След това пускаме стандартното събитие
-      (window as any).fbq('track', 'InitiateCheckout', {
+  const applyAdvancedMatching = () => {
+    const am: Record<string, string> = {};
+    if (formData.email) am.em = formData.email.toLowerCase().trim();
+    if (formData.phone) {
+      let ph = formData.phone.replace(/\D/g, '');
+      if (ph.startsWith('0')) ph = '359' + ph.slice(1);
+      am.ph = ph;
+    }
+    if (formData.fullName) {
+      const parts = formData.fullName.trim().toLowerCase().split(/\s+/);
+      am.fn = parts[0] || '';
+      if (parts.length > 1) am.ln = parts.slice(1).join(' ');
+    }
+    if (Object.keys(am).length > 0 && PIXEL_ID) {
+      ReactPixel.init(PIXEL_ID, am as any, { autoConfig: true, debug: false });
+    }
+  };
+
+  const handleFocus = () => {
+    if (touchedCountRef.current === 0) {
+      touchedCountRef.current = 1;
+      ReactPixel.track('InitiateCheckout', {
         content_name: 'Naturino Kids',
         content_type: 'product',
         value: pricePerUnit,
@@ -43,47 +53,37 @@ export function Checkout() {
         num_items: quantity,
       });
     }
-  }
-};
+  };
+
+      
 
 const handleFieldTouch = () => {
   if (addToCartFired) return;
-
   touchedCountRef.current += 1;
-  const newCount = touchedCountRef.current;
 
-  if (newCount >= 2) {
-    if ((window as any).fbq) {
-      (window as any).fbq('track', 'AddToCart', {
-        content_name: 'Naturino Kids',
-        content_type: 'product',
-        value: pricePerUnit,
-        currency: 'EUR',
-        num_items: quantity,
-      });
-    }
+  if (touchedCountRef.current >= 2) {
+    applyAdvancedMatching();
+    ReactPixel.track('AddToCart', {
+      content_name: 'Naturino Kids',
+      content_type: 'product',
+      value: pricePerUnit,
+      currency: 'EUR',
+      num_items: quantity,
+    });
     setAddToCartFired(true);
   }
 };
 
 
   useEffect(() => {
-  const tryFireViewContent = () => {
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'ViewContent', {
-        content_name: 'Naturino Kids',
-        content_type: 'product',
-        value: 19.90,
-        currency: 'EUR',
-      });
-    } else {
-      // fbq още не е готов, опитай след 500ms
-      setTimeout(tryFireViewContent, 500);
-    }
-  };
+    ReactPixel.track('ViewContent', {
+      content_name: 'Naturino Kids',
+      content_type: 'product',
+      value: 19.90,
+      currency: 'EUR',
+    });
+  }, []);
 
-  tryFireViewContent();
-}, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -154,19 +154,13 @@ const handleFieldTouch = () => {
     if (isTestOrder) {
       console.log('⚠️ Тестова поръчка засечена в Checkout! Прескачаме браузърния Facebook Pixel Event за Purchase.');
     } else {
-    // Пращаме Advanced Matching данни при Purchase за по-добро разпознаване
+    applyAdvancedMatching();
     (window as any).fbq('track', 'Purchase', {
       value: currentTotal,
-      currency: 'EUR', 
+      currency: 'EUR',
       content_name: 'Naturino Kids',
       content_type: 'product',
       num_items: quantity,
-      // Добавяме хеширани данни за по-висока точност (Match Quality)
-      external_id: eventId,
-      em: formData.email ? formData.email.toLowerCase().trim() : '',
-      ph: formData.phone ? formData.phone.replace(/\s+/g, '') : '',
-      fn: formData.fullName ? formData.fullName.split(' ')[0].toLowerCase().trim() : '',
-      ln: formData.fullName && formData.fullName.split(' ').length > 1 ? formData.fullName.split(' ').slice(1).join(' ').toLowerCase().trim() : ''
     }, { eventID: eventId });
   }
 }
