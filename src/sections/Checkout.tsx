@@ -25,15 +25,20 @@ export function Checkout() {
   const PIXEL_ID = import.meta.env.VITE_FB_PIXEL_ID;
 
   const applyAdvancedMatching = () => {
+    // Четем на живо от полетата (хваща и autofill, не само ръчно писане)
+    const liveEmail = (document.getElementById('email') as HTMLInputElement)?.value || formData.email;
+    const livePhone = (document.getElementById('phone') as HTMLInputElement)?.value || formData.phone;
+    const liveName = (document.getElementById('fullName') as HTMLInputElement)?.value || formData.fullName;
+
     const am: Record<string, string> = {};
-    if (formData.email) am.em = formData.email.toLowerCase().trim();
-    if (formData.phone) {
-      let ph = formData.phone.replace(/\D/g, '');
+    if (liveEmail) am.em = liveEmail.toLowerCase().trim();
+    if (livePhone) {
+      let ph = livePhone.replace(/\D/g, '');
       if (ph.startsWith('0')) ph = '359' + ph.slice(1);
       am.ph = ph;
     }
-    if (formData.fullName) {
-      const parts = formData.fullName.trim().toLowerCase().split(/\s+/);
+    if (liveName) {
+      const parts = liveName.trim().toLowerCase().split(/\s+/);
       am.fn = parts[0] || '';
       if (parts.length > 1) am.ln = parts.slice(1).join(' ');
     }
@@ -66,15 +71,18 @@ const handleFieldTouch = () => {
   const hasData = formData.email.trim() !== '' || formData.phone.trim() !== '';
   if (!hasData) return;
 
-  applyAdvancedMatching();
-  ReactPixel.track('AddToCart', {
-    content_name: 'Naturino Kids',
-    content_type: 'product',
-    value: pricePerUnit,
-    currency: 'EUR',
-    num_items: quantity,
-  });
   setAddToCartFired(true);
+  // Малко изчакване, за да се напълнят полетата от autofill преди да четем
+  setTimeout(() => {
+    applyAdvancedMatching();
+    ReactPixel.track('AddToCart', {
+      content_name: 'Naturino Kids',
+      content_type: 'product',
+      value: pricePerUnit,
+      currency: 'EUR',
+      num_items: quantity,
+    });
+  }, 800);
 };
 
 
