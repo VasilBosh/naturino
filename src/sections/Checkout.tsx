@@ -39,7 +39,9 @@ export function Checkout() {
     }
     if (Object.keys(am).length > 0 && PIXEL_ID) {
       ReactPixel.init(PIXEL_ID, am as any, { autoConfig: true, debug: false });
+      return true;
     }
+    return false;
   };
 
   const handleFocus = () => {
@@ -59,19 +61,20 @@ export function Checkout() {
 
 const handleFieldTouch = () => {
   if (addToCartFired) return;
-  touchedCountRef.current += 1;
 
-  if (touchedCountRef.current >= 2) {
-    applyAdvancedMatching();
-    ReactPixel.track('AddToCart', {
-      content_name: 'Naturino Kids',
-      content_type: 'product',
-      value: pricePerUnit,
-      currency: 'EUR',
-      num_items: quantity,
-    });
-    setAddToCartFired(true);
-  }
+  // Палим AddToCart едва когато реално има имейл ИЛИ телефон (работи и при autofill)
+  const hasData = formData.email.trim() !== '' || formData.phone.trim() !== '';
+  if (!hasData) return;
+
+  applyAdvancedMatching();
+  ReactPixel.track('AddToCart', {
+    content_name: 'Naturino Kids',
+    content_type: 'product',
+    value: pricePerUnit,
+    currency: 'EUR',
+    num_items: quantity,
+  });
+  setAddToCartFired(true);
 };
 
 
@@ -154,8 +157,30 @@ const handleFieldTouch = () => {
     if (isTestOrder) {
       console.log('⚠️ Тестова поръчка засечена в Checkout! Прескачаме браузърния Facebook Pixel Event за Purchase.');
     } else {
-    applyAdvancedMatching();
+    
+      // Защита за autofill: четем реалните стойности директно от полетата
+    const liveEmail = (document.getElementById('email') as HTMLInputElement)?.value || formData.email;
+    const livePhone = (document.getElementById('phone') as HTMLInputElement)?.value || formData.phone;
+    const liveName = (document.getElementById('fullName') as HTMLInputElement)?.value || formData.fullName;
+
+    const am: Record<string, string> = {};
+    if (liveEmail) am.em = liveEmail.toLowerCase().trim();
+    if (livePhone) {
+      let ph = livePhone.replace(/\D/g, '');
+      if (ph.startsWith('0')) ph = '359' + ph.slice(1);
+      am.ph = ph;
+    }
+    if (liveName) {
+      const parts = liveName.trim().toLowerCase().split(/\s+/);
+      am.fn = parts[0] || '';
+      if (parts.length > 1) am.ln = parts.slice(1).join(' ');
+    }
+    if (Object.keys(am).length > 0 && PIXEL_ID) {
+      ReactPixel.init(PIXEL_ID, am as any, { autoConfig: true, debug: false });
+    }
+
     (window as any).fbq('track', 'Purchase', {
+
       value: currentTotal,
       currency: 'EUR',
       content_name: 'Naturino Kids',
