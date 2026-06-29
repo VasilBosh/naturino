@@ -1,6 +1,6 @@
 import ReactPixel from 'react-facebook-pixel'; 
 import { useEffect, useRef, useState} from 'react';
-import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus, Ticket } from 'lucide-react'; 
+import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -446,8 +446,9 @@ const handleFieldTouch = () => {
                     />
                   </div>
                 </div>
-
+ 
                 {/* NEW: Promo Code Field */}
+                {/* 
                 <div>
                   <Label htmlFor="promoCode" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
                     <Ticket className="w-4 h-4 text-amber-600" />
@@ -464,6 +465,7 @@ const handleFieldTouch = () => {
                   />
                   {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -7%!</p>}
                 </div>
+                */}
 
                 {/* QUANTITY SELECTOR */}
                 <div className="flex flex-col gap-3 p-4 bg-white/60 rounded-2xl border border-amber-100 mt-2">
@@ -510,13 +512,27 @@ const handleFieldTouch = () => {
                 </div>
 
                 <button 
-                  type="submit"
-                  className="w-full h-16 px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-emerald-200 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group mt-4"
-                >
-                  <ShoppingCart className="w-8 h-8" />
-                  ПОТВЪРДИ ПОРЪЧКАТА
-                  <ArrowRight className="w-8 h-8 group-hover:translate-x-1 transition-transform" />
-                </button>
+                type="submit"
+                className="w-full min-h-16 px-4 md:px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black shadow-xl shadow-emerald-200 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 md:gap-3 group mt-4"
+              >
+                <ShoppingCart className="w-6 h-6 md:w-8 md:h-8 flex-shrink-0" />
+
+                <span className="flex flex-col items-center justify-center leading-tight text-center">
+                  <span className="text-base md:text-xl tracking-tight">
+                    ПОРЪЧАЙ СЕГА
+                  </span>
+                  <span className="text-xs md:text-sm font-bold opacity-95">
+                    плащаш при получаване
+                  </span>
+                </span>
+
+                <ArrowRight className="w-6 h-6 md:w-8 md:h-8 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+                <p className="text-center text-[12px] md:text-xs text-slate-500 font-semibold leading-relaxed mt-2">
+                  Преглед преди плащане • Ще ви се обадим за потвърждение
+                </p>    
+
               </div>
             </form>
           </div>

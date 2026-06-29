@@ -1,11 +1,44 @@
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function FloatingChat() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
+
+useEffect(() => {
+  const checkoutSection = document.getElementById('checkout');
+
+  if (!checkoutSection) return;
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      setIsCheckoutVisible(entry.isIntersecting);
+
+      if (entry.isIntersecting) {
+        setIsMenuOpen(false);
+      }
+    },
+    {
+      threshold: 0.05,
+    }
+  );
+
+  observer.observe(checkoutSection);
+
+  return () => {
+    observer.disconnect();
+  };
+}, []);
+
 
   return (
-    <div className="fixed bottom-20 right-4 md:right-6 z-50 flex flex-col items-end gap-3">
+    <div
+  className={`fixed bottom-20 right-4 md:right-6 z-50 flex flex-col items-end gap-3 transition-all duration-300 ${
+    isCheckoutVisible
+      ? 'opacity-0 translate-y-6 pointer-events-none'
+      : 'opacity-100 translate-y-0 pointer-events-auto'
+  }`}
+>
       {/* Опциите (Messenger и Viber) */}
       <div 
         className={`flex flex-col items-center gap-3 transition-all duration-300 ease-in-out transform ${
