@@ -61,22 +61,25 @@ useEffect(() => {
         </a>
 
         {/* Viber */}
-        <a 
-          href="viber://chat?number=%2B359896783751"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-          aria-label="Viber"
-        >
-          {/* Сега иконката е по-голяма на компютър (md:h-20), но запазва формата си */}
-          <img src="images/viber.png" alt="Viber" className="h-12 md:h-16 w-auto block object-contain" />
-        </a>
+      <a 
+        href="viber://chat?number=%2B359896783751"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center hover:scale-110 transition-transform shadow-none bg-transparent"
+        aria-label="Viber"
+      >
+        <img 
+          src="images/viber.png" 
+          alt="Viber" 
+          className="h-12 md:h-16 w-auto block object-contain shadow-none" 
+        />
+      </a>
       </div>
 
       {/* Основно 3D балонче - С комбинирана мазна анимация (Плуване + Поклащане) */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="flex h-16 w-36 md:h-16 md:w-48 items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex h-16 w-36 md:h-16 md:w-48 items-center justify-center bg-transparent border-0 p-0 shadow-none transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           // Създаваме динамична анимация на място (inline)
           animation: !isMenuOpen ? 'combined-float-wiggle 10s ease-in-out infinite' : 'none'

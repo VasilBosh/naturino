@@ -383,39 +383,44 @@ export function Hero() {
             </div>
             {/* BONUS CARD end*/}
           
-          
           </div>
         </div>
 
-        {/* Текстова секция */}
-        <div className="w-full text-center lg:text-left text-white/90 transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
-          <div className="max-w-3xl mx-auto lg:mx-0 text-base md:text-base leading-relaxed px-4 lg:px-0">
-            <p className="mb-4">
-              Naturino Kids е изграден на базата на уникалния механизъм{" "}
-              <strong className="text-amber-300">BioHerb™-10.</strong>
-            </p>
-            <p className="mb-4">
-              Тази система е уникална заради изключително редкия Планински лимон{" "}
-              <em>(Chaenomeles maulei)</em> — плод, съдържащ до{" "}
-              <strong className="text-amber-300">5 пъти повече витамин C</strong>{" "}
-              от обикновения лимон и до{" "}
-              <strong className="text-amber-300">10 пъти повече витамин P</strong>{" "}
-              от ябълките. Именно той осигурява{" "}
-              <strong className="text-amber-300">над 98% усвояемост</strong>{" "}
-              на останалите девет билки, подбрани по специална фитотерапевтична таблица
-              и съобразени с детския организъм.
-            </p>
-            <p>
-              Затова Naturino Kids е един от малкото продукти на пазара
-              подходящ за деца от{" "}
-              <strong className="text-amber-300">18 месеца</strong>{" "}
-              — 100% натурален, изследван и регистриран в{" "}
-              <strong className="text-amber-300">Българската агенция по безопасност на храните.</strong>
-            </p>
+              {/* Кратки ползи в Hero */}
+      <div className="w-full transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
+        <div className="mx-0 lg:mx-0 rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-2xl px-5 py-5 md:px-6 md:py-6">
           
-          </div>
-        </div>
+          <p className="text-white font-black text-base md:text-lg mb-4 leading-tight">
+            Какво се забелязва след приема на Naturino Kids?
+          </p>
 
+          <div className="space-y-3">
+            {[
+              'Повишава имунитета и устойчивостта на детето',
+              'Намалява боледуванията при редовен прием',
+              'Подкрепа при хрема, кашлица и сезонно натоварване',
+              'По-бързо възстановяване след боледуване и намаляване на усложненията',
+              'Подкрепя дихателната система и облекчава дразненето в гърлото',
+              '100% натурален билков екстракт, без консерванти, оцветители и захар',
+              'Подходящ за деца над 18 месеца, лесен за прием и приятен на вкус',
+              'Много родители вече споделят, че децата им си връщат апетита след приема на Naturino Kids',
+
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
+                  <span className="text-white font-black text-sm">✓</span>
+                </div>
+
+                <p className="text-white font-bold text-sm md:text-base leading-tight">
+                  {item}
+                </p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+  
       </div>
     </section>
   );
