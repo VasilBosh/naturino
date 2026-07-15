@@ -1,5 +1,6 @@
 
 import ReactPixel from 'react-facebook-pixel';
+import { CheckoutSocialProof } from './sections/CheckoutSocialProof';
 import Sertifikat from './sections/Sertifikat';
 import TrustBadges from './sections/TrustBadges';
 import ComparisonSection from './sections/ComparisonSection';
@@ -57,6 +58,7 @@ function LandingPage() {
       <FAQ />     
       <TrustBadges />
       <Checkout />
+      <CheckoutSocialProof />
       <IntentPopup />
       {showSticky && <StickyCTA />}
       
