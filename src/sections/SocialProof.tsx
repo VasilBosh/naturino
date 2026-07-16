@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Star, Quote, MessageCircle, ThumbsUp, Heart } from 'lucide-react';
+import { MessageCircle, ThumbsUp, Heart } from 'lucide-react';
+
+const reviews = Array.from(
+  { length: 9 },
+  (_, index) => `/social/${index + 1}.jpg`
+);
 
 export function SocialProof() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -36,51 +41,6 @@ export function SocialProof() {
     };
   }, []);
 
-  const testimonials = [
-    {
-      name: 'Мария Личева',
-      role: 'Майка на 5-годишно дете',
-      content: 'Откакто давам Naturino Kids на дъщеря ми, тя боледува много по-рядко. Преди беше постоянно болна, а сега е пълна с енергия! Препоръчвам го на всички родители!',
-      rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/women/13.jpg',
-    },
-    {
-      name: 'Иван Пенчев',
-      role: 'Баща на близнаци',
-      content: 'Пробвахме много уж натурални продукти, но без трайни резултати. Благодаря на Пламена за уникалния продукт. Децата ми вече не пропускат детска градина заради болести. Препоръчвам!',
-      rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-    },
-    {
-      name: 'Анна Димитрова',
-      role: 'Майка на 3-годишно дете',
-      content: 'Педиатърката ни препоръча Naturino Kids и сме много доволни. Естествен продукт, който наистина помага на имунитета. Давам го редовно и виждам голяма разлика в здравето на сина ми. Препоръчвам го на всички родители, които търсят натурална подкрепа за децата си!',
-      rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-    },
-    {
-      name: 'Петър Филчев',
-      role: 'Баща на 7-годишно дете',
-      content: 'Синът ми беше постоянно с хрема и кашлица. След 1 месец с Naturino Kids разликата е огромна. Лесно се дозира, както ми препоръчаха по телефона директно под езика и резултатите дойдоха много бързо. Благодаря!',
-      rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/men/7.jpg',
-    },
-    {
-      name: 'Елена Николова - Данова',
-      role: 'Майка на две деца',
-      content: 'Давам го и на двете си деца вече половин година. Резултатите са невероятни - здрави и жизнени деца без следа от болести! Препоръчвам го на всички родители!',
-      rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
-    },
-    {
-      name: 'Георги Стефанов Миланов',
-      role: 'Баща на 4-годишно дете',
-      content: 'Фармацевтът в Аптеки Апостолов ни препоръча този продукт. Супер е че е достъпен и там. Много сме доволни от ефекта и благодаря на Пламена от Натурино за уникалния продукт!',
-      rating: 5,
-      avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
-    },
-  ];
-
   const videoSources = [
     // "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3",
     "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3",
@@ -89,7 +49,7 @@ export function SocialProof() {
   ];
 
   const stats = [
-    { value: '4,760+', label: 'Доволни родители' },
+    { value: '4,700+', label: 'Доволни родители' },
     { value: '4.9/5', label: 'Среден рейтинг' },
     { value: '95%', label: 'Препоръчват продукта' },
     { value: '10', label: 'Натурални билки' },
@@ -116,7 +76,7 @@ export function SocialProof() {
           </p>
         </div>
 
-        {/* Video Grid (Всички на един ред) */}
+        {/* Video Grid (Всички на один ред) */}
         <div className="reveal opacity-0 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-16 max-w-5xl mx-auto">
           {videoSources.map((src, index) => (
             <div key={index} className="flex flex-col items-center">
@@ -158,39 +118,33 @@ export function SocialProof() {
           ))}
         </div>
 
-        {/* Testimonials Slider (Auto-marquee) */}
+        {/* Testimonials Slider (Auto-marquee с автентични картинки) */}
         <div className="reveal opacity-0 relative mb-20">
-          <div className="flex gap-6 animate-scroll hover:[animation-play-state:paused] w-max">
-            {[...testimonials, ...testimonials].map((testimonial, index) => (
+          {/* Странично избледняване за визуален баланс */}
+          <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
+
+          <div className="flex gap-5 animate-scroll hover:[animation-play-state:paused] w-max py-2">
+            {[...reviews, ...reviews].map((review, index) => (
               <div 
                 key={index}
-                className="w-[300px] md:w-[400px] bg-white rounded-xl md:rounded-2xl p-5 md:p-6 shadow-sm border border-slate-100 flex-shrink-0"
+                className="w-[260px] sm:w-[280px] md:w-[320px] flex-shrink-0"
               >
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <div className="relative mb-4">
-                  <Quote className="absolute -top-2 -left-1 w-6 h-6 text-emerald-100" />
-                  <p className="text-slate-700 text-sm md:text-base leading-relaxed pl-4">
-                    {testimonial.content}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.name}
-                    className="w-10 h-10 rounded-full object-cover border-2 border-emerald-100"
-                  />
-                  <div>
-                    <p className="font-semibold text-slate-900 text-sm md:text-base">{testimonial.name}</p>
-                    <p className="text-slate-500 text-xs md:text-sm">{testimonial.role}</p>
-                  </div>
-                </div>
+                <img
+                  src={review}
+                  alt={`Отзив от родител ${(index % reviews.length) + 1}`}
+                  loading="lazy"
+                  className="w-full h-auto object-contain rounded-xl shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow duration-300"
+                />
               </div>
             ))}
           </div>
+
+            {/* Инструкция за мобилни устройства */}
+          <p className="block md:hidden text-center text-[11px] text-slate-400 font-semibold italic mt-3 px-4 leading-relaxed">
+            Ако искате да спрете на даден отзив, просто го натиснете. За да преминете на следващ, натиснете на този текст.
+          </p>
+
         </div>
 
         {/* --- НОВА ИНТЕНЗИВНА СЕКЦИЯ: ФЕЙСБУК ДИСКУСИИ (100% ЕДНАКВИ ЗА ДЕСКТОП И МОБИЛНИ) --- */}
@@ -339,7 +293,7 @@ export function SocialProof() {
                 <div>
                   <div className="bg-[#f0f2f5] px-3 py-2 rounded-2xl text-slate-800 relative">
                     <span className="font-bold text-[#050505] block mb-0.5 hover:underline cursor-pointer">Валерия Янева</span>
-                    Някой дава ли ги на детенце на година и половина? Имаме проблем със сополките постоянно, но много внимавам какво давам, че сме с алергии.
+                    Някой дава ли ги на детенце на година и половина? Имаме PROBLEM със сополките постоянно, но много внимавам какво давам, че сме с алергии.
                   </div>
                   <div className="text-slate-500 text-[12px] mt-1 pl-2 font-semibold">
                     <span className="hover:underline cursor-pointer text-slate-600">Like</span> · <span className="hover:underline cursor-pointer text-slate-600">Reply</span> · <span>2w</span>
@@ -417,10 +371,10 @@ export function SocialProof() {
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes scroll {
           0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-50% - 12px)); }
+          100% { transform: translateX(calc(-50% - 10px)); } /* 10px е половината от gap-5 */
         }
         .animate-scroll {
-          animation: scroll 40s linear infinite;
+          animation: scroll 50s linear infinite;
         }
       `}} />
     </section>
