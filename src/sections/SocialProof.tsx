@@ -141,7 +141,7 @@ export function SocialProof() {
           </div>
 
             {/* Инструкция за мобилни устройства */}
-          <p className="block md:hidden text-center text-[11px] text-slate-400 font-semibold italic mt-3 px-4 leading-relaxed">
+          <p className="block md:hidden text-center text-[11px] font-bold text-rose-500 italic mt-3 px-4 leading-relaxed animate-pulse">
             Ако искате да спрете на даден отзив, просто го натиснете. За да преминете на следващ, натиснете на този текст.
           </p>
 
