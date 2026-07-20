@@ -1,11 +1,12 @@
 
 import ReactPixel from 'react-facebook-pixel';
-import { CheckoutSocialProof } from './sections/CheckoutSocialProof';
 import Sertifikat from './sections/Sertifikat';
 import TrustBadges from './sections/TrustBadges';
 import ComparisonSection from './sections/ComparisonSection';
 import IntentPopup from './sections/IntentPopup';
 import TrustHero from './sections/TrustHero';
+import { ReviewsSlider } from './sections/ReviewsSlider';
+import { CheckoutSocialProof } from './sections/CheckoutSocialProof';
 import { Story } from './sections/Story';
 import { Stats } from './sections/Stats';
 import { useState, useEffect } from 'react';
@@ -46,6 +47,7 @@ function LandingPage() {
       <TrustHero />
       <Problem />
       <Solution />
+      <ReviewsSlider />
       <ComparisonSection />
       <PharmacistReview />
       <Benefits />
