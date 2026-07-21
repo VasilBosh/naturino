@@ -1,41 +1,58 @@
 import { ShoppingCart, X, ArrowRight } from 'lucide-react';
-import { useState, useEffect } from 'react'; // 1. Добавихме useEffect
+import { useState, useEffect } from 'react';
 
 export function StickyCTA() {
-  const [isVisible, setIsVisible] = useState(false); // 2. Първоначално е false
-  const [isAtCheckout, setIsAtCheckout] = useState(false); // 3. Следим дали сме на чек аута
-  const [isClosedByUser, setIsClosedByUser] = useState(false); // 4. Ако потребителят го затвори ръчно
+  const [scrolledEnough, setScrolledEnough] = useState(false);   // скролнали ли сме > 500px
+  const [checkoutInView, setCheckoutInView] = useState(false);   // вижда ли се чек аутът
+  const [commentsVisible, setCommentsVisible] = useState(false); // вижда ли се секцията с коментари поне 20%
+  const [isClosedByUser, setIsClosedByUser] = useState(false);   // затворен ли е ръчно с X
 
+  // 1. Скрол прагът от 500px
   useEffect(() => {
-    const handleScroll = () => {
-      if (isClosedByUser) return; // Ако е затворен от X, не прави нищо
+    const onScroll = () => setScrolledEnough(window.scrollY > 500);
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-      // 5. Проверка за появяване (след 500px скрол)
-      const shouldShow = window.scrollY > 500;
+  // 2. Чек аут — следим само дали се вижда изобщо
+  useEffect(() => {
+    const checkout = document.getElementById('checkout');
+    if (!checkout) return;
 
-      // 6. Проверка за изчезване (дали чек аута е на екрана)
-      const checkoutSection = document.getElementById('checkout');
-      if (checkoutSection) {
-        const rect = checkoutSection.getBoundingClientRect();
-        // Ако горният край на чек аута влезе в изгледа на браузъра
-        const atCheckout = rect.top < window.innerHeight - 100; 
-        setIsAtCheckout(atCheckout);
-      }
+    const observer = new IntersectionObserver(
+      ([entry]) => setCheckoutInView(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(checkout);
+    return () => observer.disconnect();
+  }, []);
 
-      setIsVisible(shouldShow);
-    };
+  // 3. Коментари — показваме бутона щом 20% от секцията са видими
+  useEffect(() => {
+    const comments = document.getElementById('CheckoutSocialProof'); // <-- id на секцията с коментари
+    if (!comments) return;
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isClosedByUser]);
+    const observer = new IntersectionObserver(
+      ([entry]) => setCommentsVisible(entry.isIntersecting),
+      { threshold: 0.02} // 20%
+    );
+    observer.observe(comments);
+    return () => observer.disconnect();
+  }, []);
 
   const scrollToCheckout = () => {
     document.getElementById('checkout')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // ЛОГИКА ЗА СКРИВАНЕ: 
-  // Ако е затворен от потребителя ИЛИ още не сме скролнали достатъчно ИЛИ вече сме на чек аута
-  if (isClosedByUser || !isVisible || isAtCheckout) return null;
+  // ЛОГИКА ЗА ПОКАЗВАНЕ:
+  // - не е затворен ръчно
+  // - скролнали сме поне 500px
+  // - НЕ сме на чек аута  ИЛИ  коментарите са 20% видими
+  const shouldShow =
+    !isClosedByUser && scrolledEnough && (!checkoutInView || commentsVisible);
+
+  if (!shouldShow) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-2xl animate-fadeInUp">
@@ -65,7 +82,7 @@ export function StickyCTA() {
               <ArrowRight className="w-4 h-4" />
             </button>
             <button 
-              onClick={() => setIsClosedByUser(true)} // Променихме това, за да не се появява пак
+              onClick={() => setIsClosedByUser(true)}
               className="w-8 h-8 md:w-10 md:h-10 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center text-slate-500 transition-colors"
             >
               <X className="w-4 h-4 md:w-5 md:h-5" />

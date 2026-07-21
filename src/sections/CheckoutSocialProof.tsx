@@ -7,7 +7,7 @@ const reviews = Array.from(
 
 export function CheckoutSocialProof() {
   return (
-    <section className="bg-slate-50 overflow-hidden py-12 md:py-20 w-full">
+    <section id="CheckoutSocialProof" className="bg-slate-50 overflow-hidden py-12 md:py-20 w-full">
       <div className="max-w-7xl mx-auto px-4">
         
         {/* Заглавие - Запазено в същия стил за консистентност */}
