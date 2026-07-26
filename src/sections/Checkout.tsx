@@ -3,6 +3,7 @@ import { useEffect, useRef, useState} from 'react';
 import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UpsellFlow } from './UpsellFlow';
 
 export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -18,7 +19,7 @@ export function Checkout() {
     notes: '',
     promoCode: '', // НОВО
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [flowOrder, setFlowOrder] = useState<{ eventId: string; quantity: number; total: number } | null>(null);
   const [addToCartFired, setAddToCartFired] = useState(false);
   const touchedCountRef = useRef(0);
 
@@ -198,7 +199,7 @@ const handleFieldTouch = () => {
   }
 }
 
-    setSubmitted(true);
+    
 
     localStorage.setItem('naturino_buyer', 'true');
     const orderData = {
@@ -221,7 +222,10 @@ const handleFieldTouch = () => {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(orderData),
     }).catch(error => console.error('Background sync error:', error));
-    
+
+    // Отваряме Upsell след записа (поръчката вече е записана по-горе, с eventId)
+    setFlowOrder({ eventId: eventId, quantity: quantity, total: currentTotal });
+
     setFormData({
       fullName: '',
       phone: '',
@@ -589,18 +593,9 @@ const handleFieldTouch = () => {
         </div>
       </div>
 
-      {/* SUCCESS POP-UP */}
-      {submitted && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fadeIn" onClick={() => setSubmitted(false)}>
-          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-md w-full shadow-2xl relative animate-scaleIn" onClick={(e) => e.stopPropagation()}>
-            <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-200">
-              <Check className="w-10 h-10 text-white" />
-            </div>
-            <h3 className="text-2xl md:text-3xl font-black text-slate-900 text-center mb-4">Успешна поръчка!</h3>
-            <p className="text-slate-600 text-center mb-8 text-lg leading-relaxed">Благодарим ви за доверието! Очаквайте обаждане от наш консултант много скоро.</p>
-            <button onClick={() => setSubmitted(false)} className="w-full py-5 bg-emerald-500 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-200">ЗАТВОРИ</button>
-          </div>
-        </div>
+      {/* UPSELL / DOWNSELL / БЛАГОДАРЯ */}
+      {flowOrder && (
+        <UpsellFlow order={flowOrder} onClose={() => setFlowOrder(null)} />
       )}
     </section>
   );
