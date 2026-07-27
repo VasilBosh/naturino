@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart } from 'lucide-react';
 
 /**
@@ -99,9 +99,14 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
   const [step, setStep] = useState<'upsell' | 'downsell' | 'thankyou'>('upsell');
   const [path, setPath] = useState<'upsell' | 'downsell' | 'none'>('none');
 
-  // Обновяваща заявка — намира СЪЩИЯ ред по eventId и обновява брой/сума + маркер
-  // Праща обновяване със ФИНАЛНИ стойности. quantity = брой ДЕТСКИ опаковки.
-  const sendUpdate = (action: 'upsell' | 'downsell', quantity: number, total: number) => {
+  // Гарантира, че към сървъра тръгва САМО ЕДНА финализираща заявка (един имейл).
+  const sentRef = useRef(false);
+
+  // Праща обновяване/финализиране със ФИНАЛНИ стойности. quantity = брой ДЕТСКИ опаковки.
+  // 'complete' = клиентът отказа/не реагира → тръгва базовият имейл, редовете НЕ се пипат.
+  const sendUpdate = (action: 'upsell' | 'downsell' | 'complete', quantity: number, total: number) => {
+    if (sentRef.current) return; // вече е изпратено веднъж — не дублираме
+    sentRef.current = true;
     const payload = {
       SK: 'id:9307307573',
       action,
@@ -130,6 +135,24 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
     setPath('downsell');
     setStep('thankyou');
   };
+  const declineAll = () => {
+    // Отказ / липса на реакция → финализираме базовата поръчка (тръгва базовият имейл)
+    sendUpdate('complete', order.quantity, order.total);
+    setPath('none');
+    setStep('thankyou');
+  };
+
+  // ЗАЩИТА СРЕЩУ ЗАГУБЕН ИМЕЙЛ: ако клиентът стигне до Upsell/Downsell и не натисне нищо
+  // в рамките на 60 сек → автоматично се финализира (базов имейл към клиента и админа).
+  // Ако през това време натисне оферта или откаже — sendUpdate е защитен, няма двоен имейл.
+  useEffect(() => {
+    if (step !== 'upsell' && step !== 'downsell') return;
+    const timer = setTimeout(() => {
+      declineAll();
+    }, 60000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   return (
     <>
@@ -154,7 +177,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 Изчакай! Добави още <span className="text-rose-600">2 детски опаковки</span>
               </h2>
               <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-1.5 mb-6">
-                И грабни <b className="text-amber-600">безплатна</b> доставка за цялата поръчка!
+                И цялата поръчка пътува <b className="text-amber-600">безплатно</b> до всяка точка в България
               </p>
 
               <div className="uf-floaty">
@@ -174,15 +197,15 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 <div className="pb-1.5">
                   <span className="line-through text-slate-400 font-bold">{eur(UPSELL.wasPrice)}</span>
                   <span className="block mt-1 text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    + Безплатна доставка
+                    + доставка гратис
                   </span>
                 </div>
               </div>
 
               <div className="mt-6 space-y-2.5">
                 {[
-                  { icon: ShieldCheck, t: '3 опаковки = 2 месеца защита без прекъсване' },
-                  { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
+                  { icon: ShieldCheck, t: '3 опаковки = близо 2 месеца защита без прекъсване' },
+                  { icon: Truck, t: 'Безплатна доставка за цялата поръчка, цяла България' },
                   { icon: Heart, t: 'Никога не оставаш без наличност в разгара на вирусите' },
                 ].map(({ icon: Icon, t }, i) => (
                   <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-rose-100">
@@ -270,14 +293,11 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 onClick={acceptDownsell}
                 className="uf-shimmer relative overflow-hidden w-full mt-5 py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
               >
-                <Sparkles className="w-5 h-5" /> ДА, ДОБАВЯМ
+                <Sparkles className="w-5 h-5" /> ДА, ДОБАВИ Я
               </button>
 
               <button
-                onClick={() => {
-                  setPath('none');
-                  setStep('thankyou');
-                }}
+                onClick={declineAll}
                 className="w-full mt-3 py-2 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
               >
                 Не, благодаря — завърши поръчката
