@@ -177,14 +177,14 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 Изчакай! Добави още <span className="text-rose-600">2 детски опаковки</span>
               </h2>
               <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-1.5 mb-6">
-                И цялата поръчка пътува <b className="text-amber-600">безплатно</b> до всяка точка в България
+                И вземи <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка!
               </p>
 
               <div className="uf-floaty">
                 <ProductShot
                   src={UPSELL.img}
                   emoji={UPSELL.emoji}
-                  badge={`×${order.quantity + UPSELL.addQty}`}
+                  badge={`×${UPSELL.addQty}`}
                   tone="linear-gradient(135deg,#fecdd3,#fed7aa)"
                 />
               </div>
@@ -197,15 +197,15 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 <div className="pb-1.5">
                   <span className="line-through text-slate-400 font-bold">{eur(UPSELL.wasPrice)}</span>
                   <span className="block mt-1 text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    + доставка гратис
+                    + безплатна доставка
                   </span>
                 </div>
               </div>
 
               <div className="mt-6 space-y-2.5">
                 {[
-                  { icon: ShieldCheck, t: '3 опаковки = близо 2 месеца защита без прекъсване' },
-                  { icon: Truck, t: 'Безплатна доставка за цялата поръчка, цяла България' },
+                  { icon: ShieldCheck, t: '3 опаковки = 2 месеца защита без прекъсване' },
+                  { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
                   { icon: Heart, t: 'Никога не оставаш без наличност в разгара на вирусите' },
                 ].map(({ icon: Icon, t }, i) => (
                   <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-rose-100">
@@ -277,7 +277,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
               <div className="mt-6 space-y-2.5">
                 {[
                   { icon: Sparkles, t: 'Надградена формула: 13 билки и плодове в Тройна Имунна Архитектура™' },
-                  { icon: Zap, t: 'С адаптогени Рейши, Шийтаке и Астрагал — енергия и устойчивост на стрес' },
+                  { icon: Zap, t: 'С адаптогени Рейши, Шийтаке и Астрагал за повече енергия, устойчивост и по-малко стрес' },
                   { icon: ShieldCheck, t: 'Работи на 5 нива: имунитет, енергия, фокус, възстановяване, спокойствие' },
                 ].map(({ icon: Icon, t }, i) => (
                   <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-emerald-100">
