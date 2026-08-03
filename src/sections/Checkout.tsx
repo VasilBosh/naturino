@@ -1,15 +1,16 @@
 import ReactPixel from 'react-facebook-pixel'; 
 import { useEffect, useRef, useState} from 'react';
-import { ShoppingCart, Phone, User, MapPin, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react'; 
+import { ShoppingCart, Phone, User, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react'; 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UpsellFlow } from './UpsellFlow';
+import { CourierPicker, type CourierSelection } from '../components/CourierPicker';
 
 export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
-  const [courier, setCourier] = useState<'speedy' | 'econt'>('speedy');
-  const [courierError, setCourierError] = useState(false); // НОВО: за визуалната грешка
+  const [delivery, setDelivery] = useState<CourierSelection | null>(null);
+  const [deliveryError, setDeliveryError] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -17,7 +18,7 @@ export function Checkout() {
     city: '',
     officeAddress: '',
     notes: '',
-    promoCode: '', // НОВО
+    promoCode: '',
   });
   const [flowOrder, setFlowOrder] = useState<{ eventId: string; quantity: number; total: number } | null>(null);
   const [addToCartFired, setAddToCartFired] = useState(false);
@@ -63,29 +64,26 @@ export function Checkout() {
     }
   };
 
-      
+  const handleFieldTouch = () => {
+    if (addToCartFired) return;
 
-const handleFieldTouch = () => {
-  if (addToCartFired) return;
+    // Палим AddToCart едва когато реално има имейл ИЛИ телефон (работи и при autofill)
+    const hasData = formData.email.trim() !== '' || formData.phone.trim() !== '';
+    if (!hasData) return;
 
-  // Палим AddToCart едва когато реално има имейл ИЛИ телефон (работи и при autofill)
-  const hasData = formData.email.trim() !== '' || formData.phone.trim() !== '';
-  if (!hasData) return;
-
-  setAddToCartFired(true);
-  // Малко изчакване, за да се напълнят полетата от autofill преди да четем
-  setTimeout(() => {
-    applyAdvancedMatching();
-    ReactPixel.track('AddToCart', {
-      content_name: 'Naturino Kids',
-      content_type: 'product',
-      value: pricePerUnit,
-      currency: 'EUR',
-      num_items: quantity,
-    });
-  }, 800);
-};
-
+    setAddToCartFired(true);
+    // Малко изчакване, за да се напълнят полетата от autofill преди да четем
+    setTimeout(() => {
+      applyAdvancedMatching();
+      ReactPixel.track('AddToCart', {
+        content_name: 'Naturino Kids',
+        content_type: 'product',
+        value: pricePerUnit,
+        currency: 'EUR',
+        num_items: quantity,
+      });
+    }, 800);
+  };
 
   useEffect(() => {
     ReactPixel.track('ViewContent', {
@@ -95,7 +93,6 @@ const handleFieldTouch = () => {
       currency: 'EUR',
     });
   }, []);
-
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -134,14 +131,11 @@ const handleFieldTouch = () => {
   }, []);
 
   // ЛОГИКА ЗА ЦЕНАТА И ПРОМО КОДА
-  //const isPromoValid = formData.promoCode.trim().toUpperCase() === 'PROMO9307307573'; // Сравняваме с фиксирания код
-
   const cleanPromoInput = formData.promoCode.trim().toUpperCase();
   const isStaticPromo = cleanPromoInput === 'PROMO9307307573'; // Сравняваме с фиксирания код
   // Проверяваме дали написаното съвпада ТОЧНО с кода, дошъл от попъпа
   const isDynamicPromo = validPopupCode ? cleanPromoInput === validPopupCode : false;
   const isPromoValid = isStaticPromo || isDynamicPromo;
-
 
   const pricePerUnit = isPromoValid ? 18.50 : 19.90; // 7% отстъпка от 19.90 е 18.50
   const totalPrice = (pricePerUnit * quantity).toFixed(2);
@@ -149,79 +143,97 @@ const handleFieldTouch = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Проверка за избран куриер с визуален ефект вместо alert
-    if (!courier) {
-      setCourierError(true);
-      setTimeout(() => setCourierError(false), 5000); // Изключва ефекта след 5 сек
+    // Проверка: доставката трябва да е напълно избрана (куриер + тип + град + офис/адрес)
+    if (!delivery || !delivery.isComplete) {
+      setDeliveryError(true);
+      setTimeout(() => setDeliveryError(false), 5000);
+      document.getElementById('delivery-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
     const currentTotal = Number(totalPrice);
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    
+
     // Оптимизиран Тракинг с филтър за тестови поръчки
-  if (typeof window !== 'undefined' && (window as any).fbq) {
-    const isTestOrder = formData.fullName.toLowerCase().includes('test');
-    
-    if (isTestOrder) {
-      console.log('⚠️ Тестова поръчка засечена в Checkout! Прескачаме браузърния Facebook Pixel Event за Purchase.');
-    } else {
-    
-      // Защита за autofill: четем реалните стойности директно от полетата
-    const liveEmail = (document.getElementById('email') as HTMLInputElement)?.value || formData.email;
-    const livePhone = (document.getElementById('phone') as HTMLInputElement)?.value || formData.phone;
-    const liveName = (document.getElementById('fullName') as HTMLInputElement)?.value || formData.fullName;
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      const isTestOrder = formData.fullName.toLowerCase().includes('test');
 
-    const am: Record<string, string> = {};
-    if (liveEmail) am.em = liveEmail.toLowerCase().trim();
-    if (livePhone) {
-      let ph = livePhone.replace(/\D/g, '');
-      if (ph.startsWith('0')) ph = '359' + ph.slice(1);
-      am.ph = ph;
+      if (isTestOrder) {
+        console.log('⚠️ Тестова поръчка засечена в Checkout! Прескачаме браузърния Facebook Pixel Event за Purchase.');
+      } else {
+        // Защита за autofill: четем реалните стойности директно от полетата
+        const liveEmail = (document.getElementById('email') as HTMLInputElement)?.value || formData.email;
+        const livePhone = (document.getElementById('phone') as HTMLInputElement)?.value || formData.phone;
+        const liveName = (document.getElementById('fullName') as HTMLInputElement)?.value || formData.fullName;
+
+        const am: Record<string, string> = {};
+        if (liveEmail) am.em = liveEmail.toLowerCase().trim();
+        if (livePhone) {
+          let ph = livePhone.replace(/\D/g, '');
+          if (ph.startsWith('0')) ph = '359' + ph.slice(1);
+          am.ph = ph;
+        }
+        if (liveName) {
+          const parts = liveName.trim().toLowerCase().split(/\s+/);
+          am.fn = parts[0] || '';
+          if (parts.length > 1) am.ln = parts.slice(1).join(' ');
+        }
+        if (Object.keys(am).length > 0 && PIXEL_ID) {
+          ReactPixel.init(PIXEL_ID, am as any, { autoConfig: true, debug: false });
+        }
+
+        (window as any).fbq('track', 'Purchase', {
+          value: currentTotal,
+          currency: 'EUR',
+          content_name: 'Naturino Kids',
+          content_type: 'product',
+          num_items: quantity,
+        }, { eventID: eventId });
+      }
     }
-    if (liveName) {
-      const parts = liveName.trim().toLowerCase().split(/\s+/);
-      am.fn = parts[0] || '';
-      if (parts.length > 1) am.ln = parts.slice(1).join(' ');
-    }
-    if (Object.keys(am).length > 0 && PIXEL_ID) {
-      ReactPixel.init(PIXEL_ID, am as any, { autoConfig: true, debug: false });
-    }
-
-    (window as any).fbq('track', 'Purchase', {
-
-      value: currentTotal,
-      currency: 'EUR',
-      content_name: 'Naturino Kids',
-      content_type: 'product',
-      num_items: quantity,
-    }, { eventID: eventId });
-  }
-}
-
-    
 
     localStorage.setItem('naturino_buyer', 'true');
     const orderData = {
       ...formData,
-      phone: formData.phone.replace(/\s+/g, ''), // Почистваме телефона за скрипта
+      // Стари полета — пълним ги от новия избор, за да е таблицата съвместима:
+      city: delivery.cityName,
+      officeAddress: delivery.fullAddress,
+      notes: delivery.note,
+      phone: formData.phone.replace(/\s+/g, ''),
       quantity: quantity,
       total: currentTotal,
-      courier: courier === 'speedy' ? 'Speedy' : (courier === 'econt' ? 'ЕКОНТ' : 'Неизбран'),
+      courier: delivery.courier === 'speedy' ? 'Speedy' : 'ЕКОНТ',
       currency: 'EUR',
-      eventId: eventId, 
+      eventId: eventId,
       SK: 'id:9307307573',
-      promoApplied: isPromoValid ? 'YES (PROMO9307307573)' : 'NO'
+      promoApplied: isPromoValid ? 'YES (PROMO9307307573)' : 'NO',
+      // НОВИ структурирани полета (за пощ. код и точност):
+      deliveryType: delivery.deliveryType === 'office' ? 'До офис' : 'До адрес',
+      postCode: delivery.postCode,
+      region: delivery.region,
+      officeName: delivery.officeName,
+      officeId: String(delivery.officeId ?? ''),
+      streetName: delivery.streetName,
+      streetNo: delivery.streetNo,
+      isAutomat: delivery.isAutomat ? 'Да' : 'Не',
     };
 
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
+    const BACKUP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
 
-    // КОРИГИРАН FETCH (премахнато no-cors)
+    // Основен запис (жив, недокоснат)
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(orderData),
     }).catch(error => console.error('Background sync error:', error));
+
+    // Бекъп запис (независим — ако гръмне, не пипа основния)
+    fetch(BACKUP_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(orderData),
+    }).catch(error => console.error('Backup sync error:', error));
 
     // Отваряме Upsell след записа (поръчката вече е записана по-горе, с eventId)
     setFlowOrder({ eventId: eventId, quantity: quantity, total: currentTotal });
@@ -235,7 +247,7 @@ const handleFieldTouch = () => {
       notes: '',
       promoCode: '',
     });
-    setCourier('speedy'); // Нулиране на куриера след успешна поръчка
+    setDelivery(null);
   };
 
   return (
@@ -304,12 +316,12 @@ const handleFieldTouch = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 max-w-5xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 max-w-5xl mx-auto min-w-0">
           {/* Order Form */}
-          <div className="reveal opacity-0">
+          <div className="reveal opacity-0 min-w-0">
             <form 
               onSubmit={handleSubmit} 
-              className="bg-amber-50/50 rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-2xl shadow-amber-900/10 relative overflow-hidden"
+              className="bg-amber-50/50 rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-2xl shadow-amber-900/10 relative overflow-hidden min-w-0"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-amber-200/20 rounded-bl-full -mr-12 -mt-12"></div>
               
@@ -376,100 +388,20 @@ const handleFieldTouch = () => {
                   </div>
                 </div>
 
-                {/* Courier Selection */}
-                <div>
-                  <Label className="text-amber-900 text-sm font-bold mb-3 flex items-center gap-1.5">
-                    <Truck className="w-4 h-4 text-amber-600" />
-                    Изберете куриер <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => { setCourier('speedy'); setCourierError(false); }}
-                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-                        courier === 'speedy'
-                          ? 'border-amber-500 bg-white shadow-lg shadow-amber-200 ring-2 ring-amber-500/20'
-                          : courierError 
-                            ? 'border-red-500 bg-red-50 animate-pulse' 
-                            : 'border-amber-100 hover:border-amber-300 bg-white/60 text-slate-500'
-                      }`}
-                    >
-                      <span className="text-2xl">🚚</span>
-                      <span className={`font-bold text-sm ${courier === 'speedy' ? 'text-amber-900' : ''}`}>Speedy</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setCourier('econt'); setCourierError(false); }}
-                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-                        courier === 'econt'
-                          ? 'border-amber-500 bg-white shadow-lg shadow-amber-200 ring-2 ring-amber-500/20'
-                          : courierError 
-                            ? 'border-red-500 bg-red-50 animate-pulse' 
-                            : 'border-amber-100 hover:border-amber-300 bg-white/60 text-slate-500'
-                      }`}
-                    >
-                      <span className="text-2xl">📦</span>
-                      <span className={`font-bold text-sm ${courier === 'econt' ? 'text-amber-900' : ''}`}>ЕКОНТ</span>
-                    </button>
-                  </div>
-                  {courierError && <p className="text-[10px] text-red-500 font-bold mt-1 ml-1 animate-bounce">Моля, изберете куриер!</p>}
+                {/* НОВ БЛОК: избор на куриер + доставка (CourierPicker) */}
+                <div
+                  id="delivery-block"
+                  className={`min-w-0 rounded-2xl transition-all duration-300 ${
+                    deliveryError ? 'ring-2 ring-red-400 ring-offset-2 bg-red-50/40 p-3 -m-0.5' : ''
+                  }`}
+                >
+                  <CourierPicker onChange={setDelivery} />
+                  {deliveryError && (
+                    <p className="text-[11px] text-red-500 font-bold mt-2 ml-1 animate-bounce">
+                      Моля, изберете куриер, град и офис/адрес за доставка!
+                    </p>
+                  )}
                 </div>
-
-                {/* City & Delivery Address */}
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="city" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-amber-600" />
-                      Град <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="city"
-                      type="text"
-                      required
-                      placeholder="Вашият град"
-                      value={formData.city}
-                      onChange={(e) => { setFormData({ ...formData, city: e.target.value }); handleFieldTouch(); }}
-                      className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
-                      onFocus={handleFocus}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="officeAddress" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-amber-600" />
-                      Адрес за доставка<span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="officeAddress"
-                      type="text"
-                      required
-                      placeholder={courier ? `Личен адрес или офис на ${courier === 'speedy' ? 'Speedy' : 'Еконт'}` : 'Личен адрес или офис на куриер'}
-                      value={formData.officeAddress}
-                      onChange={(e) => { setFormData({ ...formData, officeAddress: e.target.value }); handleFieldTouch(); }}
-                      className="bg-white border-amber-200 h-12 text-base rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-sm"
-                      onFocus={handleFocus}
-                    />
-                  </div>
-                </div>
- 
-                {/* NEW: Promo Code Field */}
-                {/* 
-                <div>
-                  <Label htmlFor="promoCode" className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
-                    <Ticket className="w-4 h-4 text-amber-600" />
-                    Промо код
-                  </Label>
-                  <Input
-                    id="promoCode"
-                    type="text"
-                    placeholder="Имате ли код за отстъпка?"
-                    value={formData.promoCode}
-                    onChange={(e) => { setFormData({ ...formData, promoCode: e.target.value }); handleFieldTouch(); }}
-                    onFocus={handleFocus}
-                    className={`h-12 text-base rounded-xl transition-all shadow-sm ${isPromoValid ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-amber-200'}`}
-                  />
-                  {isPromoValid && <p className="text-xs text-emerald-600 font-bold mt-1 ml-1">✓ Приложена отстъпка -7%!</p>}
-                </div>
-                */}
 
                 {/* QUANTITY SELECTOR */}
                 <div className="flex flex-col gap-3 p-4 bg-white/60 rounded-2xl border border-amber-100 mt-2">
