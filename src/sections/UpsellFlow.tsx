@@ -18,6 +18,9 @@ import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart } from 'lucide-react';
 const GOOGLE_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
 
+const BACKUP_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
+
 const UPSELL = { addQty: 2, addPrice: 36.9, wasPrice: 39.8, img: '/upsell/kids-3pack.png', emoji: '🧴' };
 const DOWNSELL = { addQty: 1, addPrice: 23.5, img: '/upsell/adult.png', emoji: '🌿' };
 
@@ -119,7 +122,15 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
     }).catch((error) => console.error('Upsell sync error:', error));
+
+    // Бекъп запис (независим — само обновява реда в бекъпа, без имейли/Tradefy)
+    fetch(BACKUP_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    }).catch((error) => console.error('Upsell backup sync error:', error));
   };
+  
 
   const acceptUpsell = () => {
     // Upsell: +2 ДЕТСКИ опаковки → детският брой расте с 2
