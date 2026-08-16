@@ -130,7 +130,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
       body: JSON.stringify(payload),
     }).catch((error) => console.error('Upsell backup sync error:', error));
   };
-  
+
 
   const acceptUpsell = () => {
     // Upsell: +2 ДЕТСКИ опаковки → детският брой расте с 2
@@ -230,14 +230,19 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
               <button
                 onClick={acceptUpsell}
-                className="uf-shimmer relative overflow-hidden w-full mt-5 py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
+                className="uf-shimmer relative overflow-hidden w-full mt-5 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
               >
-                <Sparkles className="w-5 h-5" /> ДА! ВЗЕМИ МЕ
+                <Sparkles className="w-5 h-5 flex-shrink-0" />
+                <span className="flex flex-col items-center leading-tight text-center">
+                  <span className="text-[17px] sm:text-lg">ДА! Добави още 2 опаковки</span>
+                  <span className="text-[12px] font-bold opacity-90">с безплатна доставка</span>
+                </span>
               </button>
 
+              {/* Отказ — добавен само лек контур, за да се разпознава като бутон */}
               <button
                 onClick={() => setStep('downsell')}
-                className="w-full mt-3 py-2 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
+                className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
               >
                 Не, благодаря — продължи без офертата
               </button>
@@ -302,14 +307,15 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
               <button
                 onClick={acceptDownsell}
-                className="uf-shimmer relative overflow-hidden w-full mt-5 py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
+                className="uf-shimmer relative overflow-hidden w-full mt-5 py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[16px] sm:text-lg leading-tight shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
               >
-                <Sparkles className="w-5 h-5" /> ДА, ДОБАВИ Я
+                <Sparkles className="w-5 h-5 flex-shrink-0" /> ДА! Взимам с безплатна доставка
               </button>
 
+              {/* Отказ — добавен само лек контур, за да се разпознава като бутон */}
               <button
                 onClick={declineAll}
-                className="w-full mt-3 py-2 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
+                className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
               >
                 Не, благодаря — завърши поръчката
               </button>

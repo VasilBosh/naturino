@@ -9,10 +9,10 @@ import {
 import {
   BadgeCheck,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   FileCheck,
-  Landmark,
   MoveHorizontal,
   ShieldCheck,
   X,
@@ -67,31 +67,11 @@ const Sertifikat = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
+  // Разгъване на дългия текст на телефон (на десктоп текстът е винаги отворен)
+  const [isStoryOpen, setIsStoryOpen] = useState(false);
+
   const DOCUMENT_POPUP_ZOOM = 1.6;
   const activeDocument = documents[activeDocumentIndex];
-
-  const qualityPoints = [
-    {
-      icon: FileCheck,
-      title: 'Регистрация в БАБХ',
-      text: 'Рег. № T242506848/02.09.2025',
-    },
-    {
-      icon: BadgeCheck,
-      title: 'Удостоверено качество',
-      text: 'Качеството и съставът са подкрепени с официален документ.',
-    },
-    {
-      icon: ShieldCheck,
-      title: 'HACCP и ISO контрол',
-      text: 'Производство по контролирани стандарти за безопасност.',
-    },
-    {
-      icon: Landmark,
-      title: 'Регистрирана марка',
-      text: 'Марка №178546, защитена до 19.08.2035 г.',
-    },
-  ];
 
   const scrollToCheckout = () => {
     document.getElementById('checkout')?.scrollIntoView({
@@ -366,14 +346,14 @@ const Sertifikat = () => {
 
           {/* Основна зелена секция */}
           <div className="reveal rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 opacity-0 md:rounded-3xl md:p-8 lg:p-10">
-            <div className="grid items-center gap-8 md:grid-cols-2 md:gap-10 lg:gap-12">
+            <div className="grid items-start gap-8 md:grid-cols-2 md:gap-10 lg:gap-12">
               {/* Лява част */}
               <div className="order-2 md:order-1">
                 <h3 className="mb-4 text-xl font-bold text-slate-900 md:mb-6 md:text-2xl lg:text-3xl">
                   Проверено качество и защитено име
                 </h3>
 
-                <div className="mb-6 space-y-3 md:mb-8 md:space-y-4">
+                <div className="mb-6 space-y-3 md:space-y-4">
                   {[
                     'Официално удостоверение за качество',
                     'Регистрация в Българската агенция по безопасност на храните',
@@ -395,29 +375,162 @@ const Sertifikat = () => {
                   ))}
                 </div>
 
-                <div className="mb-6 grid gap-3 sm:grid-cols-2 md:mb-8 md:gap-4">
-                  {qualityPoints.map((point, index) => {
-                    const Icon = point.icon;
+                {/* ============================================================
+                    ОБЩ ТЕКСТ ЗАД ДВАТА ДОКУМЕНТА
+                    Показва се винаги, независимо кой документ е избран.
+                    На телефон е свит с бутон, на десктоп е винаги отворен.
+                   ============================================================ */}
+                <div className="mb-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm md:mb-8 md:rounded-3xl md:p-6 lg:p-7">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-emerald-700 sm:text-xs">
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>Зад всяка бутилка</span>
+                  </div>
 
-                    return (
-                      <div
-                        key={index}
-                        className="rounded-xl border border-emerald-100 bg-white p-4 shadow-sm md:rounded-2xl md:p-5"
-                      >
-                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 md:h-12 md:w-12">
-                          <Icon className="h-5 w-5 text-emerald-600 md:h-6 md:w-6" />
-                        </div>
+                  <h4 className="mb-4 text-lg font-black leading-snug text-slate-900 sm:text-xl md:text-2xl">
+                    Кой стои зад Naturino Kids
+                  </h4>
 
-                        <h4 className="mb-1 text-sm font-bold text-slate-900 md:text-base">
-                          {point.title}
-                        </h4>
+                  <div
+                    className={`relative ${
+                      isStoryOpen
+                        ? ''
+                        : 'max-h-[260px] overflow-hidden md:max-h-none md:overflow-visible'
+                    }`}
+                  >
+                    <div className="space-y-4 text-[14.5px] leading-relaxed text-slate-700 md:space-y-5 md:text-[15px] md:leading-7">
+                      <p>
+                        <strong className="font-bold text-slate-900">
+                          Naturino Kids® не е просто име върху
+                          опаковка.
+                        </strong>{' '}
+                        Марката е официално регистрирана в
+                        Патентното ведомство на Република
+                        България под регистрационен{' '}
+                        <strong className="font-bold text-slate-900">
+                          №178546
+                        </strong>
+                        , с притежател „НИКИ – 2025“ ЕООД и
+                        правна закрила до 19 август 2035 г.
+                      </p>
 
-                        <p className="text-xs leading-relaxed text-slate-500 md:text-sm">
-                          {point.text}
-                        </p>
-                      </div>
-                    );
-                  })}
+                      <p>
+                        Но зад Naturino Kids стои не само
+                        регистрирана марка, а и реално,
+                        специализирано българско производство.
+                      </p>
+
+                      <p>
+                        Зад производството на билковия екстракт
+                        стои{' '}
+                        <strong className="font-bold text-slate-900">
+                          д-р Антон Лазаров
+                        </strong>{' '}
+                        — основател и управител на ЛААНТ ЕООД,
+                        доктор по хранителни технологии от
+                        Университета по хранителни технологии в
+                        Пловдив и специалист с над 15 години
+                        опит в индустрията.
+                      </p>
+
+                      <p>
+                        Именно аз,{' '}
+                        <strong className="font-bold text-slate-900">
+                          инж. Пламена Бошнакова
+                        </strong>
+                        , заедно с д-р Лазаров и екипа му от
+                        технолози произвеждаме Naturino Kids в
+                        специализираната база на ЛААНТ за
+                        билкови екстракти и хранителни добавки.
+                        Производството е сертифицирано по
+                        международния стандарт ISO 22000:2018 и
+                        работи съгласно добрите производствени и
+                        хигиенни практики и принципите на HACCP.
+                      </p>
+
+                      <p>
+                        Naturino Kids е официално регистриран в
+                        БАБХ под{' '}
+                        <strong className="font-bold text-slate-900">
+                          №Т242506848/02.09.2025
+                        </strong>
+                        . Формулата събира в един концентриран
+                        екстракт 10 внимателно подбрани
+                        растения: планински лимон, плод бъзак,
+                        риган, мащерка, арония, лайка, шипка,
+                        салвия, джинджифил и бял равнец.
+                      </p>
+
+                      <p>
+                        Продуктът се произвежда по точно
+                        определена технологична документация, в
+                        която са описани съставът и количеството
+                        на всяка растителна съставка.
+                        Суровините, производствените партиди и
+                        готовият продукт подлежат на документиран
+                        контрол, а производствената база
+                        поддържа и микробиологичен мониторинг.
+                        При производството не се използват ГМО.
+                      </p>
+
+                      <p>
+                        Naturino Kids е без добавена захар,
+                        консерванти и изкуствени оцветители и е
+                        предназначен за деца от 18-месечна
+                        възраст. За продукта ЛААНТ издава
+                        удостоверение за качество, с което
+                        самото производство застава с името,
+                        експертизата и отговорността си зад
+                        произведения екстракт.
+                      </p>
+
+                      <p className="rounded-2xl border-l-4 border-emerald-500 bg-emerald-50/70 p-4 font-semibold text-slate-800">
+                        Така зад всяка бутилка Naturino Kids
+                        стоят не просто обещания, а официално
+                        регистрирана марка, регистрация в БАБХ,
+                        ясно описан състав, проследим
+                        производствен процес, сертифицирана
+                        система за безопасност с реални
+                        специалисти.
+                      </p>
+                    </div>
+
+                    {!isStoryOpen && (
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/85 to-transparent md:hidden" />
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIsStoryOpen((open) => !open)
+                    }
+                    aria-expanded={isStoryOpen}
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-extrabold text-emerald-700 transition hover:bg-emerald-100 md:hidden"
+                  >
+                    {isStoryOpen
+                      ? 'Скрий текста'
+                      : 'Прочети цялата информация'}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        isStoryOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                      <BadgeCheck className="h-5 w-5 text-emerald-600" />
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-extrabold text-slate-900">
+                        инж. Пламена Бошнакова
+                      </p>
+                      <p className="text-xs text-slate-500 md:text-sm">
+                        Naturino Kids · производство ЛААНТ ЕООД
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
