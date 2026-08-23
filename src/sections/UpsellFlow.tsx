@@ -1,32 +1,113 @@
 import { useState, useEffect, useRef } from 'react';
-import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart, Leaf } from 'lucide-react';
 
 /**
  * UpsellFlow — попъп потокът след записана поръчка: Upsell → Downsell → Благодаря.
  *
- * ВАЖНО (сигурност):
+ * ВАЖНО (сигурност, запазено 1:1 спрямо старата логика):
  * - Този компонент НЕ записва нова поръчка. Поръчката вече е записана от Checkout при "ПОРЪЧАЙ".
  * - При "Да" праща ОБНОВЯВАЩА заявка със същото eventId (action: 'upsell' | 'downsell'),
  *   за да може Apps Script да намери СЪЩИЯ ред и да обнови брой/сума + маркер в бележки.
  * - Използва същия SK ключ и същия URL като Checkout.
+ * - Гарантира ЕДНА финализираща заявка (sentRef) и авто-финализация след 60 сек.
  *
- * Продуктови снимки: public/upsell/kids-3pack.png и public/upsell/adult.png
+ * НОВО: офертата е ДИНАМИЧНА според order.quantity (детския брой в базовата поръчка):
+ *   1 → +2 Kids за 40,90 € | 2 → +2 Kids за 39,00 € | 3 → +1 Kids за 19,90 € | 4 → +2 Adults за 40,90 €
+ *   Downsell (универсален при отказ): +1 Adults за 20,90 € (вместо 24,90 €), без безплатна доставка.
+ *
+ * НОВО поле в payload: `addon` (описателен маркер, напр. "+2 Kids", "+2 Adults", "+1 Adults (downsell)").
+ *   Базовите полета остават същите (SK, action, eventId, quantity, total) — `addon` е допълнение,
+ *   за да може Apps Script/Tradefy еднозначно да различи детски от възрастен продукт.
+ *
+ * Продуктови снимки: public/upsell/kids-3pack.png и public/upsell/adult.png (1:1, ~800×800px).
  * Ако липсват — показва се резервен вид, нищо не се чупи.
  */
 
-// Същият endpoint като в Checkout (fire-and-forget, отговорът не се чете)
 const GOOGLE_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
 
 const BACKUP_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
 
-const UPSELL = { addQty: 2, addPrice: 36.9, wasPrice: 39.8, img: '/upsell/kids-3pack.png', emoji: '🧴' };
-const DOWNSELL = { addQty: 1, addPrice: 23.5, img: '/upsell/adult.png', emoji: '🌿' };
-
 const eur = (n: number) => n.toFixed(2).replace('.', ',') + ' €';
 
-export type OrderSnapshot = { eventId: string; quantity: number; total: number };
+type UpsellCfg = {
+  kind: 'kids' | 'adults';
+  addQty: number;
+  addPrice: number;
+  wasPrice: number;
+  img: string;
+  emoji: string;
+  badge: string;
+  addonLabel: string;
+  tag: string;
+  title: React.ReactNode;
+  lead: React.ReactNode;
+  result: string;
+  bullets: { icon: any; t: string }[];
+};
+
+// Динамични upsell оферти по детски брой на базовата поръчка
+const UPSELL_BY_QTY: Record<number, UpsellCfg> = {
+  1: {
+    kind: 'kids', addQty: 2, addPrice: 40.9, wasPrice: 47.8, img: '/upsell/kids-3pack.png', emoji: '🧴', badge: '×2',
+    addonLabel: '+2 Kids', tag: '🧒 Naturino Kids · за деца 18м+',
+    title: <>Изчакай! Добави още <span className="text-rose-600">2 детски опаковки</span></>,
+    lead: <>И вземи <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка!</>,
+    result: '3 опаковки Naturino Kids',
+    bullets: [
+      { icon: ShieldCheck, t: '3 опаковки = 2 месеца защита без прекъсване' },
+      { icon: Heart, t: 'Никога не оставаш без наличност в разгара на боледуванията' },
+      { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
+    ],
+  },
+  2: {
+    kind: 'kids', addQty: 2, addPrice: 39.0, wasPrice: 47.8, img: '/upsell/kids-3pack.png', emoji: '🧴', badge: '×2',
+    addonLabel: '+2 Kids', tag: '🧒 Naturino Kids · за деца 18м+',
+    title: <>Изчакай! Добави още <span className="text-rose-600">2 детски опаковки</span></>,
+    lead: <>И вземи <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка!</>,
+    result: '4 опаковки Naturino Kids',
+    bullets: [
+      { icon: ShieldCheck, t: '4 опаковки = пълно спокойствие за детето' },
+      { icon: Zap, t: 'Най-ниска цена на опаковка' },
+      { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
+    ],
+  },
+  3: {
+    kind: 'kids', addQty: 1, addPrice: 19.9, wasPrice: 23.9, img: '/upsell/kids-1pack.png', emoji: '🧴', badge: '+1',
+    addonLabel: '+1 Kids', tag: '🧒 Naturino Kids · за деца 18м+',
+    title: <>Изчакай! Добави още <span className="text-rose-600">1 детска опаковка</span></>,
+    lead: <>И вземи <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка!</>,
+    result: '4 опаковки Naturino Kids',
+    bullets: [
+      { icon: ShieldCheck, t: 'Вземи още една опаковка за плътно спокойствие' },
+      { icon: Zap, t: 'Само +19,90 € за цяла опаковка' },
+      { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
+    ],
+  },
+  4: {
+    kind: 'adults', addQty: 2, addPrice: 40.9, wasPrice: 49.8, img: '/upsell/adult2.png', emoji: '🌿', badge: '×2',
+    addonLabel: '+2 Adults', tag: '🧑 Naturino · за възрастни 12+',
+    title: <>Възползвайте се само сега на <span className="text-rose-600">невероятното намаление</span> на Naturino за възрастни!</>,
+    lead: <>Надградена формула с 13 билки + <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка.</>,
+    result: '4 детски + 2 опаковки за възрастни',
+    bullets: [
+      { icon: Sparkles, t: 'Надградена формула: 13 билки и плодове' },
+      { icon: Zap, t: 'Адаптогени Рейши, Шийтаке и Астрагал' },
+      { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
+    ],
+  },
+};
+
+const DOWNSELL = {
+  addPrice: 20.9, wasPrice: 24.9, img: '/upsell/adult.png', emoji: '🌿', badge: '+1', addonLabel: '+1 Adults (downsell)',
+  tag: '🧑 Naturino · за възрастни 12+',
+  bullets: [
+    { icon: ShieldCheck, t: 'Силен имунитет и за възрастните вкъщи' },
+    { icon: Zap, t: 'Специална цена само сега — вместо 24,90 €' },
+    { icon: Truck, t: 'Добавя се към същата пратка, без нова доставка' },
+  ],
+};
 
 const KEYFRAMES = `
 @keyframes uf_sheetIn { from { transform: translateY(24px); opacity:0 } to { transform: translateY(0); opacity:1 } }
@@ -45,16 +126,8 @@ const KEYFRAMES = `
 `;
 
 /* ---------- Продуктов визуал със сигурен fallback ---------- */
-function ProductShot({
-  src,
-  emoji,
-  badge,
-  tone,
-}: {
-  src: string;
-  emoji: string;
-  badge?: string;
-  tone: string;
+function ProductShot({ src, emoji, badge, tone, freeShipping = true }: {
+  src: string; emoji: string; badge?: string; tone: string; freeShipping?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
   return (
@@ -76,12 +149,14 @@ function ProductShot({
           </span>
         </div>
       )}
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 uf-stamp">
-        <div className="flex items-center gap-1.5 bg-amber-400 text-[#2b1a00] font-black text-[11px] uppercase tracking-wide px-3 py-1.5 rounded-full shadow-lg ring-2 ring-white">
-          <Truck className="w-3.5 h-3.5" />
-          Безплатна доставка
+      {freeShipping && (
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 uf-stamp">
+          <div className="flex items-center gap-1.5 bg-amber-400 text-[#2b1a00] font-black text-[11px] uppercase tracking-wide px-3 py-1.5 rounded-full shadow-lg ring-2 ring-white">
+            <Truck className="w-3.5 h-3.5" />
+            Безплатна доставка
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -92,13 +167,18 @@ function Modal({ children }: { children: React.ReactNode }) {
     <div className="fixed inset-0 z-[100] overflow-y-auto">
       <div className="absolute inset-0 bg-[#1b0d1a]/70 backdrop-blur-md" />
       <div className="relative flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4">
-        <div className="w-full sm:max-w-md uf-sheet-in">{children}</div>
+        <div className="w-full sm:max-w-md uf-sheet-in max-h-[92vh] sm:max-h-[94vh] overflow-y-auto">{children}</div>
       </div>
     </div>
   );
 }
 
+export type OrderSnapshot = { eventId: string; quantity: number; total: number };
+
 export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: () => void }) {
+  // Конфигурацията на upsell според детския брой (fallback към пакет 1, ако е извън 1–4)
+  const U = UPSELL_BY_QTY[order.quantity] ?? UPSELL_BY_QTY[1];
+
   const [step, setStep] = useState<'upsell' | 'downsell' | 'thankyou'>('upsell');
   const [path, setPath] = useState<'upsell' | 'downsell' | 'none'>('none');
 
@@ -107,7 +187,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
   // Праща обновяване/финализиране със ФИНАЛНИ стойности. quantity = брой ДЕТСКИ опаковки.
   // 'complete' = клиентът отказа/не реагира → тръгва базовият имейл, редовете НЕ се пипат.
-  const sendUpdate = (action: 'upsell' | 'downsell' | 'complete', quantity: number, total: number) => {
+  const sendUpdate = (action: 'upsell' | 'downsell' | 'complete', quantity: number, total: number, addon: string) => {
     if (sentRef.current) return; // вече е изпратено веднъж — не дублираме
     sentRef.current = true;
     const payload = {
@@ -116,6 +196,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
       eventId: order.eventId,
       quantity,
       total: Number(total.toFixed(2)),
+      addon, // НОВ описателен маркер за детски/възрастен продукт
     };
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
@@ -131,31 +212,32 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
     }).catch((error) => console.error('Upsell backup sync error:', error));
   };
 
-
   const acceptUpsell = () => {
-    // Upsell: +2 ДЕТСКИ опаковки → детският брой расте с 2
-    sendUpdate('upsell', order.quantity + UPSELL.addQty, order.total + UPSELL.addPrice);
+    // При детски upsell: детският брой расте с addQty.
+    // При upsell за възрастни (пакет 4): детският брой НЕ се променя — възрастният се
+    // разпознава от addon/SKU в Tradefy. Обновяваме само сумата.
+    const kidsQty = U.kind === 'kids' ? order.quantity + U.addQty : order.quantity;
+    sendUpdate('upsell', kidsQty, order.total + U.addPrice, U.addonLabel);
     setPath('upsell');
     setStep('thankyou');
   };
+
   const acceptDownsell = () => {
-    // Downsell: +1 продукт за ВЪЗРАСТНИ (различен продукт).
-    // Детският брой НЕ се променя — възрастният се разпознава от SKU_DOWNSELL в Tradefy.
-    // Обновяваме само сумата.
-    sendUpdate('downsell', order.quantity, order.total + DOWNSELL.addPrice);
+    // Downsell: +1 продукт за ВЪЗРАСТНИ. Детският брой НЕ се променя, обновяваме само сумата.
+    sendUpdate('downsell', order.quantity, order.total + DOWNSELL.addPrice, DOWNSELL.addonLabel);
     setPath('downsell');
     setStep('thankyou');
   };
+
   const declineAll = () => {
     // Отказ / липса на реакция → финализираме базовата поръчка (тръгва базовият имейл)
-    sendUpdate('complete', order.quantity, order.total);
+    sendUpdate('complete', order.quantity, order.total, '');
     setPath('none');
     setStep('thankyou');
   };
 
   // ЗАЩИТА СРЕЩУ ЗАГУБЕН ИМЕЙЛ: ако клиентът стигне до Upsell/Downsell и не натисне нищо
   // в рамките на 60 сек → автоматично се финализира (базов имейл към клиента и админа).
-  // Ако през това време натисне оферта или откаже — sendUpdate е защитен, няма двоен имейл.
   useEffect(() => {
     if (step !== 'upsell' && step !== 'downsell') return;
     const timer = setTimeout(() => {
@@ -169,7 +251,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
     <>
       <style>{KEYFRAMES}</style>
 
-      {/* ---------- UPSELL ---------- */}
+      {/* ---------- UPSELL (динамичен според пакета) ---------- */}
       {step === 'upsell' && (
         <Modal>
           <div className="bg-gradient-to-b from-[#fff1f5] to-white rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl">
@@ -181,21 +263,21 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
             <div className="px-5 sm:px-6 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-7">
               <div className="mx-auto mb-3 flex items-center justify-center gap-1.5 bg-rose-100 text-rose-700 rounded-full px-3.5 py-1 w-max max-w-full">
-                <span className="font-black text-[11px] sm:text-[12px] uppercase tracking-wide text-center">🧒 Naturino Kids · за деца 18м+</span>
+                <span className="font-black text-[11px] sm:text-[12px] uppercase tracking-wide text-center">{U.tag}</span>
               </div>
 
               <h2 className="text-center text-[22px] sm:text-[26px] leading-tight font-black text-[#231018]">
-                Изчакай! Добави още <span className="text-rose-600">2 детски опаковки</span>
+                {U.title}
               </h2>
               <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-1.5 mb-6">
-                И вземи <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка!
+                {U.lead}
               </p>
 
               <div className="uf-floaty">
                 <ProductShot
-                  src={UPSELL.img}
-                  emoji={UPSELL.emoji}
-                  badge={`×${UPSELL.addQty}`}
+                  src={U.img}
+                  emoji={U.emoji}
+                  badge={U.badge}
                   tone="linear-gradient(135deg,#fecdd3,#fed7aa)"
                 />
               </div>
@@ -203,10 +285,10 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
               <div className="mt-8 sm:mt-9 flex items-end justify-center gap-3">
                 <div className="text-center">
                   <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Само +</p>
-                  <p className="text-[42px] sm:text-5xl font-black text-[#231018] leading-none">{eur(UPSELL.addPrice)}</p>
+                  <p className="text-[42px] sm:text-5xl font-black text-[#231018] leading-none">{eur(U.addPrice)}</p>
                 </div>
                 <div className="pb-1.5">
-                  <span className="line-through text-slate-400 font-bold">{eur(UPSELL.wasPrice)}</span>
+                  <span className="line-through text-slate-400 font-bold">{eur(U.wasPrice)}</span>
                   <span className="block mt-1 text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                     + безплатна доставка
                   </span>
@@ -214,11 +296,7 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
               </div>
 
               <div className="mt-6 space-y-2.5">
-                {[
-                  { icon: ShieldCheck, t: '3 опаковки = 2 месеца защита без прекъсване' },
-                  { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
-                  { icon: Heart, t: 'Никога не оставаш без наличност в разгара на вирусите' },
-                ].map(({ icon: Icon, t }, i) => (
+                {U.bullets.map(({ icon: Icon, t }, i) => (
                   <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-rose-100">
                     <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-4 h-4 text-rose-600" />
@@ -234,24 +312,23 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
               >
                 <Sparkles className="w-5 h-5 flex-shrink-0" />
                 <span className="flex flex-col items-center leading-tight text-center">
-                  <span className="text-[17px] sm:text-lg">ДА! Добави още 2 опаковки</span>
-                  <span className="text-[12px] font-bold opacity-90">с безплатна доставка</span>
+                  <span className="text-[16px] sm:text-lg">Да, искам я! Добави я към поръчката</span>
+                  <span className="text-[12px] font-bold opacity-90">+ безплатна доставка за цялата поръчка</span>
                 </span>
               </button>
 
-              {/* Отказ — добавен само лек контур, за да се разпознава като бутон */}
               <button
                 onClick={() => setStep('downsell')}
                 className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
               >
-                Не, благодаря — продължи без офертата
+                Не сега — продължи без офертата
               </button>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* ---------- DOWNSELL ---------- */}
+      {/* ---------- DOWNSELL (универсален, различаващ се от upsell-а) ---------- */}
       {step === 'downsell' && (
         <Modal>
           <div className="bg-gradient-to-b from-[#eefaf3] to-white rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl">
@@ -263,39 +340,30 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
             <div className="px-5 sm:px-6 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-7">
               <div className="mx-auto mb-3 flex items-center justify-center gap-1.5 bg-emerald-100 text-emerald-700 rounded-full px-3.5 py-1 w-max max-w-full">
-                <span className="font-black text-[11px] sm:text-[12px] uppercase tracking-wide text-center">🧑 Naturino · за възрастни 12+</span>
+                <span className="font-black text-[11px] sm:text-[12px] uppercase tracking-wide text-center">{DOWNSELL.tag}</span>
               </div>
 
-              <h2 className="text-center text-[22px] sm:text-[26px] leading-tight font-black text-[#0f2a20]">
-                Да сте здрави <span className="text-emerald-600">всички вкъщи</span>
+              <h2 className="text-center text-[21px] sm:text-[25px] leading-tight font-black text-[#0f2a20]">
+                Вземи <span className="text-emerald-600">един брой</span> за възрастни и се убеди в силата на надградената формула.
               </h2>
-              <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-1.5 mb-5">
-                Надградената формула за възрастни — с безплатна доставка за цялата поръчка
+              <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-2 mb-5">
+                Само 1 опаковка на <b className="text-emerald-700">специална цена</b> — само сега.
               </p>
 
-              <div className="mx-auto mb-1 flex items-center justify-center gap-2 bg-emerald-600 text-white rounded-full px-4 py-1.5 w-max shadow-lg shadow-emerald-600/25">
-                <Sparkles className="w-4 h-4" />
-                <span className="font-black text-sm tracking-tight">13 билки и плодове</span>
-              </div>
-
               <div className="uf-floaty">
-                <ProductShot src={DOWNSELL.img} emoji={DOWNSELL.emoji} badge="+1" tone="linear-gradient(135deg,#a7f3d0,#99f6e4)" />
+                <ProductShot src={DOWNSELL.img} emoji={DOWNSELL.emoji} badge={DOWNSELL.badge} tone="linear-gradient(135deg,#a7f3d0,#99f6e4)" freeShipping={false} />
               </div>
 
-              <div className="mt-8 sm:mt-9 text-center">
-                <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Само +</p>
-                <p className="text-[42px] sm:text-5xl font-black text-[#0f2a20] leading-none">{eur(DOWNSELL.addPrice)}</p>
-                <span className="inline-block mt-2 text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                  + Безплатна доставка за цялата поръчка
-                </span>
+              <div className="mt-8 sm:mt-9 text-center flex items-end justify-center gap-3">
+                <div className="text-center">
+                  <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Само +</p>
+                  <p className="text-[42px] sm:text-5xl font-black text-[#0f2a20] leading-none">{eur(DOWNSELL.addPrice)}</p>
+                </div>
+                <span className="line-through text-slate-400 font-bold pb-1.5">{eur(DOWNSELL.wasPrice)}</span>
               </div>
 
               <div className="mt-6 space-y-2.5">
-                {[
-                  { icon: Sparkles, t: 'Надградена формула: 13 билки и плодове в Тройна Имунна Архитектура™' },
-                  { icon: Zap, t: 'С адаптогени Рейши, Шийтаке и Астрагал за повече енергия, устойчивост и по-малко стрес' },
-                  { icon: ShieldCheck, t: 'Работи на 5 нива: имунитет, енергия, фокус, възстановяване, спокойствие' },
-                ].map(({ icon: Icon, t }, i) => (
+                {DOWNSELL.bullets.map(({ icon: Icon, t }, i) => (
                   <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-emerald-100">
                     <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-4 h-4 text-emerald-600" />
@@ -307,17 +375,17 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
               <button
                 onClick={acceptDownsell}
-                className="uf-shimmer relative overflow-hidden w-full mt-5 py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[16px] sm:text-lg leading-tight shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
+                className="uf-shimmer relative overflow-hidden w-full mt-5 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex flex-col items-center justify-center leading-tight gap-0.5"
               >
-                <Sparkles className="w-5 h-5 flex-shrink-0" /> ДА! Взимам с безплатна доставка
+                <span className="inline-flex items-center gap-2 text-[16px] sm:text-lg"><Leaf className="w-5 h-5" /> Да! Искам да я пробвам</span>
+                <span className="text-[12px] font-bold opacity-90">на специална цена — само сега</span>
               </button>
 
-              {/* Отказ — добавен само лек контур, за да се разпознава като бутон */}
               <button
                 onClick={declineAll}
                 className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
               >
-                Не, благодаря — завърши поръчката
+                Не сега — завърши поръчката
               </button>
             </div>
           </div>
@@ -344,8 +412,8 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
             </div>
             <h2 className="text-3xl font-black text-slate-900">Успешна поръчка!</h2>
             <p className="text-slate-600 mt-3 leading-relaxed">
-              {path === 'upsell' && '3 опаковки Naturino Kids, с безплатна доставка. '}
-              {path === 'downsell' && 'Поръчката ви с опаковката за възрастни, с безплатна доставка. '}
+              {path === 'upsell' && `Поръчката ти вече е ${U.result}, с безплатна доставка. `}
+              {path === 'downsell' && 'Добавихме и опаковка Naturino за възрастни към пратката ти. '}
               Очаквайте обаждане за потвърждение на поръчката съвсем скоро.
             </p>
             <button
