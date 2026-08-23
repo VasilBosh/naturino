@@ -327,7 +327,7 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
                 onChange={(e) => { setCity(null); setOffice(null); setCityQuery(e.target.value); }}
                 onFocus={() => cityHits.length && setCityOpen(true)}
                 placeholder="Напишете град или село"
-                autoComplete="off"
+                autoComplete="new-password"
                 className="w-full min-w-0 bg-white border border-amber-200 h-12 text-base rounded-xl px-3 pr-9 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 pointer-events-none">
@@ -422,7 +422,7 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
                 onChange={(e) => { if (street) setStreet(null); setStreetQuery(e.target.value); }}
                 onFocus={() => streetHits.length && setStreetOpen(true)}
                 placeholder={city ? 'Улица или квартал (напр. Ivan, Mladost)' : 'Първо изберете населено място'}
-                autoComplete="off"
+                autoComplete="new-password"
                 className={`w-full min-w-0 truncate bg-white border border-amber-200 h-12 text-base rounded-xl px-3 pr-9 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm outline-none ${!city ? 'opacity-60' : ''}`}
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500">
@@ -453,7 +453,7 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
               disabled={!city}
               onChange={(e) => setStreetNo(e.target.value)}
               placeholder="напр. ул.№ , бл. , вх. , ап. "
-              autoComplete="off"
+              autoComplete="new-password"
               className={`w-full bg-white border border-amber-200 h-12 text-base rounded-xl px-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm outline-none ${!city ? 'opacity-60' : ''}`}
             />
           </div>
