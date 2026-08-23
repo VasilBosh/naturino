@@ -175,7 +175,7 @@ export function Hero() {
                     </p>
 
                     <p className="text-lg font-black italic">
-                      19.90€
+                      23.90€
                     </p>
                   </div>
 
@@ -196,7 +196,7 @@ export function Hero() {
               >
                 <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
                 <span>ВЗЕМИ СЕГА ➡️</span>
-                <span className="cta-price ml-1">19.90€</span>
+                <span className="cta-price ml-1">23.90€</span>
               </button>
               
               <button 
@@ -345,7 +345,7 @@ export function Hero() {
 
                 <div className="absolute -right-4 md:-right-5 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20" style={{ bottom: '124px' }}>
                   <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
-                  <p className="text-lg md:text-xl font-black italic">19.90€</p>
+                  <p className="text-lg md:text-xl font-black italic">23.90€</p>
                 </div>
                 <div className="absolute -top-2 -left-2 md:-top-3 md:-left-3 bg-red-500 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg shadow-xl font-bold">
                   <p className="text-[10px] md:text-xs uppercase">-50%</p>

@@ -543,7 +543,7 @@ const Sertifikat = () => {
                   </button>
 
                   <p className="text-center text-sm font-semibold text-slate-600 sm:text-left">
-                    19.90€ • Плащане при получаване
+                    23.90€ • Плащане при получаване
                   </p>
                 </div>
               </div>
