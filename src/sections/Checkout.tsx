@@ -530,6 +530,7 @@ export function Checkout() {
                     id="fullName"
                     type="text"
                     required
+                    autoComplete="name"
                     placeholder="Име и фамилия"
                     value={formData.fullName}
                     onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); handleFieldTouch(); }}
@@ -549,6 +550,7 @@ export function Checkout() {
                       id="phone"
                       type="tel"
                       required
+                      autoComplete="tel"
                       placeholder="08xxxxxxxx"
                       value={formData.phone}
                       onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); handleFieldTouch(); }}
@@ -564,6 +566,7 @@ export function Checkout() {
                     <Input
                       id="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="example@mail.com"
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); handleFieldTouch(); }}
