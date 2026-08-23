@@ -65,7 +65,7 @@ export function StickyCTA() {
               <p className="font-bold text-slate-900 text-sm md:text-base">100% Билков екстракт</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 line-through text-sm md:text-base">39.80€</span>
+              <span className="text-slate-400 line-through text-sm md:text-base">47.80€</span>
               <span className="text-emerald-600 font-black text-lg md:text-2xl">23.90€</span>
             </div>
           </div>
