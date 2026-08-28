@@ -19,6 +19,11 @@ export default function TrustHero() {
       sizeClasses: 'w-[100%] sm:w-24' 
     },
     { 
+      src: '/logo/NovaFarm.png', 
+      alt: 'NovaFarm',
+      sizeClasses: 'w-[100%] sm:w-28' 
+    },
+    { 
       src: '/logo/Апостолов4.jpg', 
       alt: 'Аптеки Апостолов',
       sizeClasses: 'w-[100%] sm:w-28' 
