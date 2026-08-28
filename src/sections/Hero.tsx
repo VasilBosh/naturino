@@ -35,21 +35,19 @@ export function Hero() {
 
   return (
     // ПРЕНАПИСАН КЛАС: Премахнато min-h-screen, добавено контролирано отстояние (py-12 md:py-20)
-    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20">
+    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20 lg:pb-80">
       
       {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div 
-          className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-2xl" 
-          style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+          className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-2xl"
         />
         <div 
-          className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/10 rounded-full blur-2xl" 
-          style={{ animationDelay: '1s', willChange: 'transform', transform: 'translateZ(0)' }}
+          className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/10 rounded-full blur-2xl"
         />
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl" 
-          style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl"
+
         />
       </div>
 
@@ -62,7 +60,7 @@ export function Hero() {
       </div>
 
       {/* ОСНОВЕН СТАБИЛЕН КОНТЕЙНЕР */}
-      <div className="relative z-10 container-custom w-full flex flex-col gap-8 md:gap-12 lg:gap-16">
+      <div className="relative z-10 container-custom w-full flex flex-col gap-8 md:gap-12 lg:gap-20">
         
         {/* Header */}
         <header className="flex items-center justify-between w-full">
@@ -90,7 +88,7 @@ export function Hero() {
         </header>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-12 xl:gap-16 w-full">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6 lg:gap-12 xl:gap-16 w-full">
           
           {/* Left Content */}
           <div className="flex-1 max-w-2xl text-center lg:text-left transform-gpu">
@@ -192,6 +190,7 @@ export function Hero() {
             <div className="order-3 lg:order-none flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
               <button 
                 onClick={scrollToCheckout}
+                style={{ animation: 'none' }}
                 className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[340px]"
               >
                 <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
@@ -279,8 +278,8 @@ export function Hero() {
           </div>
 
                       {/* MOBILE BONUS CARD */}
-            <div className="block lg:hidden mt-5 mb-6 max-w-[340px] mx-auto">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center bonus-cta-pulse">
+            <div className="block lg:hidden mt-5 mb-0 max-w-[340px] mx-auto">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center">
 
                 <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
                   🎁 Подарък за всяка майка
@@ -312,8 +311,62 @@ export function Hero() {
               </div>
             </div>
 
+
+          {/* MOBILE FACEBOOK GROUP BONUS CARD */}
+          <div className="block lg:hidden mt-5 mb-6 max-w-[340px] mx-auto">
+            <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl p-4 shadow-xl border-2 border-blue-200/70 text-center">
+
+              <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white text-blue-600 font-black text-sm leading-none">
+                  f
+                </span>
+                Ексклузивен бонус
+              </div>
+
+              <div className="flex items-start gap-3 text-left">
+                <div className="flex-shrink-0 w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md">
+                  <span className="text-2xl font-black leading-none">f</span>
+                </div>
+
+                <div>
+                  <h3 className="text-slate-900 font-black text-lg leading-tight">
+                    Затворена Facebook група на майките на Naturino
+                  </h3>
+                  <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                    След поръчка получавате достъп до нашата затворена общност, където майките си помагат ежедневно.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2 text-left text-sm text-slate-800 font-semibold">
+                <p>✔ Теми за здраве, хранене, ясла, градина и училище</p>
+                <p>✔ Реални дискусии и споделен опит от други майки</p>
+                <p>✔ Полезни съвети и помощ директно от Пламена</p>
+                <p>✔ Място, където не сте сами в трудните моменти</p>
+              </div>
+
+              <div className="mt-4 rounded-2xl bg-blue-600 text-white px-4 py-3 shadow-lg">
+                <p className="text-[12px] uppercase font-black tracking-wide opacity-90">
+                  Бонус с дългосрочна стойност
+                </p>
+                <p className="text-sm font-black leading-tight mt-1 opacity-70">
+                  Не получавате само еднократна консултация, а постоянен достъп до силна общност и помощ.
+                </p>
+              </div>
+
+              <p className="text-xs text-slate-500 mt-3 leading-relaxed">
+                Поканата за групата се изпраща на имейла, посочен при поръчката.
+              </p>
+
+              <p className="font-black text-blue-700 text-lg mt-2">
+                Достъп: БЕЗПЛАТНО
+              </p>
+            </div>
+          </div>
+
+
           {/* Right Content Desktop Only */}
-          <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[320px] lg:max-w-[420px] transform-gpu lg:translate-y-40">
+          <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[320px] lg:max-w-[420px] transform-gpu lg:-mt-6">
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
@@ -352,9 +405,9 @@ export function Hero() {
                 </div>
               </div>
             </div>
-                  {/* BONUS CARD */}
+                  {/* BONUS CARD Desktop*/}
             <div className="mt-5">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center bonus-cta-pulse">
+              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center">
 
                 <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-base font-black uppercase mb-3 shadow-lg">
                   🎁 Подарък за всяка майка
@@ -382,12 +435,64 @@ export function Hero() {
               </div>
             </div>
             {/* BONUS CARD end*/}
+
+            {/* FACEBOOK GROUP BONUS CARD */}
+            <div className="mt-5">
+              <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl p-4 shadow-xl border-2 border-blue-200/70 text-center">
+
+                <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white text-blue-600 font-black text-sm leading-none">
+                    f
+                  </span>
+                  Ексклузивен бонус
+                </div>
+
+                <div className="flex items-start gap-3 text-left">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md">
+                    <span className="text-2xl font-black leading-none">f</span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-slate-900 font-black text-lg leading-tight">
+                      Затворена Facebook група на майките на Naturino
+                    </h3>
+                    <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                      Всеки, който направи поръчка, получава достъп до общност с полезни теми, реални майки и лична помощ от Пламена.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-2 text-left text-sm text-slate-800 font-semibold">
+                  <p>✔ Здраве, хранене, ясла, градина и училище</p>
+                  <p>✔ Дискусии по реални теми от ежедневието на майките</p>
+                  <p>✔ Съвети, насоки и подкрепа от Пламена</p>
+                  <p>✔ Помощ, когато имате въпроси и се чудите какво да правите</p>
+                </div>
+
+                <div className="mt-4 rounded-2xl bg-blue-600 text-white px-4 py-3 shadow-lg">
+                  <p className="text-[11px] uppercase font-black tracking-wide opacity-90">
+                    Бонус с дългосрочна стойност
+                  </p>
+                  <p className="text-sm font-black leading-tight mt-1">
+                    Не получавате само еднократна консултация, а постоянен достъп до силна общност и помощ.
+                  </p>
+                </div>
+
+                <p className="text-xs text-slate-500 mt-3 leading-relaxed">
+                  Поканата за групата се изпраща на имейла, посочен при поръчката.
+                </p>
+
+                <p className="font-black text-blue-700 text-xl mt-2">
+                  Достъп: БЕЗПЛАТНО
+                </p>
+              </div>
+            </div>
           
           </div>
         </div>
 
               {/* Кратки ползи в Hero */}
-      <div className="w-full transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-24 lg:max-w-[55%]">
+      <div className="w-full transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-[740px] lg:max-w-[55%] lg:ml-6">
         <div className="mx-0 lg:mx-0 rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-2xl px-5 py-5 md:px-6 md:py-6">
           
           <p className="text-white font-black text-base md:text-lg mb-4 leading-tight">
