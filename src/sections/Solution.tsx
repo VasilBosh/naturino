@@ -187,8 +187,8 @@ export function Solution() {
             <div className="bg-amber-50 border-l-4 border-amber-400 p-4 md:p-5 rounded-r-xl mb-6">
               <p className="text-slate-800 text-sm md:text-base">
                 <strong>Важно:</strong> Продуктът е наличен в
-                <strong className="text-emerald-700"> Аптеки Апостолов</strong> —
-                една от най-големите аптечни вериги в България!
+                <strong className="text-emerald-700"> Аптеки Апостолов и Аптеки Нова Фарм</strong> —
+                от скоро и в още обекти в България!
               </p>
             </div>
 
