@@ -47,7 +47,6 @@ export function Hero() {
         />
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 rounded-full blur-3xl"
-
         />
       </div>
 
@@ -190,7 +189,6 @@ export function Hero() {
             <div className="order-3 lg:order-none flex flex-col gap-4 items-center lg:items-start mb-6 md:mb-8 w-full px-2">
               <button 
                 onClick={scrollToCheckout}
-                style={{ animation: 'none' }}
                 className="btn-cta-primary flex items-center justify-center gap-2 w-full max-w-[340px]"
               >
                 <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
