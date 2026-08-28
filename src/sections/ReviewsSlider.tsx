@@ -1,9 +1,17 @@
 import { useEffect, useRef } from 'react';
 
-const reviews = Array.from(
-  { length: 9 },
-  (_, index) => `/social/${index + 1}.jpg`
-);
+const reviews = [
+  '/social/1.jpg',
+  '/social/2.jpg',
+  '/social/3.jpg',
+  '/social/4.jpg',
+  '/social/5.jpg',
+  '/social/6.jpg',
+  '/social/7.jpg',
+  '/social/8.jpg',
+  '/social/9.jpg',
+  '/social/15.jpg',
+];
 
 export function ReviewsSlider() {
   const sectionRef = useRef<HTMLDivElement>(null);

@@ -18,7 +18,7 @@ import { PharmacistReview } from './sections/PharmacistReview';
 import { Benefits } from './sections/Benefits';
 import { Ingredients } from './sections/Ingredients';
 import { SocialProof } from './sections/SocialProof';
-import { Guarantee } from './sections/Guarantee';
+//import { Guarantee } from './sections/Guarantee';
 import { FAQ } from './sections/FAQ';
 import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
@@ -56,7 +56,7 @@ function LandingPage() {
       <Story />
       <Stats />
       <SocialProof />
-      <Guarantee />
+      
       <FAQ />     
       <TrustBadges />
       <Checkout />

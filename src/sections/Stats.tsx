@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const Stats = () => {
   return (
     <section className="relative py-14 bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden border-y border-white/10">
@@ -66,7 +64,7 @@ export const Stats = () => {
 
         {/* Bottom note — честно и просто */}
         <p className="text-center text-emerald-300/60 text-sm mt-8 font-medium">
-          Поръчки през всички канали — www.naturinokids.bg, Messanger, Viber, WhatsApp и Аптеки Апостолов
+          Поръчки през всички канали — www.naturinokids.bg, Messanger, Viber, WhatsApp, Всички Аптеки Апостолов и Аптеки Нова Фарм
         </p>
 
       </div>
