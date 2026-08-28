@@ -77,8 +77,8 @@ export function Hero() {
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <div className="hidden sm:flex items-center gap-2 text-white/80">
-              <Phone className="w-4 h-4" />
-              <span className="text-sm font-medium">0896 783 751</span>
+              <Phone className="w-5 h-5" />
+              <span className="text-base font-medium">0896 783 751</span>
             </div>
             <a 
               href="tel:0896783751"
@@ -106,7 +106,7 @@ export function Hero() {
 
             <p className="text-base sm:text-lg md:text-2xl text-emerald-100 mb-6 md:mb-2 lg:pt-0 lg:-mt-12 leading-relaxed max-w-xl mx-auto lg:mx-0">
               <strong className="text-white">100% натурални билкови капки</strong> с 10 български билки. 
-              Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов</strong>.
+              Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов и Аптеки Нова Фарм</strong>.
             </p>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
