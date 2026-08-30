@@ -18,7 +18,7 @@ import { PharmacistReview } from './sections/PharmacistReview';
 import { Benefits } from './sections/Benefits';
 import { Ingredients } from './sections/Ingredients';
 import { SocialProof } from './sections/SocialProof';
-//import { Guarantee } from './sections/Guarantee';
+import { Guarantee } from './sections/Guarantee';
 import { FAQ } from './sections/FAQ';
 import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
@@ -47,6 +47,7 @@ function LandingPage() {
       <TrustHero />
       <Problem />
       <Solution />
+      <Guarantee />
       <ReviewsSlider />
       <ComparisonSection />
       <PharmacistReview />
@@ -56,7 +57,6 @@ function LandingPage() {
       <Story />
       <Stats />
       <SocialProof />
-      
       <FAQ />     
       <TrustBadges />
       <Checkout />

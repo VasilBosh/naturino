@@ -33,9 +33,15 @@ export function Hero() {
     }
   };
 
+  const scrollToGuarantee = () => {
+  document
+    .getElementById('guarantee')
+    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
   return (
     // ПРЕНАПИСАН КЛАС: Премахнато min-h-screen, добавено контролирано отстояние (py-12 md:py-20)
-    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20 lg:pb-80">
+    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20 lg:pb-20">
       
       {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -522,6 +528,46 @@ export function Hero() {
           </div>
 
         </div>
+      </div>
+
+            {/* ЛИЧНА ГАРАНЦИЯ - BADGE */}
+      <div className="w-full lg:max-w-[55%] lg:ml-6 flex justify-center mt-3 md:mt-4 lg:-mt-[60px]">
+        <button
+          type="button"
+          onClick={scrollToGuarantee}
+          className="
+            group relative
+            flex flex-col items-center
+            transition-all duration-300
+            hover:-translate-y-1
+          "
+          aria-label="Виж личната гаранция на Пламена"
+        >
+          <img
+            src="/guarantee-badge.png"
+            alt="Лична гаранция Naturino Kids от Пламена Бошнакова"
+            className="
+              h-auto
+              w-[290px]
+              sm:w-[400px]
+              md:w-[400px]
+              lg:w-[410px]
+              xl:w-[440px]
+            "
+            loading="eager"
+          />
+
+          <span
+            className="
+              mt-2
+              text-[10px] sm:text-[11px]
+              font-black uppercase tracking-[0.12em]
+              text-white/90
+            "
+          >
+            Виж моята лична гаранция ↓
+          </span>
+        </button>
       </div>
   
       </div>
