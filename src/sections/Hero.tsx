@@ -41,7 +41,7 @@ export function Hero() {
 
   return (
     // ПРЕНАПИСАН КЛАС: Премахнато min-h-screen, добавено контролирано отстояние (py-12 md:py-20)
-    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20 lg:pb-20">
+    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20 lg:pb-[260px]">
       
       {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -368,7 +368,6 @@ export function Hero() {
             </div>
           </div>
 
-
           {/* Right Content Desktop Only */}
           <div className="hidden lg:block flex-shrink-0 w-full max-w-[280px] sm:max-w-[320px] md:max-w-[320px] lg:max-w-[420px] transform-gpu lg:-mt-6">
             <div className="relative">
@@ -491,12 +490,33 @@ export function Hero() {
                 </p>
               </div>
             </div>
+
+            {/* FORBES / LAANT - DESKTOP */}
+            <div className="mt-8 text-center">
+              <h3 className="text-white font-black text-xl xl:text-2xl leading-tight">
+                Naturino Kids® на Forbes Health &amp; Longevity Forum - Sofia 2026
+              </h3>
+
+              <p className="mt-2 text-emerald-100 text-sm md:text-base font-semibold leading-relaxed">
+                Представен пред десетки професори, фармацевти и лекари.
+              </p>
+
+              <img
+                src="/Laant.jpg"
+                alt="Naturino Kids на Forbes Health & Longevity Forum - Sofia 2026"
+                width={800}
+                height={640}
+                className="mt-4 w-full h-auto object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
           
           </div>
         </div>
 
               {/* Кратки ползи в Hero */}
-      <div className="w-full transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-[740px] lg:max-w-[55%] lg:ml-6">
+      <div className="w-full transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-[1210px] lg:max-w-[55%] lg:ml-6">
         <div className="mx-0 lg:mx-0 rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-2xl px-5 py-5 md:px-6 md:py-6">
           
           <p className="text-white font-black text-base md:text-lg mb-4 leading-tight">
@@ -529,6 +549,28 @@ export function Hero() {
 
         </div>
       </div>
+
+        {/* FORBES / LAANT - MOBILE */}
+          <div className="block lg:hidden mt-8 mb-2 w-full max-w-[800px] mx-auto text-center">
+            <h3 className="text-white font-black text-xl sm:text-2xl leading-tight">
+              Naturino Kids® на Forbes Health &amp; Longevity Forum - Sofia 2026
+            </h3>
+
+            <p className="mt-2 text-emerald-100 text-sm sm:text-base font-semibold leading-relaxed">
+              Представен пред десетки професори, фармацевти и лекари.
+            </p>
+
+            <img
+              src="/Laant.jpg"
+              alt="Naturino Kids на Forbes Health & Longevity Forum - Sofia 2026"
+              width={800}
+              height={640}
+              className="mt-4 w-full h-auto object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
 
             {/* ЛИЧНА ГАРАНЦИЯ - BADGE */}
       <div className="w-full lg:max-w-[55%] lg:ml-6 flex justify-center mt-3 md:mt-4 lg:-mt-[60px]">
