@@ -1,5 +1,176 @@
-import { useEffect } from 'react';
-import { Shield, Leaf, Star, Phone, Award, ShoppingCart } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Shield, Leaf, Star, Phone, Award, ShoppingCart, ChevronDown } from 'lucide-react';
+
+function VideoBonusCard({ variant }: { variant: 'mobile' | 'desktop' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const detailsId = `video-bonus-details-${variant}`;
+
+  return (
+    <div className="bg-gradient-to-br from-amber-300 via-yellow-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/30 text-center overflow-hidden">
+      <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs sm:text-sm font-black uppercase mb-3 shadow-lg">
+        🎁 Ексклузивен бонус
+      </div>
+
+      <h3 className="text-emerald-950 font-black text-xl leading-[1.1]">
+        ВЗЕМИ СЕГА БЕЗЦЕННИЯ ВИДЕО ПАКЕТ НА ПЛАМЕНА!
+      </h3>
+
+      <p className="mt-2 text-sm text-emerald-950/80 font-bold leading-snug">
+        Най-важното от личните ми консултации с родители — събрано в кратки видеа, които взимаш с безсрочен достъп.
+      </p>
+
+      <div className="mt-4 space-y-2.5 text-left text-[13px] sm:text-sm text-emerald-950 font-semibold leading-snug">
+        <p className="flex items-start gap-2">
+          <span className="font-black shrink-0">✓</span>
+          <span><strong>Първите симптоми</strong> — как да реагираме още в началото и какво е важно през първите 48 часа</span>
+        </p>
+        <p className="flex items-start gap-2">
+          <span className="font-black shrink-0">✓</span>
+          <span><strong>„Моето дете пак е болно“</strong> — 5 грешки, които често допускаме от притеснение</span>
+        </p>
+        <p className="flex items-start gap-2">
+          <span className="font-black shrink-0">✓</span>
+          <span><strong>Защо детето боледува отново и отново</strong> след тръгване на ясла или градина</span>
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+        aria-controls={detailsId}
+        className="group relative mt-2 block w-full rounded-xl text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-white/70"
+      >
+        <div
+          id={detailsId}
+          className={`overflow-hidden transition-[max-height] duration-700 ease-in-out ${
+            isOpen ? 'max-h-[620px]' : 'max-h-[58px]'
+          }`}
+        >
+          <div
+            className={`pt-2.5 space-y-2.5 text-left text-[13px] sm:text-sm text-emerald-950 font-semibold leading-snug transition-[filter,opacity] duration-500 ${
+              isOpen ? 'blur-0 opacity-100' : 'blur-[1px] opacity-60'
+            }`}
+          >
+            <p className="flex items-start gap-2">
+              <span className="font-black shrink-0">✓</span>
+              <span><strong>Злоядото дете</strong> — има ли връзка между апетита и честото боледуване?</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="font-black shrink-0">✓</span>
+              <span><strong>Третата сливица не е враг</strong> — и кои са причините, които я карат да се възпалява отново и отново</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="font-black shrink-0">✓</span>
+              <span><strong>Какво бих направила аз</strong>, ако детето ми днес тръгваше за първи път на ясла</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="font-black shrink-0">✓</span>
+              <span><strong>Най-честите въпроси за Naturino Kids</strong> — с конкретни отговори</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="font-black shrink-0">✓</span>
+              <span><strong>Как се роди Naturino Kids</strong> — от личен проблем до формула за хиляди семейства</span>
+            </p>
+          </div>
+
+          <p className="mt-3 text-[12px] sm:text-[13px] font-black text-emerald-950">
+            + още практически теми от реалните въпроси на родителите
+          </p>
+
+          <div className="mt-4 rounded-xl bg-emerald-950/10 border border-emerald-950/10 px-3 py-3 space-y-1.5 text-[12px] sm:text-[13px] text-emerald-950 font-bold leading-snug">
+            <p>🔒 Само за клиенти, получили своята поръчка</p>
+            <p>♾️ Безсрочен достъп до всички материали</p>
+            <p>📅 Достъпен от 15.09.2026 г.</p>
+          </div>
+        </div>
+
+        {!isOpen && (
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[58px] rounded-xl bg-gradient-to-b from-yellow-300/5 via-yellow-300/35 to-yellow-400" />
+        )}
+
+        <span
+          className={`relative z-10 mx-auto flex w-fit items-center justify-center gap-1.5 rounded-full border border-white/80 bg-white/90 px-3.5 py-1.5 text-xs font-black text-emerald-950 shadow-md transition-all duration-300 group-hover:bg-white group-hover:shadow-lg ${
+            isOpen ? 'mt-3' : '-mt-2'
+          }`}
+        >
+          <span>{isOpen ? 'Прибери' : 'Виж още'}</span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 transition-transform duration-300 ${
+              isOpen ? 'rotate-180' : 'animate-bounce'
+            }`}
+          />
+        </span>
+      </button>
+
+      <p className="font-black text-red-700 text-xl mt-3">
+        Към поръчката: БЕЗПЛАТНО
+      </p>
+    </div>
+  );
+}
+
+function HeroBenefitsCard() {
+  const benefits = [
+    'Трайно повишава имунитета и устойчивостта на детето',
+    'Намалява боледуванията до 90% при редовен прием',
+    'Защита при хрема, кашлица и сезонно натоварване',
+    'По-бързо възстановяване след боледуване и намаляване на усложненията',
+    'Подкрепя дихателната система и облекчава дразненето в гърлото',
+    'Изключително подходящ за деца с проблеми с третата сливица и честите ангини',
+    '100% натурален билков екстракт, без консерванти, оцветители и захар',
+    'Подходящ за деца от 18 месеца, лесен за прием и с приятен билков вкус',
+    'Много родители вече споделят, че децата им си връщат апетита след приема на Naturino Kids',
+  ];
+
+  return (
+    <div className="w-full mt-6 transform-gpu">
+      <div className="rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-2xl px-5 py-5 md:px-6 md:py-6">
+        <p className="text-white font-black text-base md:text-lg mb-4 leading-tight">
+          Какво се забелязва след приема на Naturino Kids?
+        </p>
+
+        <div className="space-y-3">
+          {benefits.map((item, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
+                <span className="text-white font-black text-sm">✓</span>
+              </div>
+
+              <p className="text-white font-bold text-sm md:text-base leading-tight">
+                {item}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ForumPresentation() {
+  return (
+    <div className="mt-8 w-full text-center">
+      <h3 className="text-white font-black text-xl sm:text-2xl leading-tight">
+        Naturino Kids® на Forbes Health &amp; Longevity Forum - Sofia 2026
+      </h3>
+
+      <p className="mt-2 text-emerald-100 text-sm sm:text-base font-semibold leading-relaxed">
+        Представен пред десетки професори, фармацевти и лекари.
+      </p>
+
+      <img
+        src="/Laant.jpg"
+        alt="Naturino Kids на Forbes Health & Longevity Forum - Sofia 2026"
+        width={800}
+        height={640}
+        className="mt-4 w-full h-auto object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  );
+}
 
 export function Hero() {
   // Оптимизация за Gumlet
@@ -33,15 +204,9 @@ export function Hero() {
     }
   };
 
-  const scrollToGuarantee = () => {
-  document
-    .getElementById('guarantee')
-    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
   return (
     // ПРЕНАПИСАН КЛАС: Премахнато min-h-screen, добавено контролирано отстояние (py-12 md:py-20)
-    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20 lg:pb-[260px]">
+    <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20">
       
       {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -279,40 +444,17 @@ export function Hero() {
               </div>
 
             </div>
+
+            {/* Ползите вече са реално в лявата колона, веднага след отзива */}
+            <HeroBenefitsCard />
+
+            {/* Представянето на форума е преместено на мястото на стария бадж */}
+            <ForumPresentation />
           </div>
 
-                      {/* MOBILE BONUS CARD */}
+            {/* MOBILE BONUS CARD */}
             <div className="block lg:hidden mt-5 mb-0 max-w-[340px] mx-auto">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center">
-
-                <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-black uppercase mb-3 shadow-lg">
-                  🎁 Подарък за всяка майка
-                </div>
-
-                <h3 className="text-emerald-950 font-black text-xl leading-tight">
-                  10-минутна консултация с Пламена
-                </h3>
-
-                <div className="mt-4 space-y-2 text-left text-sm text-emerald-950 font-semibold">
-                  <p>✔ Как да постигнете максимален ефект</p>
-                  <p>✔ Какво да очаквате още в началото</p>
-                  <p>✔ Лични насоки за вашето дете</p>
-                </div>
-
-                <div className="w-40 h-[2px] bg-emerald-900/20 mx-auto my-4"></div>
-
-                <div className="text-base text-emerald-900">
-                  Стойност:
-                  <span className="line-through text-xl font-black text-red-600 ml-1">
-                    50€
-                  </span>
-                </div>
-
-                <p className="font-black text-red-700 text-2xl mt-2">
-                  Днес: БЕЗПЛАТНО
-                </p>
-
-              </div>
+              <VideoBonusCard variant="mobile" />
             </div>
 
 
@@ -410,32 +552,7 @@ export function Hero() {
             </div>
                   {/* BONUS CARD Desktop*/}
             <div className="mt-5">
-              <div className="bg-gradient-to-r from-amber-300 to-yellow-400 rounded-2xl p-4 shadow-xl border-2 border-white/25 text-center">
-
-                <div className="inline-flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-base font-black uppercase mb-3 shadow-lg">
-                  🎁 Подарък за всяка майка
-                </div>
-
-                <h3 className="text-emerald-950 font-black text-lg leading-tight">
-                  10-минутна консултация с Пламена
-                </h3>
-
-                <div className="mt-3 space-y-1 text-left text-sm text-emerald-950 font-semibold">
-                  <p>✔ Как да постигнете максимален ефект</p>
-                  <p>✔ Какво да очаквате през първите седмици</p>
-                  <p>✔ Лични насоки за вашето дете</p>
-                </div>
-
-                <div className="mt-3 text-base text-emerald-900">
-                  <div className="w-60 h-[2px] bg-emerald-900/20 mx-auto my-2"></div>
-                  Стойност: <span className="line-through text-xl font-black text-red-600">50€</span>
-                </div>
-
-                <p className="font-black text-red-700 text-xl mt-1">
-                  Днес: БЕЗПЛАТНО
-                </p>
-
-              </div>
+              <VideoBonusCard variant="desktop" />
             </div>
             {/* BONUS CARD end*/}
 
@@ -491,128 +608,8 @@ export function Hero() {
               </div>
             </div>
 
-            {/* FORBES / LAANT - DESKTOP */}
-            <div className="mt-8 text-center">
-              <h3 className="text-white font-black text-xl xl:text-2xl leading-tight">
-                Naturino Kids® на Forbes Health &amp; Longevity Forum - Sofia 2026
-              </h3>
-
-              <p className="mt-2 text-emerald-100 text-sm md:text-base font-semibold leading-relaxed">
-                Представен пред десетки професори, фармацевти и лекари.
-              </p>
-
-              <img
-                src="/Laant.jpg"
-                alt="Naturino Kids на Forbes Health & Longevity Forum - Sofia 2026"
-                width={800}
-                height={640}
-                className="mt-4 w-full h-auto object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-          
           </div>
         </div>
-
-              {/* Кратки ползи в Hero */}
-      <div className="w-full transform-gpu pt-0 -mt-6 lg:pt-0 lg:-mt-[1210px] lg:max-w-[55%] lg:ml-6">
-        <div className="mx-0 lg:mx-0 rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-2xl px-5 py-5 md:px-6 md:py-6">
-          
-          <p className="text-white font-black text-base md:text-lg mb-4 leading-tight">
-            Какво се забелязва след приема на Naturino Kids?
-          </p>
-
-          <div className="space-y-3">
-            {[
-              'Трайно повишава имунитета и устойчивостта на детето',
-              'Намалява боледуванията до 90% при редовен прием',
-              'Защита при хрема, кашлица и сезонно натоварване',
-              'По-бързо възстановяване след боледуване и намаляване на усложненията',
-              'Подкрепя дихателната система и облекчава дразненето в гърлото',
-              'Изключително подходящ за деца с проблеми с третата сливица и честите ангини',
-              '100% натурален билков екстракт, без консерванти, оцветители и захар',
-              'Подходящ за деца от 18 месеца, лесен за прием и с приятен билков вкус',
-              'Много родители вече споделят, че децата им си връщат апетита след приема на Naturino Kids',
-
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
-                  <span className="text-white font-black text-sm">✓</span>
-                </div>
-
-                <p className="text-white font-bold text-sm md:text-base leading-tight">
-                  {item}
-                </p>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      </div>
-
-        {/* FORBES / LAANT - MOBILE */}
-          <div className="block lg:hidden mt-8 mb-2 w-full max-w-[800px] mx-auto text-center">
-            <h3 className="text-white font-black text-xl sm:text-2xl leading-tight">
-              Naturino Kids® на Forbes Health &amp; Longevity Forum - Sofia 2026
-            </h3>
-
-            <p className="mt-2 text-emerald-100 text-sm sm:text-base font-semibold leading-relaxed">
-              Представен пред десетки професори, фармацевти и лекари.
-            </p>
-
-            <img
-              src="/Laant.jpg"
-              alt="Naturino Kids на Forbes Health & Longevity Forum - Sofia 2026"
-              width={800}
-              height={640}
-              className="mt-4 w-full h-auto object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-
-
-            {/* ЛИЧНА ГАРАНЦИЯ - BADGE */}
-      <div className="w-full lg:max-w-[55%] lg:ml-6 flex justify-center mt-3 md:mt-4 lg:-mt-[60px]">
-        <button
-          type="button"
-          onClick={scrollToGuarantee}
-          className="
-            group relative
-            flex flex-col items-center
-            transition-all duration-300
-            hover:-translate-y-1
-          "
-          aria-label="Виж личната гаранция на Пламена"
-        >
-          <img
-            src="/guarantee-badge.png"
-            alt="Лична гаранция Naturino Kids от Пламена Бошнакова"
-            className="
-              h-auto
-              w-[290px]
-              sm:w-[400px]
-              md:w-[400px]
-              lg:w-[410px]
-              xl:w-[440px]
-            "
-            loading="eager"
-          />
-
-          <span
-            className="
-              mt-2
-              text-[10px] sm:text-[11px]
-              font-black uppercase tracking-[0.12em]
-              text-white/90
-            "
-          >
-            Виж моята лична гаранция ↓
-          </span>
-        </button>
-      </div>
-  
       </div>
     </section>
   );
