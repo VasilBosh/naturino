@@ -11,6 +11,7 @@ const reviews = [
   '/social/8.jpg',
   '/social/9.jpg',
   '/social/15.jpg',
+  '/social/16.jpg','/social/17.jpg','/social/18.jpg','/social/19.jpg','/social/20.jpg','/social/21.jpg','/social/22.jpg',
 ];
 
 export function ReviewsSlider() {
