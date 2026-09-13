@@ -203,12 +203,12 @@ export const ComparisonSection: React.FC = () => {
           </div>
 
           <div className="md:col-span-5 flex justify-center mt-4 md:mt-0">
-            {/* ПРОМПТ ЗА ГЕНЕРИРАНЕ НА ИЗОБРАЖЕНИЕТО (Генерирай го в Midjourney или DALL-E и го запиши като `herbal-tea-equivalent.png`):
+            {/* ПРОМПТ ЗА ГЕНЕРИРАНЕ НА ИЗОБРАЖЕНИЕТО (Генерирай го в Midjourney или DALL-E и го запиши като `herbal-tea-equivalent.webp`):
               "A minimalistic beautiful split comparison design. On the left: a huge aesthetic jar full of colorful herbal tea with fresh herbs floating inside. On the right: a premium natural supplement amber dropper bottle. An arrow showing how 3 Liters of tea condense into 1 small beautiful golden drop of herbal extract. Soft warm lighting, clean studio shot, no clutter --ar 4:3 --v 6.0"
             */}
             <div className="relative group max-w-[280px] md:max-w-full">
               <img 
-                src="/images/herbal-tea-equivalent.png" 
+                src="/images/herbal-tea-equivalent.webp" 
                 alt="3 литра чай концентрирани в няколко капки Naturino Kids" 
                 className="w-full h-auto object-contain rounded-2xl shadow-md border border-emerald-700/50 p-1.5 bg-emerald-900/40"
                 onError={(e) => {

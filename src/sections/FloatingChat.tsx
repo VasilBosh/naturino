@@ -69,7 +69,7 @@ useEffect(() => {
         aria-label="Viber"
       >
         <img 
-          src="images/viber.png" 
+          src="images/viber.webp" 
           alt="Viber" 
           className="h-12 md:h-16 w-auto block object-contain shadow-none" 
         />
@@ -91,7 +91,7 @@ useEffect(() => {
             <X className="w-6 h-6 md:w-6 md:h-6 stroke-[2.5]" />
           </div>
         ) : (
-          <img src="images/message.png" alt="Чат" className="h-full w-full object-contain block" />
+          <img src="images/message.webp" alt="Чат" className="h-full w-full object-contain block" />
         )}
       </button>
 

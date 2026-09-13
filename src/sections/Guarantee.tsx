@@ -246,7 +246,7 @@ export function Guarantee() {
                 {/* Right - badge + date */}
                 <div className="flex flex-col items-start gap-3 md:items-end">
                   <img
-                    src="/guarantee-badge.png"
+                    src="/guarantee-badge.webp"
                     alt="Личната гаранция на Пламена"
                     className="h-auto w-[180px] sm:w-[200px] md:w-[220px]"
                   />

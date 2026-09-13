@@ -160,7 +160,7 @@ function ForumPresentation() {
       </p>
 
       <img
-        src="/Laant.jpg"
+        src="/Laant.webp"
         alt="Naturino Kids на Forbes Health & Longevity Forum - Sofia 2026"
         width={800}
         height={640}
@@ -236,7 +236,7 @@ export function Hero() {
         <header className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 md:gap-3">
             <img
-              src="/logo-icon.png"
+              src="/logo-icon.webp"
               alt="Naturino Kids"
               className="w-14 h-14 md:w-16 md:h-16 object-contain"
             />
@@ -297,7 +297,7 @@ export function Hero() {
                 <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-2xl">
                   
                   <img
-                    src="/images/product-main.jpg"
+                    src="/images/product-main.webp"
                     alt="Naturino Kids"
                     className="w-full h-auto rounded-xl"
                     loading="eager"
@@ -308,7 +308,7 @@ export function Hero() {
                   <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3">
                     <div className="flex items-center justify-center gap-3 mb-2">
                       <img
-                        src="/logo/speedy-logo.png"
+                        src="/logo/speedy-logo.webp"
                         alt="Speedy"
                         className="h-7 w-auto object-contain bg-white rounded px-2 py-1"
                       />
@@ -318,7 +318,7 @@ export function Hero() {
                       </span>
 
                       <img
-                        src="/logo/ekont-logo.png"
+                        src="/logo/ekont-logo.webp"
                         alt="Еконт"
                         className="h-7 w-auto object-contain bg-white rounded px-2 py-1"
                       />
@@ -518,7 +518,7 @@ export function Hero() {
               <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
                 <img 
-                  src="/images/product-main.jpg" 
+                  src="/images/product-main.webp" 
                   alt="Naturino Kids - Натурална защита за Деца"
                   className="w-full h-auto rounded-xl md:rounded-2xl"
                   loading="eager"
@@ -528,9 +528,9 @@ export function Hero() {
 
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
                   <div className="flex items-center justify-center gap-3 mb-2">
-                    <img src="/logo/speedy-logo.png" alt="Speedy" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
+                    <img src="/logo/speedy-logo.webp" alt="Speedy" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                     <span className="text-white/60 text-xs">или</span>
-                    <img src="/logo/ekont-logo.png" alt="Еконт" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
+                    <img src="/logo/ekont-logo.webp" alt="Еконт" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2">

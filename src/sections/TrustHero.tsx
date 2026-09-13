@@ -4,32 +4,32 @@ export default function TrustHero() {
   // За десктоп (компютър) ползваме класове със "sm:" префикс (напр. sm:w-24 или sm:w-36).
   const logos = [
     { 
-      src: '/logo/Natural1.png', 
+      src: '/logo/Natural1.webp', 
       alt: '100% Натурално',
       sizeClasses: 'w-[100%] sm:w-28' // автоматично се смалява на телефон, на компютър е 112px
     },
     { 
-      src: '/logo/botanical.png', 
+      src: '/logo/botanical.webp', 
       alt: 'Ботаникъл',
       sizeClasses: 'w-[100%] sm:w-40' // по-широко, защото е дълго правоъгълно лого
     },
     { 
-      src: '/logo/BioExperts3.png', 
+      src: '/logo/BioExperts3.webp', 
       alt: 'Bio Experts',
       sizeClasses: 'w-[100%] sm:w-24' 
     },
     { 
-      src: '/logo/NovaFarm.png', 
+      src: '/logo/NovaFarm.webp', 
       alt: 'NovaFarm',
       sizeClasses: 'w-[100%] sm:w-28' 
     },
     { 
-      src: '/logo/Апостолов4.jpg', 
+      src: '/logo/Апостолов4.webp', 
       alt: 'Аптеки Апостолов',
       sizeClasses: 'w-[100%] sm:w-28' 
     },
     { 
-      src: '/logo/Bulgaria8.png', 
+      src: '/logo/Bulgaria8.webp', 
       alt: 'Произведени в България',
       sizeClasses: 'w-[100%] sm:w-24' // по-тясно, защото е кръгло
     },

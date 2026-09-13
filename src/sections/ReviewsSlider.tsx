@@ -1,18 +1,18 @@
 import { useEffect, useRef } from 'react';
 
 const reviews = [
-  '/social/1.jpg',
-  '/social/2.jpg',
-  '/social/3.jpg',
-  '/social/4.jpg',
-  '/social/5.jpg',
-  '/social/6.jpg',
-  '/social/7.jpg',
-  '/social/8.jpg',
-  '/social/9.jpg',
-  '/social/15.jpg',
-  '/social/16.jpg','/social/17.jpg','/social/18.jpg','/social/19.jpg','/social/20.jpg','/social/21.jpg','/social/22.jpg',
-  '/social/23.jpg','/social/24.jpg','/social/25.jpg','/social/26.jpg','/social/27.jpg',
+  '/social/1.webp',
+  '/social/2.webp',
+  '/social/3.webp',
+  '/social/4.webp',
+  '/social/5.webp',
+  '/social/6.webp',
+  '/social/7.webp',
+  '/social/8.webp',
+  '/social/9.webp',
+  '/social/15.webp',
+  '/social/16.webp','/social/17.webp','/social/18.webp','/social/19.webp','/social/20.webp','/social/21.webp','/social/22.webp',
+  '/social/23.webp','/social/24.webp','/social/25.webp','/social/26.webp','/social/27.webp',
 ];
 
 export function ReviewsSlider() {

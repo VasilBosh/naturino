@@ -10,7 +10,7 @@ import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart } from 'lucide-react';
  *   за да може Apps Script да намери СЪЩИЯ ред и да обнови брой/сума + маркер в бележки.
  * - Използва същия SK ключ и същия URL като Checkout.
  *
- * Продуктови снимки: public/upsell/kids-3pack.png и public/upsell/adult.png
+ * Продуктови снимки: public/upsell/kids-3pack.webp и public/upsell/adult.webp
  * Ако липсват — показва се резервен вид, нищо не се чупи.
  */
 
@@ -21,8 +21,8 @@ const GOOGLE_SCRIPT_URL =
 const BACKUP_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
 
-const UPSELL = { addQty: 2, addPrice: 44.9, wasPrice: 47.8, img: '/upsell/kids-3pack.png', emoji: '🧴' };
-const DOWNSELL = { addQty: 1, addPrice: 24.9, img: '/upsell/adult.png', emoji: '🌿' };
+const UPSELL = { addQty: 2, addPrice: 44.9, wasPrice: 47.8, img: '/upsell/kids-3pack.webp', emoji: '🧴' };
+const DOWNSELL = { addQty: 1, addPrice: 24.9, img: '/upsell/adult.webp', emoji: '🌿' };
 
 const eur = (n: number) => n.toFixed(2).replace('.', ',') + ' €';
 

@@ -867,8 +867,8 @@ export function Checkout() {
             {/* ⬇️ КУРИЕР ЛОГА ⬇️ */}
             <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
               <div className="flex items-center justify-center gap-4 md:gap-6">
-                <img src="/logo/speedy-logo.png" alt="Speedy" className="h-12 md:h-16 w-auto object-contain" />
-                <img src="/logo/ekont-logo.png" alt="Еконт" className="h-11 md:h-16 w-auto object-contain" />
+                <img src="/logo/speedy-logo.webp" alt="Speedy" className="h-12 md:h-16 w-auto object-contain" />
+                <img src="/logo/ekont-logo.webp" alt="Еконт" className="h-11 md:h-16 w-auto object-contain" />
               </div>
             </div>
             {/* ⬆️ КРАЙ ⬆️ */}

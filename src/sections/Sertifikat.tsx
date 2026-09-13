@@ -23,7 +23,7 @@ const documents = [
     id: 'quality',
     tabTitle: 'Качество',
     title: 'Удостоверение за качество',
-    src: '/sertifikat.png',
+    src: '/sertifikat.webp',
     alt: 'Удостоверение за качество на Naturino Kids',
     width: 1275,
     height: 1650,
@@ -35,7 +35,7 @@ const documents = [
     id: 'trademark',
     tabTitle: 'Защитена марка',
     title: 'Свидетелство за регистрация на марка',
-    src: '/patent.jpg',
+    src: '/patent.webp',
     alt: 'Свидетелство за регистрация на търговската марка Naturino Kids',
     width: 1240,
     height: 1753,
@@ -651,7 +651,7 @@ const Sertifikat = () => {
 
                               {document.showQualityBadge && (
                                 <img
-                                  src="/quality-badge.png"
+                                  src="/quality-badge.webp"
                                   alt="Бадж за проверено качество"
                                   className="
                                     pointer-events-none absolute z-20 object-contain drop-shadow-xl

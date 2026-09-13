@@ -2,7 +2,7 @@ import { MessageCircle } from 'lucide-react';
 
 const reviews = Array.from(
   { length: 27 },
-  (_, index) => `/social/${index + 1}.jpg`
+  (_, index) => `/social/${index + 1}.webp`
 );
 
 export function CheckoutSocialProof() {
