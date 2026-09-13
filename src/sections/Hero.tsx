@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Shield, Leaf, Star, Phone, Award, ShoppingCart, ChevronDown } from 'lucide-react';
+import { Shield, Star, Phone, Award, ShoppingCart, ChevronDown } from 'lucide-react';
 
 function VideoBonusCard({ variant }: { variant: 'mobile' | 'desktop' }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -235,9 +235,11 @@ export function Hero() {
         {/* Header */}
         <header className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
-              <Leaf className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
-            </div>
+            <img
+              src="/logo-icon.png"
+              alt="Naturino Kids"
+              className="w-14 h-14 md:w-16 md:h-16 object-contain"
+            />
             <div>
               <h1 className="text-white font-bold text-lg md:text-xl lg:text-2xl">Naturino Kids</h1>
               <p className="text-emerald-200 text-xs md:text-sm hidden sm:block">Натурална защита за деца</p>
