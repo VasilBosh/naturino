@@ -59,7 +59,7 @@ export function SocialProof() {
   ];
 
   const stats = [
-    { value: '4,700+', label: 'Доволни родители' },
+    { value: '57,000+', label: 'Доволни родители' },
     { value: '4.9/5', label: 'Среден рейтинг' },
     { value: '95%', label: 'Препоръчват продукта' },
     { value: '10', label: 'Натурални билки' },

@@ -27,10 +27,10 @@ export const Stats = () => {
           {/* Yearly */}
           <div className="bg-white/8 backdrop-blur-sm border border-white/12 rounded-2xl p-7 text-center">
             <p className="text-xs uppercase tracking-widest text-emerald-300 font-semibold mb-3">
-              От стартирането
+              От стартирането вече над
             </p>
             <div className="text-4xl md:text-5xl font-black text-amber-400 mb-2">
-              4,700+
+              57,000+
             </div>
             <p className="text-sm text-emerald-100/70 font-medium">доволни семейства</p>
           </div>
@@ -44,7 +44,7 @@ export const Stats = () => {
               Нови поръчки
             </p>
             <div className="text-4xl md:text-5xl font-black text-white mb-2">
-              350+
+              3,500+
             </div>
             <p className="text-sm text-emerald-100/70 font-medium">поръчки от родители</p>
           </div>
