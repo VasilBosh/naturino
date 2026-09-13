@@ -1,7 +1,7 @@
 import { MessageCircle } from 'lucide-react';
 
 const reviews = Array.from(
-  { length: 26 },
+  { length: 27 },
   (_, index) => `/social/${index + 1}.jpg`
 );
 
