@@ -591,45 +591,329 @@ export function Checkout() {
           </h2>
           <div className="reveal opacity-0 text-base md:text-lg text-slate-600 leading-relaxed text-center max-w-3xl mx-auto">
 
-            <div className="mt-2 bg-gradient-to-br from-rose-50 to-white rounded-3xl border border-rose-200 p-5 shadow-lg">
+            {/* =========================================================
+    ДВОЕН БОНУС — PREMIUM / ATTENTION SECTION
+========================================================= */}
 
-              <div className="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full font-black text-sm mb-5">
-                🎁 ДВОЕН БОНУС ЗА ВСЯКА МАЙКА
-              </div>
+<style>{`
+  @keyframes bonusFloat {
+    0%, 100% { transform: translateY(0px) rotate(-5deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+  }
 
-              <div className="space-y-4">
+  @keyframes bonusFloatAlt {
+    0%, 100% { transform: translateY(0px) rotate(6deg); }
+    50% { transform: translateY(-12px) rotate(-6deg); }
+  }
 
-                {/* Консултация */}
-                <div className="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm">
-                  <h4 className="font-black text-lg text-emerald-700">
-                    💬 10-минутна консултация с Пламена
-                  </h4>
+  @keyframes bonusGlow {
+    0%, 100% {
+      box-shadow:
+        0 0 0 rgba(16,185,129,0),
+        0 15px 40px rgba(16,185,129,.10);
+    }
+    50% {
+      box-shadow:
+        0 0 28px rgba(16,185,129,.28),
+        0 20px 50px rgba(16,185,129,.18);
+    }
+  }
 
-                  <p className="text-slate-600 mt-2 text-sm md:text-base">
-                    Лични насоки и отговори на всички ваши въпроси.
-                  </p>
-                </div>
+  @keyframes bonusGlowBlue {
+    0%, 100% {
+      box-shadow:
+        0 0 0 rgba(59,130,246,0),
+        0 15px 40px rgba(59,130,246,.10);
+    }
+    50% {
+      box-shadow:
+        0 0 28px rgba(59,130,246,.28),
+        0 20px 50px rgba(59,130,246,.18);
+    }
+  }
 
-                {/* Facebook група */}
-                <div className="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm">
-                  <h4 className="font-black text-lg text-[#1877F2]">
-                    👩‍👩‍👧 Затворена общност за родители
-                  </h4>
-                  <div className="mt-3 space-y-2 text-sm font-medium text-slate-700">
-                    <p>✔ Съвети и подкрепа от други майки</p>
-                    <p>✔ Бързи решения при вируси и боледуване</p>
-                    <p>✔ Идеи за хранене и силен имунитет</p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 bg-rose-50 rounded-2xl p-4 border border-rose-100">
-                <p className="text-center font-bold text-rose-600 leading-relaxed">
-                  ❤️ Няма да сте сами в най-трудните моменти.
-                  <br />
-                  Покана в затворената група става на имейл посочен при поръчката.
-                </p>
-              </div>
-            </div>
+  @keyframes sparkleBlink {
+    0%, 100% { opacity: .25; transform: scale(.8); }
+    50% { opacity: 1; transform: scale(1.25); }
+  }
+
+  @keyframes giftWiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-7deg) scale(1.05); }
+    75% { transform: rotate(7deg) scale(1.05); }
+  }
+
+  @keyframes shineSweep {
+    0% { transform: translateX(-160%) skewX(-20deg); }
+    55%, 100% { transform: translateX(260%) skewX(-20deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bonus-motion {
+      animation: none !important;
+    }
+  }
+`}</style>
+
+<div className="relative mt-3 sm:mt-4">
+
+  {/* ДЕКОРАТИВНИ ПОДАРЪЦИ / КОНФЕТИ */}
+  <div
+    className="bonus-motion hidden sm:block absolute -left-3 md:-left-8 top-12 text-4xl md:text-5xl z-20 pointer-events-none"
+    style={{ animation: 'bonusFloat 2.8s ease-in-out infinite' }}
+  >
+    🎁
+  </div>
+
+  <div
+    className="bonus-motion hidden sm:block absolute -right-3 md:-right-8 top-20 text-4xl md:text-5xl z-20 pointer-events-none"
+    style={{ animation: 'bonusFloatAlt 3.2s ease-in-out infinite' }}
+  >
+    🎉
+  </div>
+
+  <div
+    className="bonus-motion absolute left-[6%] top-[19%] text-xl pointer-events-none"
+    style={{ animation: 'sparkleBlink 1.7s ease-in-out infinite' }}
+  >
+    ✨
+  </div>
+
+  <div
+    className="bonus-motion absolute right-[7%] top-[43%] text-lg pointer-events-none"
+    style={{ animation: 'sparkleBlink 2.1s ease-in-out infinite .4s' }}
+  >
+    ✨
+  </div>
+
+  <div
+    className="bonus-motion absolute left-[4%] bottom-[15%] text-lg pointer-events-none"
+    style={{ animation: 'sparkleBlink 1.9s ease-in-out infinite .8s' }}
+  >
+    🎊
+  </div>
+
+  {/* ОСНОВНА РАМКА */}
+  <div className="relative overflow-hidden rounded-[28px] border-2 border-rose-200 bg-gradient-to-b from-rose-50 via-white to-amber-50 p-3 sm:p-5 md:p-7 shadow-2xl">
+
+    {/* декоративни светлини */}
+    <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div className="absolute -bottom-28 -left-20 w-64 h-64 bg-rose-200/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    {/* ГОРЕН БАНЕР */}
+    <div className="relative text-center mb-5 sm:mb-6">
+
+      <div
+        className="bonus-motion inline-block text-3xl sm:text-4xl mb-2"
+        style={{ animation: 'giftWiggle 2.4s ease-in-out infinite' }}
+      >
+        🎁
+      </div>
+
+      <div className="relative overflow-hidden inline-flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 text-white px-4 sm:px-7 py-2.5 sm:py-3 rounded-full shadow-xl border border-white/50">
+
+        {/* движещ се shine */}
+        <span
+          className="bonus-motion absolute top-0 bottom-0 w-10 bg-white/30 blur-sm"
+          style={{ animation: 'shineSweep 3.2s ease-in-out infinite' }}
+        ></span>
+
+        <span className="relative z-10 text-sm sm:text-base md:text-lg font-black tracking-wide">
+          🎉 ДВОЕН БОНУС КЪМ ПОРЪЧКАТА
+        </span>
+
+      </div>
+
+      <p className="mt-3 text-sm sm:text-base font-bold text-slate-700">
+        Получавате и двата бонуса
+        <span className="text-rose-600 font-black"> напълно БЕЗПЛАТНО</span>
+      </p>
+
+    </div>
+
+    {/* =====================================================
+        БОНУС №1
+    ===================================================== */}
+    <div
+      className="relative overflow-hidden rounded-3xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-4 sm:p-5 md:p-6 mb-4 sm:mb-5"
+      style={{ animation: 'bonusGlow 2.8s ease-in-out infinite' }}
+    >
+
+      <div className="absolute -top-16 -right-12 w-40 h-40 rounded-full bg-emerald-200/30 blur-3xl pointer-events-none"></div>
+
+      <div className="relative z-10">
+
+        {/* БАДЖОВЕ */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4">
+
+          <span className="inline-flex items-center justify-center bg-emerald-600 text-white px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md">
+            🎁 БОНУС №1
+          </span>
+
+          <span className="inline-flex items-center justify-center bg-white border-2 border-emerald-200 text-emerald-700 px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md">
+            БЕЗПЛАТНО
+          </span>
+
+        </div>
+
+        {/* ЗАГЛАВИЕ */}
+        <h4 className="text-center font-black text-lg sm:text-xl md:text-2xl text-emerald-800 leading-tight">
+          🎥 Безценният видео пакет на Пламена
+        </h4>
+
+        <p className="text-center text-slate-600 text-sm sm:text-base leading-relaxed mt-3 max-w-2xl mx-auto">
+          Най-важното от личните ми разговори и консултации с родители —
+          събрано в кратки практически видеа с
+          <strong className="text-slate-800"> безсрочен достъп.</strong>
+        </p>
+
+        {/* ТОЧКИ */}
+        <div className="mt-5 max-w-xl mx-auto">
+          <div className="flex flex-col items-start gap-2.5 text-left text-sm sm:text-base font-semibold text-slate-700">
+
+            <p className="flex gap-2">
+              <span className="text-emerald-600 font-black">✓</span>
+              <span>Как да реагирате още при първите симптоми</span>
+            </p>
+
+            <p className="flex gap-2">
+              <span className="text-emerald-600 font-black">✓</span>
+              <span>5 грешки, които родителите често допускат</span>
+            </p>
+
+            <p className="flex gap-2">
+              <span className="text-emerald-600 font-black">✓</span>
+              <span>Защо детето боледува отново и отново</span>
+            </p>
+
+            <p className="flex gap-2">
+              <span className="text-emerald-600 font-black">✓</span>
+              <span>Третата сливица, храненето и още практически теми</span>
+            </p>
+
+          </div>
+        </div>
+
+        {/* ДОЛЕН РЕД */}
+        <div className="mt-5 pt-4 border-t border-emerald-200 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs sm:text-sm font-black text-emerald-700">
+          <span>♾️ Безсрочен достъп</span>
+          <span>🔒 Само за клиенти</span>
+        </div>
+
+      </div>
+    </div>
+
+
+    {/* =====================================================
+        БОНУС №2
+    ===================================================== */}
+    <div
+      className="relative overflow-hidden rounded-3xl border-2 border-blue-300 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 sm:p-5 md:p-6"
+      style={{ animation: 'bonusGlowBlue 3.2s ease-in-out infinite' }}
+    >
+
+      <div className="absolute -top-16 -left-12 w-40 h-40 rounded-full bg-blue-200/30 blur-3xl pointer-events-none"></div>
+
+      <div className="relative z-10">
+
+        {/* БАДЖОВЕ */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4">
+
+          <span className="inline-flex items-center justify-center bg-blue-600 text-white px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md">
+            🎁 БОНУС №2
+          </span>
+
+          <span className="inline-flex items-center justify-center bg-white border-2 border-blue-200 text-blue-700 px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md">
+            БЕЗПЛАТНО
+          </span>
+
+        </div>
+
+        {/* ЗАГЛАВИЕ */}
+        <h4 className="text-center font-black text-lg sm:text-xl md:text-2xl text-blue-700 leading-tight">
+          👩‍👩‍👧 Затворена общност за родители
+        </h4>
+
+        <p className="text-center text-slate-600 text-sm sm:text-base leading-relaxed mt-3 max-w-2xl mx-auto">
+          Получавате достъп до затворената общност на Naturino —
+          място за реални въпроси, опит и полезни теми за родителите.
+        </p>
+
+        {/* ТОЧКИ */}
+        <div className="mt-5 max-w-xl mx-auto">
+          <div className="flex flex-col items-start gap-2.5 text-left text-sm sm:text-base font-semibold text-slate-700">
+
+            <p className="flex gap-2">
+              <span className="text-blue-600 font-black">✓</span>
+              <span>Съвети и опит от други майки</span>
+            </p>
+
+            <p className="flex gap-2">
+              <span className="text-blue-600 font-black">✓</span>
+              <span>Полезни теми при вируси и боледуване</span>
+            </p>
+
+            <p className="flex gap-2">
+              <span className="text-blue-600 font-black">✓</span>
+              <span>Идеи за хранене, ясла, градина и ежедневието</span>
+            </p>
+
+            <p className="flex gap-2">
+              <span className="text-blue-600 font-black">✓</span>
+              <span>Лична помощ от Пламена при въпроси</span>
+            </p>
+
+          </div>
+        </div>
+
+        {/* ДОЛЕН РЕД */}
+        <div className="mt-5 pt-4 border-t border-blue-200 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs sm:text-sm font-black text-blue-700">
+          <span>👩‍👩‍👧 Затворена група</span>
+          <span>🔒 Само за клиенти</span>
+        </div>
+
+      </div>
+    </div>
+
+
+    {/* =====================================================
+        КАК СЕ ПОЛУЧАВАТ
+    ===================================================== */}
+    <div className="relative mt-5 overflow-hidden rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 p-4 sm:p-5 shadow-lg">
+
+      <div
+        className="bonus-motion absolute top-2 left-3 text-xl"
+        style={{ animation: 'sparkleBlink 1.6s ease-in-out infinite' }}
+      >
+        ✨
+      </div>
+
+      <div
+        className="bonus-motion absolute bottom-2 right-3 text-xl"
+        style={{ animation: 'sparkleBlink 1.8s ease-in-out infinite .5s' }}
+      >
+        ✨
+      </div>
+
+      <div className="relative z-10 text-center">
+
+        <p className="text-base sm:text-lg font-black text-amber-900">
+          🎁 И двата бонуса са подарък към поръчката ви
+        </p>
+
+        <p className="mt-2 text-sm sm:text-base text-slate-700 font-semibold leading-relaxed">
+          След като получите своя Naturino Kids, ще получите
+          <strong> достъп до видео пакета</strong> и
+          <strong> покана за затворената група</strong> на имейла,
+          посочен при поръчката.
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+</div>
 
             {/* 3. Финалният призив за действие */}
             <p className="mt-8 text-base md:text-lg font-bold text-green-700 animate-pulse border-t border-slate-100 pt-6 transition-all duration-10000">

@@ -172,6 +172,47 @@ function ForumPresentation() {
   );
 }
 
+
+function ProductSparkles({ desktop = false }: { desktop?: boolean }) {
+  return (
+    <div
+      className={`absolute z-20 pointer-events-none ${
+        desktop ? '-top-3 -left-3 md:-top-4 md:-left-4' : '-top-2 -left-2'
+      }`}
+    >
+      <div className="relative w-[72px] h-[72px] md:w-[84px] md:h-[84px]">
+        <span
+          className="absolute left-0 top-2 text-xl md:text-2xl hero-sparkle hero-sparkle-1"
+          aria-hidden="true"
+        >
+          ✨
+        </span>
+
+        <span
+          className="absolute left-6 top-0 text-base md:text-lg hero-sparkle hero-sparkle-2"
+          aria-hidden="true"
+        >
+          ⭐
+        </span>
+
+        <span
+          className="absolute left-10 top-5 text-lg md:text-xl hero-sparkle hero-sparkle-3"
+          aria-hidden="true"
+        >
+          ✨
+        </span>
+
+        <span
+          className="absolute left-3 top-8 text-sm md:text-base hero-sparkle hero-sparkle-4"
+          aria-hidden="true"
+        >
+          ✦
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function Hero() {
   // Оптимизация за Gumlet
   useEffect(() => {
@@ -207,6 +248,94 @@ export function Hero() {
   return (
     // ПРЕНАПИСАН КЛАС: Премахнато min-h-screen, добавено контролирано отстояние (py-12 md:py-20)
     <section className="relative w-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden isolate py-8 md:py-16 lg:py-20">
+      <style>{`
+        @keyframes heroSparkleFloat {
+          0%, 100% {
+            transform: translateY(0px) scale(1) rotate(0deg);
+            opacity: 0.85;
+          }
+          50% {
+            transform: translateY(-6px) scale(1.12) rotate(8deg);
+            opacity: 1;
+          }
+        }
+
+        @keyframes heroSparklePulse {
+          0%, 100% {
+            transform: scale(0.95);
+            opacity: 0.7;
+            filter: drop-shadow(0 0 0 rgba(255,255,255,0));
+          }
+          50% {
+            transform: scale(1.18);
+            opacity: 1;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.7));
+          }
+        }
+
+        .hero-sparkle {
+          will-change: transform, opacity;
+        }
+
+        .hero-sparkle-1 {
+          animation: heroSparkleFloat 2s ease-in-out infinite;
+        }
+
+        .hero-sparkle-2 {
+          animation: heroSparklePulse 1.8s ease-in-out infinite .2s;
+        }
+
+        .hero-sparkle-3 {
+          animation: heroSparkleFloat 2.2s ease-in-out infinite .35s;
+        }
+
+        .hero-sparkle-4 {
+          animation: heroSparklePulse 1.9s ease-in-out infinite .5s;
+        }
+
+        @keyframes heroImageShine {
+          0% {
+            transform: translateX(-180%) skewX(-24deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0;
+          }
+          22% {
+            opacity: 0.9;
+          }
+          38% {
+            transform: translateX(220%) skewX(-24deg);
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(220%) skewX(-24deg);
+            opacity: 0;
+          }
+        }
+
+        .hero-image-shine {
+          animation: heroImageShine 3s linear infinite;
+          will-change: transform, opacity;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-image-shine {
+            animation: none !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-sparkle,
+          .hero-sparkle-1,
+          .hero-sparkle-2,
+          .hero-sparkle-3,
+          .hero-sparkle-4 {
+            animation: none !important;
+          }
+        }
+      `}</style>
+
       
       {/* BACKGROUND EFFECTS (GPU Акумулирани) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -296,13 +425,26 @@ export function Hero() {
 
                 <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-2xl">
                   
-                  <img
-                    src="/images/product-main.webp"
-                    alt="Naturino Kids"
-                    className="w-full h-auto rounded-xl"
-                    loading="eager"
-                    fetchPriority="high"
-                  />
+                  <div className="relative overflow-hidden rounded-xl">
+                    <img
+                      src="/images/product-main.webp"
+                      alt="Naturino Kids"
+                      className="w-full h-auto rounded-xl block"
+                      loading="eager"
+                      fetchPriority="high"
+                    />
+
+                    <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/20" />
+
+                    <div
+                      className="hero-image-shine pointer-events-none absolute -top-[15%] bottom-[-15%] left-[-35%] w-[22%]"
+                      style={{
+                        background:
+                          'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.10) 80%, rgba(255,255,255,0) 100%)',
+                        filter: 'blur(2px)',
+                      }}
+                    />
+                  </div>
 
 
                   <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3">
@@ -349,11 +491,7 @@ export function Hero() {
                     </p>
                   </div>
 
-                  <div className="absolute -top-2 -left-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-xl font-bold">
-                    <p className="text-[10px] uppercase">
-                      -50%
-                    </p>
-                  </div>
+                  <ProductSparkles />
 
                 </div>
               </div>
@@ -517,14 +655,27 @@ export function Hero() {
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
-                <img 
-                  src="/images/product-main.webp" 
-                  alt="Naturino Kids - Натурална защита за Деца"
-                  className="w-full h-auto rounded-xl md:rounded-2xl"
-                  loading="eager"
-                  fetchPriority="high"
-                  decoding="sync"
-                />
+                <div className="relative overflow-hidden rounded-xl md:rounded-2xl">
+                  <img 
+                    src="/images/product-main.webp" 
+                    alt="Naturino Kids - Натурална защита за Деца"
+                    className="w-full h-auto rounded-xl md:rounded-2xl block"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="sync"
+                  />
+
+                  <div className="pointer-events-none absolute inset-0 rounded-xl md:rounded-2xl ring-1 ring-white/20" />
+
+                  <div
+                    className="hero-image-shine pointer-events-none absolute -top-[15%] bottom-[-15%] left-[-35%] w-[22%]"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.10) 80%, rgba(255,255,255,0) 100%)',
+                      filter: 'blur(2px)',
+                    }}
+                  />
+                </div>
 
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
                   <div className="flex items-center justify-center gap-3 mb-2">
@@ -547,9 +698,7 @@ export function Hero() {
                   <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
                   <p className="text-lg md:text-xl font-black italic">23.90€</p>
                 </div>
-                <div className="absolute -top-2 -left-2 md:-top-3 md:-left-3 bg-red-500 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg shadow-xl font-bold">
-                  <p className="text-[10px] md:text-xs uppercase">-50%</p>
-                </div>
+                <ProductSparkles desktop />
               </div>
             </div>
                   {/* BONUS CARD Desktop*/}
