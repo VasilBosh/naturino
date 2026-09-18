@@ -921,6 +921,11 @@ export function Checkout() {
               <span className="block">Ще се свържем с вас за потвърждение ✅</span>
             </p>
 
+            <p className="mt-8 text-base md:text-lg font-bold text-[#3A83F7] animate-pulse border-t border-slate-100 pt-6 transition-all duration-10000">
+              Ако срещате трудност с попълването на формата за поръчка, можете да поръчате и по телефона на номер:
+              <span> <strong>📞0896 783 751</strong> </span>
+            </p>
+
           </div>
         </div>
 
