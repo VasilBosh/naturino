@@ -403,10 +403,33 @@ export function Hero() {
               <span className="text-amber-300">боледуване на детето!</span>
             </h2>
 
-            <p className="text-base sm:text-lg md:text-2xl text-emerald-100 mb-6 md:mb-2 lg:pt-0 lg:-mt-12 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              <strong className="text-white">100% натурални билкови капки</strong> с 10 български билки. 
-              Препоръчан от педиатри и фармацевти в <strong className="text-amber-300">Аптеки Апостолов и Аптеки Нова Фарм</strong>.
-            </p>
+            <div className="max-w-xl mx-auto lg:mx-0 mb-3 md:mb-2 lg:pt-0 lg:-mt-12">
+
+              <p className="text-base sm:text-lg md:text-2xl text-emerald-100 leading-relaxed">
+                <strong className="text-white">
+                  100% натурални билкови капки
+                </strong>{' '}
+                с 10 български билки.{' '}
+                <strong className="text-white">
+                  Препоръчван от педиатри и фармацевти.
+                </strong>
+              </p>
+
+              <p className="mt-3 text-base sm:text-lg md:text-xl text-emerald-100 leading-relaxed">
+                Вече можеш да откриеш Naturino Kids и на място — в{' '}
+                <strong className="text-amber-300">
+                  9 физически обекта в 5 града в страната.
+                </strong>
+              </p>
+
+            </div>
+
+            <a
+              href="#physical-stores"
+              className="inline-block mb-6 md:mb-7 text-sm sm:text-base font-bold text-amber-300 hover:text-amber-200 transition-colors duration-300 underline underline-offset-4 decoration-amber-300/50 text-center lg:text-left leading-relaxed"
+            >
+              📍 Виж физическите обекти →
+            </a>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
               {['Без консерванти', 'Без захар', 'Без оцветители'].map((item, i) => (
