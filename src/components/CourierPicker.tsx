@@ -2,6 +2,14 @@
 // Самостоятелен избор на доставка: куриер → офис/адрес → град (с автокомплийт и
 // транслитерация лат→кир) → офис ИЛИ улица+номер → бележка.
 // Зависи само от React + lucide-react. Един файл, копира се между фунии.
+//
+// ПОПРАВКИ (вж. коментарите с 🔧):
+//  1. След избор на улица полето се ЗАКЛЮЧВА (чип като при града) — няма как
+//     клиентът да продължи да пише и без да усети да размаже избора си.
+//  2. След избор на улица фокусът скача автоматично в полето за номер.
+//  3. Ако клиентът пише, но НЕ избере от списъка — вижда червено предупреждение.
+//  4. Ако улицата я няма в базата на куриера — има ръчен вход, за да не се губи поръчка.
+//  5. Смяна на града нулира улицата (иначе оставаше улица от предишния град).
 
 import { useEffect, useRef, useState } from 'react';
 import { Truck, MapPin, Building2, Home, Search, Check, Loader2, ChevronDown } from 'lucide-react';
@@ -129,7 +137,6 @@ async function searchQuarters(courier: Courier, cityId: number | string, raw: st
     const d = await getJSON(`${WORKER}/${courier}/quarters?${param}&name=${encodeURIComponent(cyr)}`);
     const list = (d.quarters || []) as StreetHit[];
     return list.map((s) => {
-      
       const n = (s.name || '').trim();
       // Чистим дублиран тип отпред (напр. "ж.к. Изток" + type "жк.")
       const nClean = n.replace(/^ж\.?\s*к\.?\s*/i, '').trim();
@@ -175,6 +182,8 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
   const [street, setStreet] = useState<AddressHit | null>(null);
   const [streetOpen, setStreetOpen] = useState(false);
   const [streetNo, setStreetNo] = useState('');
+  const [streetSearched, setStreetSearched] = useState(false); // търсили ли сме вече за текущия текст
+  const [manualStreet, setManualStreet] = useState(false);     // 🔧 ръчен вход, ако улицата я няма
 
   const [note, setNote] = useState('');
 
@@ -182,18 +191,29 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
   const officeBoxRef = useRef<HTMLDivElement>(null);
   const streetBoxRef = useRef<HTMLDivElement>(null);
 
+  const focusStreetNo = () => setTimeout(() => document.getElementById('street-no')?.focus(), 60);
+  const focusStreetInput = () => setTimeout(() => document.getElementById('street-input')?.focus(), 60);
+
   // Смяна на куриер → нулираме всичко надолу (типът остава "office")
   useEffect(() => {
     setCityQuery(''); setCity(null); setCityHits([]);
     setOffices([]); setOffice(null); setOfficeOpen(false);
     setStreetQuery(''); setStreet(null); setStreetNo('');
+    setStreetHits([]); setStreetSearched(false); setManualStreet(false);
   }, [courier]);
 
   // Смяна на тип → нулираме избора надолу (пазим града)
   useEffect(() => {
     setOffice(null); setOfficeOpen(false);
     setStreet(null); setStreetQuery(''); setStreetNo('');
+    setStreetHits([]); setStreetSearched(false); setManualStreet(false);
   }, [deliveryType]);
+
+  // 🔧 5. Смяна на града → улицата от стария град става невалидна
+  useEffect(() => {
+    setStreet(null); setStreetQuery(''); setStreetHits([]);
+    setStreetSearched(false); setManualStreet(false);
+  }, [city]);
 
   // Търсене на град (debounce 300ms)
   useEffect(() => {
@@ -222,15 +242,17 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
 
   // Търсене на улица + квартал (debounce 300ms)
   useEffect(() => {
-    if (!city || deliveryType !== 'address' || street) return;
+    if (!city || deliveryType !== 'address' || street || manualStreet) return;
     const q = streetQuery;
+    setStreetSearched(false);
     if (toCyrillic(q.trim()).length < 2) { setStreetHits([]); return; }
     const t = setTimeout(async () => {
       try { setStreetHits(await searchStreetsAndQuarters(courier, city.id, q)); setStreetOpen(true); }
       catch { setStreetHits([]); }
+      finally { setStreetSearched(true); }
     }, 300);
     return () => clearTimeout(t);
-  }, [streetQuery, courier, city, deliveryType, street]);
+  }, [streetQuery, courier, city, deliveryType, street, manualStreet]);
 
   // Затваряне на падащите при клик навън
   useEffect(() => {
@@ -245,17 +267,24 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
 
   // Емит нагоре при всяка промяна
   useEffect(() => {
-    const streetFull = street ? `${street.type} ${street.name}`.trim() : '';
+    // 🔧 4. Ръчно въведената улица е също толкова валидна, колкото избраната от списъка
+    const manualOk = manualStreet && streetQuery.trim().length >= 3;
+    const streetFull = street
+      ? `${street.type} ${street.name}`.trim()
+      : (manualOk ? streetQuery.trim() : '');
+
     let fullAddress = '';
     if (deliveryType === 'office' && office) {
       fullAddress = `Офис ${office.name} — ${office.address}, ${office.city} ${office.postCode}`;
-    } else if (deliveryType === 'address' && street && streetNo) {
+    } else if (deliveryType === 'address' && streetFull && streetNo.trim()) {
       fullAddress = `${streetFull} №${streetNo}, ${city?.name || ''} ${city?.postCode || ''}`.trim();
+      if (manualOk) fullAddress += ' (ръчно въведен адрес — да се потвърди по телефон)';
     }
+
     const isComplete =
       !!city &&
       ((deliveryType === 'office' && !!office) ||
-       (deliveryType === 'address' && !!street && streetNo.trim() !== ''));
+       (deliveryType === 'address' && !!streetFull && streetNo.trim() !== ''));
 
     onChange({
       courier,
@@ -275,7 +304,7 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
       isComplete,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courier, deliveryType, city, office, street, streetNo, note]);
+  }, [courier, deliveryType, city, office, street, streetQuery, manualStreet, streetNo, note]);
 
 
   // ---------- UI ----------
@@ -308,7 +337,7 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
         <label className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-amber-600" /> Населено място <span className="text-red-500">*</span>
         </label>
-        
+
         <div className="relative">
           {city ? (
             <button
@@ -361,8 +390,9 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
           <label className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
             <Building2 className="w-4 h-4 text-amber-600" /> Изберете офис <span className="text-red-500">*</span>
           </label>
-         
+
           <button
+            id="office-input"
             type="button"
             disabled={!city}
             onClick={() => setOfficeOpen((v) => !v)}
@@ -410,36 +440,105 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
       {deliveryType === 'address' && (
         <div className="space-y-4">
           <div ref={streetBoxRef} className="relative">
-            
+
             <label className="text-amber-900 text-sm font-bold mb-1.5 flex items-center gap-1.5">
               <Home className="w-4 h-4 text-amber-600" /> Улица или квартал <span className="text-red-500">*</span>
             </label>
 
-            <div className="relative">
-              <input
-                value={street ? `${street.type} ${street.name}` : streetQuery}
-                disabled={!city}
-                onChange={(e) => { if (street) setStreet(null); setStreetQuery(e.target.value); }}
-                onFocus={() => streetHits.length && setStreetOpen(true)}
-                placeholder={city ? 'Улица или квартал (напр. Ivan, Mladost)' : 'Първо изберете населено място'}
-                autoComplete="new-password"
-                className={`w-full min-w-0 truncate bg-white border border-amber-200 h-12 text-base rounded-xl px-3 pr-9 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm outline-none ${!city ? 'opacity-60' : ''}`}
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500">
-                {street ? <Check className="w-4 h-4 text-emerald-500" /> : <Search className="w-4 h-4" />}
-              </span>
-            </div>
-            
-            {streetOpen && !street && streetHits.length > 0 && (
+            {street ? (
+              // 🔧 1. ЗАКЛЮЧЕНО поле — в него НЕ може да се пише.
+              // Клик = изчистване и ново търсене (точно както при града).
+              <button
+                type="button"
+                onClick={() => { setStreet(null); setStreetQuery(''); setStreetHits([]); setStreetOpen(false); focusStreetInput(); }}
+                title="Натиснете, за да изберете друга улица"
+                className="w-full min-w-0 flex items-center justify-between gap-2 bg-white border border-emerald-300 ring-2 ring-emerald-400 h-12 text-base rounded-xl px-3 shadow-sm outline-none text-left"
+              >
+                <span className="text-slate-800 font-medium truncate min-w-0">{street.type} {street.name}</span>
+                <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              </button>
+            ) : (
+              <div className="relative">
+                <input
+                  id="street-input"
+                  value={streetQuery}
+                  disabled={!city}
+                  onChange={(e) => setStreetQuery(e.target.value)}
+                  onFocus={() => !manualStreet && streetHits.length > 0 && setStreetOpen(true)}
+                  placeholder={
+                    !city ? 'Първо изберете населено място'
+                    : manualStreet ? 'Напишете улица/квартал (само името, без номер)'
+                    : 'Улица или квартал (напр. Ivan, Mladost)'
+                  }
+                  autoComplete="new-password"
+                  className={`w-full min-w-0 truncate bg-white h-12 text-base rounded-xl px-3 pr-9 shadow-sm outline-none focus:ring-2 ${
+                    !city ? 'opacity-60 border border-amber-200'
+                    : manualStreet ? 'border border-blue-300 ring-2 ring-blue-200 focus:ring-blue-400 focus:border-blue-400'
+                    : streetSearched && streetQuery.trim().length >= 2
+                      ? 'border border-red-300 ring-2 ring-red-200 focus:ring-red-300 focus:border-red-300'
+                      : 'border border-amber-200 focus:ring-amber-500 focus:border-amber-500'
+                  }`}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 pointer-events-none">
+                  <Search className="w-4 h-4" />
+                </span>
+              </div>
+            )}
+
+            {streetOpen && !street && !manualStreet && streetHits.length > 0 && (
               <ul className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-amber-200 bg-white shadow-xl">
                 {streetHits.map((s) => (
                   <li key={`${s.kind}-${s.id}`}>
-                    <button type="button" onClick={() => { setStreet(s); setStreetOpen(false); }} className="w-full text-left px-4 py-2.5 hover:bg-amber-50 min-w-0">
+                    <button
+                      type="button"
+                      // 🔧 2. След избор фокусът сам отива на полето за номер
+                      onClick={() => { setStreet(s); setStreetOpen(false); setStreetHits([]); focusStreetNo(); }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-amber-50 min-w-0"
+                    >
                       <span className="font-medium text-slate-800 truncate block min-w-0">{s.type} {s.name}</span>
                     </button>
                   </li>
                 ))}
               </ul>
+            )}
+
+            {/* ---- Подсказки под полето ---- */}
+            {street ? (
+              <p className="text-[11px] text-emerald-600 font-bold mt-1 ml-1 leading-snug">
+                ✓ Улицата е избрана. Напишете номера/блока в полето по-долу 👇
+              </p>
+            ) : manualStreet ? (
+              <p className="text-[11px] text-blue-700 font-semibold mt-1 ml-1 leading-snug">
+                Пишете ръчно — ще потвърдим адреса по телефона.{' '}
+                <button
+                  type="button"
+                  onClick={() => { setManualStreet(false); setStreetQuery(''); setStreetHits([]); focusStreetInput(); }}
+                  className="underline font-bold"
+                >
+                  Върни търсенето
+                </button>
+              </p>
+            ) : streetHits.length > 0 ? (
+              // 🔧 3. Пише, има резултати, но не е избрал нищо
+              <p className="text-[11px] text-red-500 font-bold mt-1 ml-1 leading-snug">
+                ⚠️ Изберете улицата от списъка — само писането не е достатъчно.
+              </p>
+            ) : streetSearched && streetQuery.trim().length >= 2 ? (
+              // 🔧 4. Няма намерена улица → ръчен вход, за да не изгубим поръчката
+              <p className="text-[11px] text-amber-700 font-semibold mt-1 ml-1 leading-snug">
+                Няма намерена улица с това име. Проверете изписването или{' '}
+                <button
+                  type="button"
+                  onClick={() => { setManualStreet(true); setStreetHits([]); setStreetOpen(false); focusStreetInput(); }}
+                  className="underline font-bold text-emerald-700"
+                >
+                  напишете адреса ръчно
+                </button>.
+              </p>
+            ) : (
+              <p className="text-[11px] text-slate-400 font-normal italic mt-1 ml-1 leading-tight">
+                Напишете 2–3 букви и изберете от списъка. Номерът се пише в полето отдолу.
+              </p>
             )}
 
           </div>
@@ -449,10 +548,11 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
               <MapPin className="w-4 h-4 text-amber-600" /> № / блок / вход / ап. <span className="text-red-500">*</span>
             </label>
             <input
+              id="street-no"
               value={streetNo}
               disabled={!city}
               onChange={(e) => setStreetNo(e.target.value)}
-              placeholder="напр. ул.№ , бл. , вх. , ап. "
+              placeholder="напр. 12, бл. 3, вх. Б, ап. 15"
               autoComplete="new-password"
               className={`w-full bg-white border border-amber-200 h-12 text-base rounded-xl px-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm outline-none ${!city ? 'opacity-60' : ''}`}
             />

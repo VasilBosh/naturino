@@ -13,7 +13,11 @@ export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
   const [delivery, setDelivery] = useState<CourierSelection | null>(null);
-  const [deliveryError, setDeliveryError] = useState(false);
+
+  // 🔧 ПРОМЯНА 1: беше useState(false) — сега пази КОНКРЕТНОТО съобщение за грешка,
+  // за да казваме на клиента точно кое поле липсва, вместо общо "изберете доставка".
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validPopupCode, setValidPopupCode] = useState<string | null>(null);
 
@@ -426,10 +430,30 @@ export function Checkout() {
     }
 
     // 2) Доставката трябва да е напълно избрана (куриер + тип + град + офис/адрес)
+    //
+    // 🔧 ПРОМЯНА 2: вместо едно общо съобщение казваме ТОЧНО кое липсва
+    // и завеждаме клиента (скрол + курсор) право в проблемното поле.
     if (!delivery || !delivery.isComplete) {
-      setDeliveryError(true);
-      setTimeout(() => setDeliveryError(false), 5000);
-      document.getElementById('delivery-block')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const msg =
+        !delivery?.cityId
+          ? 'Моля, изберете населено място от списъка.'
+          : delivery.deliveryType === 'office'
+            ? 'Моля, изберете офис от списъка.'
+            : !delivery.streetName
+              ? 'Моля, изберете улица или квартал от падащия списък.'
+              : 'Моля, попълнете № / блок / вход / ап.';
+
+      const targetId =
+        !delivery?.cityId || delivery.deliveryType === 'office'
+          ? 'delivery-block'
+          : !delivery.streetName
+            ? 'street-input'
+            : 'street-no';
+
+      setDeliveryError(msg);
+      setTimeout(() => setDeliveryError(null), 8000);
+      document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => (document.getElementById(targetId) as HTMLInputElement)?.focus?.(), 400);
       return;
     }
 
@@ -566,6 +590,7 @@ export function Checkout() {
     setQuantity(1);
     setEmailNote(null);
     setPhoneNote(null);
+    setDeliveryError(null);
     setFieldErrors({ fullName: false, phone: false, email: false });
   };
 
@@ -1068,9 +1093,11 @@ export function Checkout() {
                   }`}
                 >
                   <CourierPicker onChange={setDelivery} />
+
+                  {/* 🔧 ПРОМЯНА 3: показваме конкретното съобщение, а не фиксиран текст */}
                   {deliveryError && (
                     <p className="text-[11px] text-red-500 font-bold mt-2 ml-1 animate-bounce">
-                      Моля, изберете куриер, град и офис/адрес за доставка!
+                      {deliveryError}
                     </p>
                   )}
                 </div>

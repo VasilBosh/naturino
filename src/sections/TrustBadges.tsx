@@ -72,7 +72,7 @@ export default function TrustBadges() {
             </svg>
 
             {/* Водещо изречение */}
-            <p className="relative text-xl sm:text-2xl md:text-3xl font-semibold text-[#14532d] leading-snug tracking-tight">
+            <p className="relative text-lg sm:text-2xl md:text-xl font-semibold text-[#14532d] leading-snug tracking-tight">
               Всяка капка от нашия изцяло натурален билков екстракт е създадена с уважение към природата и отговорност към здравето на твоето дете.
             </p>
 

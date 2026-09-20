@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { MessageCircle, ThumbsUp, Heart } from 'lucide-react';
 
 const reviews = [
@@ -18,7 +18,6 @@ const reviews = [
 
 export function SocialProof() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [shouldLoadVideos, setShouldLoadVideos] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -26,7 +25,6 @@ export function SocialProof() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate-fadeInUp');
-            setShouldLoadVideos(true);
           }
         });
       },
@@ -36,27 +34,10 @@ export function SocialProof() {
     const elements = sectionRef.current?.querySelectorAll('.reveal');
     elements?.forEach((el) => observer.observe(el));
 
-    const handleHeroButtonClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('a[href="#social-proof"]') || target.closest('button')) {
-        setShouldLoadVideos(true);
-      }
-    };
-
-    window.addEventListener('click', handleHeroButtonClick);
-
     return () => {
       observer.disconnect();
-      window.removeEventListener('click', handleHeroButtonClick);
     };
   }, []);
-
-  const videoSources = [
-    // "https://play.gumlet.io/embed/69f0b6c84d5bf5db18d79fc3",
-    "https://play.gumlet.io/embed/69f0b6de9c68b6349a8d83a3",
-    "https://play.gumlet.io/embed/69f0b6f0a3dc19951f1982e9",
-    "https://play.gumlet.io/embed/69f0ba7f4d5bf5db18d7f83f"
-  ];
 
   const stats = [
     { value: '57,000+', label: 'Доволни родители' },
@@ -86,33 +67,16 @@ export function SocialProof() {
           </p>
         </div>
 
-        {/* Video Grid (Всички на один ред) */}
-        <div className="reveal opacity-0 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-16 max-w-5xl mx-auto">
-          {videoSources.map((src, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-slate-200">
-                {shouldLoadVideos ? (
-                  <iframe
-                    loading="lazy" 
-                    title={`Gumlet video player ${index + 1}`}
-                    src={src}
-                    style={{ border: 'none', position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
-                    referrerPolicy="origin"
-                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture;"
-                  ></iframe>
-                ) : (
-                  <div className="absolute inset-0 bg-slate-100 animate-pulse" />
-                )}
-              </div>
-              <div className="mt-4 text-center">
-                <div className="flex justify-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-500 text-sm">★</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
+        {/* Wall of Love */}
+        <div className="reveal opacity-0 mb-16 max-w-6xl mx-auto">
+          <div className="relative rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
+            <img
+              src="/images/Walloflove.webp"
+              alt="Wall of Love – истински отзиви от родители за Naturino Kids"
+              loading="lazy"
+              className="block w-full h-auto object-contain"
+            />
+          </div>
         </div>
 
         {/* Stats */}
