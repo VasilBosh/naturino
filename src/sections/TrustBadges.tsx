@@ -11,6 +11,8 @@ export default function TrustBadges() {
     { src: '/logo/Bulgaria8.webp',   alt: 'Произведени в България',  sizeClasses: 'w-full sm:w-24' },
     { src: '/logo/Novedes.png',      alt: 'Аптеки Новедес',          sizeClasses: 'w-full sm:w-28' },
     { src: '/logo/Eliksir.webp',     alt: 'Билков магазин Еликсир',  sizeClasses: 'w-full sm:w-28' },
+    { src: '/logo/novaf.webp',       alt: 'Nova Farm Пловдив',       sizeClasses: 'w-full sm:w-40' },
+    { src: '/logo/Amaya.webp',       alt: 'Amaya Organics',          sizeClasses: 'w-full sm:w-40' },
   ];
 
   return (
