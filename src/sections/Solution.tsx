@@ -48,7 +48,7 @@ export function Solution() {
     },
     {
       icon: <Shield className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />,
-      title: 'Без консерванти',
+      title: 'Без изкуствени подсладители',
       description: 'Чиста формула',
     },
     {

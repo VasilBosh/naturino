@@ -323,7 +323,7 @@ export function PharmacistReview() {
                     </p>
 
                     <p className="mt-1 text-xs sm:text-sm leading-relaxed text-slate-600 break-words">
-                      Без захар, консерванти и оцветители.
+                      Без захар, Без изкуствени подсладители и оцветители.
                     </p>
                   </div>
 

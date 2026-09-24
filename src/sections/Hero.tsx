@@ -118,7 +118,7 @@ function HeroBenefitsCard() {
     'По-бързо възстановяване след боледуване и намаляване на усложненията',
     'Подкрепя дихателната система и облекчава дразненето в гърлото',
     'Изключително подходящ за деца с проблеми с третата сливица и честите ангини',
-    '100% натурален билков екстракт, без консерванти, оцветители и захар',
+    '100% натурален билков екстракт, Без изкуствени подсладители, оцветители и захар',
     'Подходящ за деца от 18 месеца, лесен за прием и с приятен билков вкус',
     'Много родители вече споделят, че децата им си връщат апетита след приема на Naturino Kids',
   ];
@@ -432,7 +432,7 @@ export function Hero() {
             </a>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3 mb-6 md:mb-8">
-              {['Без консерванти', 'Без захар', 'Без оцветители'].map((item, i) => (
+              {['Без изкуствени подсладители', 'Без захар', 'Без оцветители'].map((item, i) => (
                 <div key={i} className="flex items-center gap-1.5 md:gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/5">
                   <Shield className="w-3 h-3 md:w-4 md:h-4 text-amber-300" />
                   <span className="text-white text-xs md:text-sm font-medium">{item}</span>
