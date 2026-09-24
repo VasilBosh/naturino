@@ -138,7 +138,7 @@ export const ExitIntentPopup: React.FC = () => {
         </h3>
 
         <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed mb-5">
-          Над <span className="font-black text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-md">4,760 семейства</span> вече забравиха за постоянните боледувания. Децата играят здрави в градината, а родителите са спокойни! 🧸✨
+          Над <span className="font-black text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-md">57,000 семейства</span> вече забравиха за постоянните боледувания. Децата играят здрави в градината, а родителите са спокойни! 🧸✨
         </p>
 
         <div className="bg-white/90 border border-emerald-100 rounded-2xl p-4 mb-6 shadow-sm text-xs sm:text-sm text-slate-600 leading-relaxed">
