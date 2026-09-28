@@ -84,7 +84,7 @@ export function Footer() {
 
               <li>
                 <a
-                  href="#problem"
+                  href="#solution"
                   className="text-slate-400 hover:text-emerald-400 transition-colors text-sm md:text-base"
                 >
                   За продукта
@@ -102,7 +102,7 @@ export function Footer() {
 
               <li>
                 <a
-                  href="#testimonials"
+                  href="#CheckoutSocialProof"
                   className="text-slate-400 hover:text-emerald-400 transition-colors text-sm md:text-base"
                 >
                   Отзиви

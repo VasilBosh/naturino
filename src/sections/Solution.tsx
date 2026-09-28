@@ -59,7 +59,7 @@ export function Solution() {
   ];
 
   return (
-    <section ref={sectionRef} className="section-padding bg-white">
+    <section id="solution" ref={sectionRef} className="section-padding bg-white">
       <div className="container-custom">
 
         {/* Header */}
