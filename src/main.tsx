@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
+// Шрифтът Inter е вече на нашия сайт (не се чака сървърът на Google)
+import '@fontsource-variable/inter'
 import './index.css'
 import App from './App.tsx'
 import { initTracking } from './utils/tracking'
