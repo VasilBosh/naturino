@@ -9,7 +9,14 @@ import {
   Store,
 } from 'lucide-react';
 
-const storeGroups = [
+type StoreGroup = {
+  city: string;
+  count: number;
+  comingSoon?: boolean; // true → показва "От ноември"
+  stores: { name: string; address: string; type: string; status?: string }[];
+};
+
+const storeGroups: StoreGroup[] = [
   {
     city: 'Казанлък',
     count: 5,
@@ -531,6 +538,8 @@ export function PharmacistReview() {
 
                   <img
                     src="/images/NaturinoStoresMap.webp"
+                    width={1000}
+                    height={667}
                     alt="Карта на България с градовете, в които се предлага Naturino Kids"
                     className="block w-full max-w-full h-auto object-contain"
                     loading="lazy"

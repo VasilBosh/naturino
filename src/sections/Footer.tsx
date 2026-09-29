@@ -243,6 +243,8 @@ export function Footer() {
 
                 <img
                   src="/images/NaturinoFooterMap.webp"
+                  width={600}
+                  height={450}
                   alt="Физически обекти на Naturino Kids в България"
                   loading="lazy"
                   decoding="async"

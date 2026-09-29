@@ -26,7 +26,15 @@ const DOWNSELL = { addQty: 1, addPrice: 24.9, img: '/upsell/adult.webp', emoji: 
 
 const eur = (n: number) => n.toFixed(2).replace('.', ',') + ' €';
 
-export type OrderSnapshot = { eventId: string; quantity: number; total: number };
+export type OrderSnapshot = {
+  eventId: string;
+  quantity: number;
+  total: number;
+  // НОВО: пълните данни на поръчката (име, телефон, адрес...). Изпращат се заедно с
+  // ъпсел/финализиращата заявка, за да може скриптът да ВЪЗСТАНОВИ поръчката,
+  // ако първоначалният запис не е стигнал до таблицата.
+  base?: Record<string, unknown>;
+};
 
 const KEYFRAMES = `
 @keyframes uf_sheetIn { from { transform: translateY(24px); opacity:0 } to { transform: translateY(0); opacity:1 } }
@@ -117,17 +125,29 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
       quantity,
       total: Number(total.toFixed(2)),
     };
+
+    // Към основния скрипт: + пълните данни на поръчката и базовите брой/сума (за възстановяване)
+    const fullPayload = {
+      ...(order.base || {}),
+      ...payload,
+      baseQuantity: order.quantity,
+      baseTotal: order.total,
+    };
+
+    // keepalive: заявката стига до таблицата, дори клиентът веднага да затвори страницата
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(fullPayload),
+      keepalive: true,
     }).catch((error) => console.error('Upsell sync error:', error));
 
-    // Бекъп запис (независим — само обновява реда в бекъпа, без имейли/Tradefy)
+    // Бекъп запис (независим — само обновява реда в бекъпа, без имейли/Tradefy) — същото като преди
     fetch(BACKUP_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
+      keepalive: true,
     }).catch((error) => console.error('Upsell backup sync error:', error));
   };
 
@@ -156,6 +176,17 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
   // ЗАЩИТА СРЕЩУ ЗАГУБЕН ИМЕЙЛ: ако клиентът стигне до Upsell/Downsell и не натисне нищо
   // в рамките на 60 сек → автоматично се финализира (базов имейл към клиента и админа).
   // Ако през това време натисне оферта или откаже — sendUpdate е защитен, няма двоен имейл.
+  // НОВО: ако клиентът затвори страницата по време на ъпсела — финализираме веднага,
+  // иначе поръчката оставаше без имейл (60-секундният таймер не успяваше да тръгне).
+  useEffect(() => {
+    const onPageHide = () => {
+      if (!sentRef.current) sendUpdate('complete', order.quantity, order.total);
+    };
+    window.addEventListener('pagehide', onPageHide);
+    return () => window.removeEventListener('pagehide', onPageHide);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (step !== 'upsell' && step !== 'downsell') return;
     const timer = setTimeout(() => {

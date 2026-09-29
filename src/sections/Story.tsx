@@ -62,9 +62,12 @@ export function Story() {
 
             {/* Снимка */}
             <div className="md:col-span-2 order-1 md:order-2 flex justify-center">
-              <div className="relative p-2 bg-white rounded-2xl shadow-md border border-slate-100 max-w-[280px] sm:max-w-[320px] md:max-w-none transform rotate-1 hover:rotate-0 transition-transform duration-300">
+              <div className="relative w-full p-2 bg-white rounded-2xl shadow-md border border-slate-100 max-w-[280px] sm:max-w-[320px] md:max-w-none transform rotate-1 hover:rotate-0 transition-transform duration-300">
                 <img 
                   src="/images/plami.webp" 
+                  width={1200}
+                  height={1600}
+                  decoding="async"
                   alt="Семейството зад Naturino Kids" 
                   className="rounded-xl w-full h-auto object-cover"
                   loading="lazy"

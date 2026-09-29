@@ -10,7 +10,7 @@ export function StickyCTA() {
   // 1. Скрол прагът от 500px
   useEffect(() => {
     const onScroll = () => setScrolledEnough(window.scrollY > 500);
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Shield, Star, Phone, Award, ShoppingCart, ChevronDown } from 'lucide-react';
 
 function VideoBonusCard({ variant }: { variant: 'mobile' | 'desktop' }) {
@@ -214,35 +214,12 @@ function ProductSparkles({ desktop = false }: { desktop?: boolean }) {
 }
 
 export function Hero() {
-  // Оптимизация за Gumlet
-  useEffect(() => {
-    const domains = ['https://video.gumlet.io', 'https://cdn.gumlet.com'];
-    domains.forEach(domain => {
-      const dnsPrefetch = document.createElement('link');
-      dnsPrefetch.rel = 'dns-prefetch';
-      dnsPrefetch.href = domain;
-      document.head.appendChild(dnsPrefetch);
-
-      const preconnect = document.createElement('link');
-      preconnect.rel = 'preconnect';
-      preconnect.href = domain;
-      preconnect.crossOrigin = "anonymous";
-      document.head.appendChild(preconnect);
-    });
-  }, []);
-
   const scrollToCheckout = () => {
     document.getElementById('checkout')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const scrollToSocialProof = () => {
     document.getElementById('social-proof')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const triggerVideoPreload = () => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('preload-videos'));
-    }
   };
 
   return (
@@ -367,6 +344,8 @@ export function Hero() {
             <img
               src="/logo-icon.webp"
               alt="Naturino Kids"
+              width={400}
+              height={400}
               className="w-14 h-14 md:w-16 md:h-16 object-contain"
             />
             <div>
@@ -452,6 +431,8 @@ export function Hero() {
                     <img
                       src="/images/product-main.webp"
                       alt="Naturino Kids"
+                      width={1200}
+                      height={1644}
                       className="w-full h-auto rounded-xl block"
                       loading="eager"
                       fetchPriority="high"
@@ -475,6 +456,8 @@ export function Hero() {
                       <img
                         src="/logo/speedy-logo.webp"
                         alt="Speedy"
+                        width={300}
+                        height={109}
                         className="h-7 w-auto object-contain bg-white rounded px-2 py-1"
                       />
 
@@ -485,6 +468,8 @@ export function Hero() {
                       <img
                         src="/logo/ekont-logo.webp"
                         alt="Еконт"
+                        width={300}
+                        height={109}
                         className="h-7 w-auto object-contain bg-white rounded px-2 py-1"
                       />
                     </div>
@@ -532,8 +517,6 @@ export function Hero() {
               
               <button 
                 onClick={scrollToSocialProof}
-                onMouseEnter={triggerVideoPreload}
-                onTouchStart={triggerVideoPreload}
                 className="btn-cta-secondary w-full max-w-[340px] flex items-center justify-center whitespace-nowrap py-3 px-5 rounded-full border border-white/20 hover:bg-white/10 transition-colors duration-300"
               > 
                 <span className="font-bold text-sm uppercase tracking-tight">
@@ -564,6 +547,8 @@ export function Hero() {
                     <img 
                       src="https://images.unsplash.com/photo-1687456338383-656a5fc1ea5e?w=100&auto=format&fit=crop&q=80" 
                       alt="Невена Караиванова" 
+                      width={100}
+                      height={100}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
@@ -682,10 +667,11 @@ export function Hero() {
                   <img 
                     src="/images/product-main.webp" 
                     alt="Naturino Kids - Натурална защита за Деца"
+                    width={1200}
+                    height={1644}
                     className="w-full h-auto rounded-xl md:rounded-2xl block"
                     loading="eager"
                     fetchPriority="high"
-                    decoding="sync"
                   />
 
                   <div className="pointer-events-none absolute inset-0 rounded-xl md:rounded-2xl ring-1 ring-white/20" />
@@ -702,9 +688,9 @@ export function Hero() {
 
                 <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
                   <div className="flex items-center justify-center gap-3 mb-2">
-                    <img src="/logo/speedy-logo.webp" alt="Speedy" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
+                    <img src="/logo/speedy-logo.webp" alt="Speedy" width={300} height={109} className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                     <span className="text-white/60 text-xs">или</span>
-                    <img src="/logo/ekont-logo.webp" alt="Еконт" className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
+                    <img src="/logo/ekont-logo.webp" alt="Еконт" width={300} height={109} className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2">

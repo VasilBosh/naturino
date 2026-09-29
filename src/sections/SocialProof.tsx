@@ -1,20 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { MessageCircle, ThumbsUp, Heart } from 'lucide-react';
+import { SLIDER_REVIEWS } from '../data/reviews';
 
-const reviews = [
-  '/social/1.webp',
-  '/social/2.webp',
-  '/social/3.webp',
-  '/social/4.webp',
-  '/social/5.webp',
-  '/social/6.webp',
-  '/social/7.webp',
-  '/social/8.webp',
-  '/social/9.webp',
-  '/social/15.webp',
-  '/social/16.webp','/social/17.webp','/social/18.webp','/social/19.webp','/social/20.webp','/social/21.webp','/social/22.webp',
-  '/social/23.webp','/social/24.webp','/social/25.webp','/social/26.webp','/social/27.webp',
-];
+const reviews = SLIDER_REVIEWS;
 
 export function SocialProof() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -72,6 +60,9 @@ export function SocialProof() {
           <div className="relative rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
             <img
               src="/images/Walloflove.webp"
+              width={1672}
+              height={941}
+              decoding="async"
               alt="Wall of Love – истински отзиви от родители за Naturino Kids"
               loading="lazy"
               className="block w-full h-auto object-contain"
@@ -105,9 +96,12 @@ export function SocialProof() {
                 className="w-[260px] sm:w-[280px] md:w-[320px] flex-shrink-0"
               >
                 <img
-                  src={review}
+                  src={review.src}
+                  width={review.width}
+                  height={review.height}
                   alt={`Отзив от родител ${(index % reviews.length) + 1}`}
                   loading="lazy"
+                  decoding="async"
                   className="w-full h-auto object-contain rounded-xl shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow duration-300"
                 />
               </div>

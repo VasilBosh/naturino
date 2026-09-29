@@ -642,11 +642,7 @@ const Sertifikat = () => {
                                 height={document.height}
                                 draggable={false}
                                 className="h-auto w-full select-none rounded-xl bg-white object-contain shadow-2xl shadow-emerald-900/15"
-                                loading={
-                                  index === 0
-                                    ? 'eager'
-                                    : 'lazy'
-                                }
+                                loading="lazy"
                               />
 
                               {document.showQualityBadge && (

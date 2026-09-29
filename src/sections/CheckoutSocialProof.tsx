@@ -1,9 +1,7 @@
 import { MessageCircle } from 'lucide-react';
+import { ALL_REVIEWS } from '../data/reviews';
 
-const reviews = Array.from(
-  { length: 27 },
-  (_, index) => `/social/${index + 1}.webp`
-);
+const reviews = ALL_REVIEWS;
 
 export function CheckoutSocialProof() {
   return (
@@ -31,10 +29,12 @@ export function CheckoutSocialProof() {
         <div className="mx-auto flex w-full max-w-md flex-col gap-5 lg:hidden">
           {reviews.map((review, index) => (
             <img
-              key={review}
-              src={review}
+              key={review.src}
+              src={review.src}
+              width={review.width}
+              height={review.height}
               alt={`Отзив от родител ${index + 1}`}
-              loading={index < 2 ? 'eager' : 'lazy'}
+              loading="lazy"
               decoding="async"
               className="block h-auto w-full object-contain rounded-xl shadow-sm border border-slate-200/60"
             />
@@ -55,9 +55,12 @@ export function CheckoutSocialProof() {
                 className="w-[280px] md:w-[320px] flex-shrink-0"
               >
                 <img
-                  src={review}
+                  src={review.src}
+                  width={review.width}
+                  height={review.height}
                   alt={`Отзив от родител ${(index % reviews.length) + 1}`}
                   loading="lazy"
+                  decoding="async"
                   className="w-full h-auto object-contain rounded-xl shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow duration-300"
                 />
               </div>

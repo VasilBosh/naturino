@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// Безопасно четене/запис в паметта на браузъра. В Safari "частен режим" или при блокирани
+// бисквитки localStorage хвърля грешка — без тази защита целият сайт можеше да не се зареди.
+const safeGet = (store: 'local' | 'session', key: string) => {
+  try { return (store === 'local' ? window.localStorage : window.sessionStorage).getItem(key); } catch { return null; }
+};
+const safeSet = (store: 'local' | 'session', key: string, value: string) => {
+  try { (store === 'local' ? window.localStorage : window.sessionStorage).setItem(key, value); } catch { /* нищо */ }
+};
+
 export const ExitIntentPopup: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const isClosingRef = useRef(false);
@@ -20,9 +29,9 @@ export const ExitIntentPopup: React.FC = () => {
     isSetupRef.current = true;
 
     // --- ТОЧНИТЕ ТВОИ МАРКЕТИНГОВИ ПРОВЕРКИ ---
-    const isBuyer = localStorage.getItem('naturino_buyer');
-    const hasSeenReviews = localStorage.getItem('naturino_clicked_reviews');
-    const hasRefusedInSession = sessionStorage.getItem('naturino_refused_exit_popup');
+    const isBuyer = safeGet('local', 'naturino_buyer');
+    const hasSeenReviews = safeGet('local', 'naturino_clicked_reviews');
+    const hasRefusedInSession = safeGet('session', 'naturino_refused_exit_popup');
     
     // Ако е купувач, ако вече е гледал отзивите ИЛИ ако вече е отказал в СЕГАШНАТА сесия -> НЕ показваме
     if (isBuyer || hasSeenReviews || hasRefusedInSession) return;
@@ -48,6 +57,8 @@ export const ExitIntentPopup: React.FC = () => {
     // Слушател за хардуерния бутон "Назад"
     const handlePopState = () => {
       if (isClosingRef.current) return;
+      // Вече поръча по време на тази сесия → не показваме попъпа (преди излизаше върху ъпсела)
+      if (safeGet('local', 'naturino_buyer')) return;
 
       // Потребителят се опитва да излезе -> показваме попъпа!
       setIsVisible(true);
@@ -78,7 +89,7 @@ export const ExitIntentPopup: React.FC = () => {
     setIsVisible(false);
     
     // Записваме ЗАВИНАГИ в паметта
-    localStorage.setItem('naturino_clicked_reviews', 'true');
+    safeSet('local', 'naturino_clicked_reviews', 'true');
     
     // Изчистваме историята, която вкарахме, за да скролираме чисто
     if (window.history.length > 2) {
@@ -101,7 +112,7 @@ export const ExitIntentPopup: React.FC = () => {
     
     // Записваме САМО за текущата сесия (sessionStorage). 
     // След като затвори браузъра/таба — този запис изчезва!
-    sessionStorage.setItem('naturino_refused_exit_popup', 'true');
+    safeSet('session', 'naturino_refused_exit_popup', 'true');
     
     // Пускаме браузъра да извърши излизането назад
     if (window.history.length > 2) {

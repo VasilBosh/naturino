@@ -9,8 +9,8 @@ import { ReviewsSlider } from './sections/ReviewsSlider';
 import { CheckoutSocialProof } from './sections/CheckoutSocialProof';
 import { Story } from './sections/Story';
 import { Stats } from './sections/Stats';
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect, useRef, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Hero } from './sections/Hero';
 import { Problem } from './sections/Problem';
 import { Solution } from './sections/Solution';
@@ -18,28 +18,18 @@ import { PharmacistReview } from './sections/PharmacistReview';
 import { Benefits } from './sections/Benefits';
 import { Ingredients } from './sections/Ingredients';
 import { SocialProof } from './sections/SocialProof';
-//import { Guarantee } from './sections/Guarantee';
 import { FAQ } from './sections/FAQ';
 import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
 import { FloatingChat } from './sections/FloatingChat';
 import { StickyCTA } from './sections/StickyCTA';
-import { Terms } from './Pages/Terms';
-import { Privacy } from './Pages/Privacy';
+// Страниците с условия се зареждат чак когато някой ги отвори (олекотява началното зареждане)
+const Terms = lazy(() => import('./Pages/Terms').then((m) => ({ default: m.Terms })));
+const Privacy = lazy(() => import('./Pages/Privacy').then((m) => ({ default: m.Privacy })));
 import './App.css';
 
 // КОМПОНЕНТ ЗА ГЛАВНАТА СТРАНИЦА
 function LandingPage() {
-  const [showSticky, setShowSticky] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowSticky(window.scrollY > 500);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <>
       <FloatingChat />
@@ -61,10 +51,28 @@ function LandingPage() {
       <Checkout />
       <CheckoutSocialProof />
       <IntentPopup />
-      {showSticky && <StickyCTA />}
-      
+      {/* StickyCTA сам решава кога да се покаже (след 500px скрол) */}
+      <StickyCTA />
     </>
   );
+}
+
+// PageView при смяна на страница (/terms, /privacy) — БЕЗ първото зареждане,
+// защото то вече е отчетено при инициализацията на пиксела.
+// (Преди PageView се пращаше 2 пъти при всяко отваряне на сайта.)
+function PixelRouteTracker() {
+  const location = useLocation();
+  const isFirst = useRef(true);
+  useEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+    if (import.meta.env.VITE_FB_PIXEL_ID) {
+      ReactPixel.pageView();
+    }
+  }, [location.pathname]);
+  return null;
 }
 
 // ОСНОВНИЯТ APP КОМПОНЕНТ
@@ -81,9 +89,11 @@ function App() {
       ReactPixel.pageView();
     }
 
-    // 2. Инициализация на Microsoft Clarity
+    // 2. Инициализация на Microsoft Clarity — след като страницата се зареди,
+    // за да не се бори за мрежата/процесора с първия екран. Записите си работят както преди.
     const win = window as any;
-    if (!win.clarity) {
+    const loadClarity = () => {
+      if (win.clarity) return;
       win.clarity = function() {
         (win.clarity.q = win.clarity.q || []).push(arguments);
       };
@@ -93,25 +103,29 @@ function App() {
       const firstScript = document.getElementsByTagName('script')[0];
       if (firstScript && firstScript.parentNode) {
         firstScript.parentNode.insertBefore(script, firstScript);
+      } else {
+        document.head.appendChild(script);
       }
-    }
+    };
+    const scheduleClarity = () => {
+      if ('requestIdleCallback' in win) win.requestIdleCallback(loadClarity, { timeout: 3000 });
+      else setTimeout(loadClarity, 1500);
+    };
+    if (document.readyState === 'complete') scheduleClarity();
+    else window.addEventListener('load', scheduleClarity, { once: true });
   }, []);
-
-  // Слушател за промяна на URL адреса (за тракинг на /terms и /privacy)
-  useEffect(() => {
-    if (import.meta.env.VITE_FB_PIXEL_ID) {
-      ReactPixel.pageView();
-    }
-  }, [window.location.pathname]);
 
   return (
     <BrowserRouter>
+      <PixelRouteTracker />
       <div className="min-h-screen bg-white overflow-x-hidden">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-        </Routes>
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+          </Routes>
+        </Suspense>
         <Footer />
       </div>
     </BrowserRouter>

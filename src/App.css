@@ -1,5 +1,5 @@
 /* Naturino Kids - Modern Sales Funnel Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+/* Шрифтът Inter се зарежда от index.html (по-бързо от @import тук) */
 
 * {
   font-family: 'Inter', sans-serif;

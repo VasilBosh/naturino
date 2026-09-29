@@ -3,11 +3,17 @@ import { useEffect, useRef, useState } from 'react';
 import { ShoppingCart, Phone, User, Check, Truck, Shield, Mail, Package, ArrowRight, RotateCcw, Minus, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UpsellFlow } from './UpsellFlow';
+import { UpsellFlow, type OrderSnapshot } from './UpsellFlow';
 import { CourierPicker, type CourierSelection } from '../components/CourierPicker';
 
 // Максимално количество в една поръчка (защита срещу случайно натискане)
 const MAX_QUANTITY = 10;
+
+// Google Apps Script адреси (същите като досега)
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
+const BACKUP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
+
+const newLeadId = () => 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
 
 export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -40,7 +46,15 @@ export function Checkout() {
     promoCode: '',
   });
 
-  const [flowOrder, setFlowOrder] = useState<{ eventId: string; quantity: number; total: number } | null>(null);
+  const [flowOrder, setFlowOrder] = useState<OrderSnapshot | null>(null);
+
+  // Ключ за CourierPicker — сменя се след поръчка, за да се изчисти и изборът на доставка
+  // (преди формата се чистеше, но куриерът/градът оставаха видимо избрани, а реално празни).
+  const [pickerKey, setPickerKey] = useState(0);
+
+  // Изоставени колички: уникален номер на тази "количка" + какво вече сме пратили
+  const leadIdRef = useRef(newLeadId());
+  const lastAbandonSigRef = useRef('');
 
   // Рефове — държат стойност веднага, без да чакат React да прерисува
   const addToCartFiredRef = useRef(false);
@@ -283,6 +297,11 @@ export function Checkout() {
   const handleFocus = () => {
     if (touchedCountRef.current === 0) {
       touchedCountRef.current = 1;
+      // Подгряваме снимките от ъпсела, за да се покажат мигновено след поръчката
+      ['/upsell/kids-3pack.webp', '/upsell/adult.webp'].forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
       ReactPixel.track('InitiateCheckout', {
         content_name: 'Naturino Kids',
         content_type: 'product',
@@ -394,6 +413,74 @@ export function Checkout() {
   const totalPrice = (pricePerUnit * quantity).toFixed(2);
 
   // ==========================================================
+  // ИЗОСТАВЕНИ КОЛИЧКИ (НОВО)
+  // Щом клиентът е написал поне валиден телефон или имейл, пазим какво е попълнил
+  // в отделен лист "Изоставени колички". Ако после поръча — скриптът го маха оттам.
+  // Нищо тук не може да спре или забави поръчката.
+  // ==========================================================
+
+  const sendAbandon = () => {
+    if (isSubmittingRef.current) return; // поръчката вече тръгва — не е изоставена
+    try {
+      const live = readLiveFields();
+      const phone = normalizePhone(live.phone);
+      const email = autoFixEmail(live.email).email;
+      const phoneOk = !reviewPhone(live.phone) && phone.replace(/\D/g, '').length >= 9;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/.test(email);
+      if (!phoneOk && !emailOk) return;
+
+      const body = JSON.stringify({
+        SK: 'id:9307307573',
+        action: 'abandon',
+        leadId: leadIdRef.current,
+        fullName: String(live.name || '').trim(),
+        phone: phoneOk ? phone : String(live.phone || '').trim(),
+        email: emailOk ? email : '',
+        courier: delivery?.courier === 'econt' ? 'ЕКОНТ' : 'Speedy',
+        city: delivery?.cityName || '',
+        officeAddress: delivery?.fullAddress || '',
+        quantity,
+        total: Number(totalPrice),
+      });
+      if (body === lastAbandonSigRef.current) return; // нищо ново — не пращаме
+      lastAbandonSigRef.current = body;
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body,
+        keepalive: true,
+      }).catch(() => {});
+    } catch {
+      /* тихо — изоставената количка никога не пречи на нищо */
+    }
+  };
+
+  // Винаги пазим най-новата версия на функцията (за слушателите по-долу)
+  const sendAbandonRef = useRef(sendAbandon);
+  sendAbandonRef.current = sendAbandon;
+
+  // 5 сек след последната промяна във формата
+  useEffect(() => {
+    const t = setTimeout(() => sendAbandonRef.current(), 5000);
+    return () => clearTimeout(t);
+  }, [formData.fullName, formData.phone, formData.email, delivery, quantity]);
+
+  // При излизане / скриване на страницата — пращаме веднага
+  useEffect(() => {
+    const flush = () => sendAbandonRef.current();
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
+
+  // ==========================================================
   // ИЗПРАЩАНЕ НА ПОРЪЧКАТА
   // ==========================================================
 
@@ -498,10 +585,9 @@ export function Checkout() {
       streetName: delivery.streetName,
       streetNo: delivery.streetNo,
       isAutomat: delivery.isAutomat ? 'Да' : 'Не',
+      // НОВО: връзка с изоставената количка (скриптът я маха, щом поръчката мине)
+      leadId: leadIdRef.current,
     };
-
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
-    const BACKUP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
 
     const payload = JSON.stringify(orderData);
 
@@ -515,10 +601,26 @@ export function Checkout() {
       });
 
     // ----- 1) ПЪРВО записваме поръчката (основен + независим бекъп) -----
-    const mainSave = sendOrder(GOOGLE_SCRIPT_URL).catch((error) => {
-      console.error('Background sync error:', error);
-      throw error;
-    });
+    // НОВО: основният запис проверява отговора на скрипта и при грешка опитва пак
+    // (до 3 пъти). Скриптът не дублира редове по eventId, затова повторният опит е безопасен.
+    const mainSave = (async () => {
+      let lastError: unknown = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (attempt > 0) await new Promise((r) => setTimeout(r, attempt * 2500));
+        try {
+          const res = await sendOrder(GOOGLE_SCRIPT_URL);
+          let result: { result?: string } | null = null;
+          try { result = await res.json(); } catch { result = null; }
+          // Ако отговорът не се чете (рядко) — приемаме, че е минало; ако е изрична грешка — пак.
+          if (!result || result.result === 'success') return res;
+          lastError = new Error(JSON.stringify(result));
+        } catch (error) {
+          lastError = error;
+        }
+        console.error('Background sync error (опит ' + (attempt + 1) + '):', lastError);
+      }
+      throw lastError;
+    })();
 
     const backupSave = sendOrder(BACKUP_SCRIPT_URL).catch((error) => {
       console.error('Backup sync error:', error);
@@ -577,7 +679,13 @@ export function Checkout() {
     });
 
     // ----- 3) Отваряме Upsell веднага (не караме клиента да чака) -----
-    setFlowOrder({ eventId: eventId, quantity: currentQuantity, total: currentTotal });
+    // НОВО: подаваме и пълните данни на поръчката — ако първият запис се изгуби по пътя,
+    // скриптът ще я възстанови от ъпсел/финализиращата заявка.
+    setFlowOrder({ eventId: eventId, quantity: currentQuantity, total: currentTotal, base: orderData });
+
+    // Количката вече е поръчка — следващата е нова
+    leadIdRef.current = newLeadId();
+    lastAbandonSigRef.current = '';
 
     // ----- 4) Чистим формата -----
     setFormData({
@@ -587,6 +695,7 @@ export function Checkout() {
       promoCode: '',
     });
     setDelivery(null);
+    setPickerKey((k) => k + 1);
     setQuantity(1);
     setEmailNote(null);
     setPhoneNote(null);
@@ -1092,7 +1201,7 @@ export function Checkout() {
                     deliveryError ? 'ring-2 ring-red-400 ring-offset-2 bg-red-50/40 p-3 -m-0.5' : ''
                   }`}
                 >
-                  <CourierPicker onChange={setDelivery} />
+                  <CourierPicker key={pickerKey} onChange={setDelivery} />
 
                   {/* 🔧 ПРОМЯНА 3: показваме конкретното съобщение, а не фиксиран текст */}
                   {deliveryError && (
@@ -1183,8 +1292,8 @@ export function Checkout() {
             {/* ⬇️ КУРИЕР ЛОГА ⬇️ */}
             <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
               <div className="flex items-center justify-center gap-4 md:gap-6">
-                <img src="/logo/speedy-logo.webp" alt="Speedy" className="h-12 md:h-16 w-auto object-contain" />
-                <img src="/logo/ekont-logo.webp" alt="Еконт" className="h-11 md:h-16 w-auto object-contain" />
+                <img src="/logo/speedy-logo.webp" alt="Speedy" width={300} height={109} loading="lazy" className="h-12 md:h-16 w-auto object-contain" />
+                <img src="/logo/ekont-logo.webp" alt="Еконт" width={300} height={109} loading="lazy" className="h-11 md:h-16 w-auto object-contain" />
               </div>
             </div>
             {/* ⬆️ КРАЙ ⬆️ */}
