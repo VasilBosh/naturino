@@ -360,6 +360,7 @@ export function Hero() {
             </div>
             <a 
               href="tel:0896783751"
+              aria-label="Обади се: 0896 783 751"
               className="sm:hidden w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white"
             >
               <Phone className="w-5 h-5" />
