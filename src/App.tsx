@@ -28,6 +28,21 @@ const Terms = lazy(() => import('./Pages/Terms').then((m) => ({ default: m.Terms
 const Privacy = lazy(() => import('./Pages/Privacy').then((m) => ({ default: m.Privacy })));
 import './App.css';
 
+// ==========================================================
+// FACEBOOK PIXEL — инициализира се ВЕДНЪЖ, ПРЕДИ страницата да се нарисува.
+// Преди се инициализираше след като секциите вече бяха заредени, и събитието
+// ViewContent (от Checkout) тръгваше ПРЕДИ пиксела да е готов → губеше се всеки път.
+// Пиксел ID-то идва от .env (VITE_FB_PIXEL_ID), както досега.
+// ==========================================================
+const pixelId = import.meta.env.VITE_FB_PIXEL_ID;
+if (pixelId) {
+  ReactPixel.init(pixelId, undefined, {
+    autoConfig: true,
+    debug: false,
+  });
+  ReactPixel.pageView();
+}
+
 // КОМПОНЕНТ ЗА ГЛАВНАТА СТРАНИЦА
 function LandingPage() {
   return (
@@ -78,16 +93,7 @@ function PixelRouteTracker() {
 // ОСНОВНИЯТ APP КОМПОНЕНТ
 function App() {
   useEffect(() => {
-    // 1. Инициализация на Facebook Pixel чрез .env файла
-    const pixelId = import.meta.env.VITE_FB_PIXEL_ID;
-    
-    if (pixelId) {
-      ReactPixel.init(pixelId, undefined, {
-        autoConfig: true,
-        debug: false,
-      });
-      ReactPixel.pageView();
-    }
+    // 1. Facebook Pixel се инициализира по-горе (извън компонента), преди страницата да се нарисува.
 
     // 2. Инициализация на Microsoft Clarity — след като страницата се зареди,
     // за да не се бори за мрежата/процесора с първия екран. Записите си работят както преди.
