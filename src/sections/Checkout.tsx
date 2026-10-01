@@ -15,6 +15,35 @@ const BACKUP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5
 
 const newLeadId = () => 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
 
+
+// ==========================================================
+// 🛡️ CLOUDFLARE TURNSTILE — проверка „човек ли е“
+// Site Key е ПУБЛИЧЕН ключ — безопасно е да стои в кода.
+// Тайният ключ (Secret Key) стои САМО в Apps Script → Script Properties.
+// ==========================================================
+const TURNSTILE_SITE_KEY = '0x4AAAAAAFLYMAc0Y4RS644E';
+const TURNSTILE_SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+
+// Зарежда скрипта на Cloudflare само веднъж за цялата страница
+let turnstileScriptPromise: Promise<void> | null = null;
+const loadTurnstile = (): Promise<void> => {
+  if ((window as any).turnstile) return Promise.resolve();
+  if (turnstileScriptPromise) return turnstileScriptPromise;
+  turnstileScriptPromise = new Promise<void>((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = TURNSTILE_SCRIPT_SRC;
+    s.async = true;
+    s.defer = true;
+    s.onload = () => resolve();
+    s.onerror = () => {
+      turnstileScriptPromise = null;
+      reject(new Error('Turnstile script failed to load'));
+    };
+    document.head.appendChild(s);
+  });
+  return turnstileScriptPromise;
+};
+
 export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
@@ -63,6 +92,73 @@ export function Checkout() {
   const submitLockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const PIXEL_ID = import.meta.env.VITE_FB_PIXEL_ID;
+
+  
+  // ==========================================================
+  // 🛡️ TURNSTILE — „билетът“ за всяка поръчка
+  // Обикновено е НЕВИДИМ. Показва се само ако Cloudflare поиска потвърждение.
+  // Нищо тук не може да спре поръчката — ако няма билет, сървърът решава.
+  // ==========================================================
+  const turnstileBoxRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetIdRef = useRef<string | null>(null);
+  const turnstileTokenRef = useRef('');
+
+  useEffect(() => {
+    let cancelled = false;
+    loadTurnstile()
+      .then(() => {
+        const ts = (window as any).turnstile;
+        if (cancelled || !ts || !turnstileBoxRef.current || turnstileWidgetIdRef.current) return;
+        turnstileWidgetIdRef.current = ts.render(turnstileBoxRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          appearance: 'interaction-only', // невидим, освен ако е нужно кликване
+          language: 'bg',
+          'refresh-expired': 'auto',      // билетът се подновява сам (важи 5 мин.)
+          callback: (token: string) => {
+            turnstileTokenRef.current = token;
+          },
+          'expired-callback': () => {
+            turnstileTokenRef.current = '';
+          },
+        });
+      })
+      .catch(() => {
+        /* без Turnstile поръчката пак тръгва — сървърът решава какво да прави */
+      });
+    return () => {
+      cancelled = true;
+      const ts = (window as any).turnstile;
+      if (ts && turnstileWidgetIdRef.current) {
+        try { ts.remove(turnstileWidgetIdRef.current); } catch { /* нищо */ }
+      }
+      turnstileWidgetIdRef.current = null;
+      turnstileTokenRef.current = '';
+    };
+  }, []);
+
+  // Взима билета. Ако още не е готов — чака до 5 сек. Никога не спира поръчката.
+  const getTurnstileToken = async (maxWaitMs = 5000): Promise<string> => {
+    const started = Date.now();
+    while (Date.now() - started < maxWaitMs) {
+      let t = turnstileTokenRef.current;
+      const ts = (window as any).turnstile;
+      if (!t && ts && turnstileWidgetIdRef.current) {
+        try { t = ts.getResponse(turnstileWidgetIdRef.current) || ''; } catch { t = ''; }
+      }
+      if (t) return t;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    return '';
+  };
+
+  // След всяка поръчка — НОВ билет (за клиенти, които поръчват втори път)
+  const resetTurnstile = () => {
+    turnstileTokenRef.current = '';
+    const ts = (window as any).turnstile;
+    if (ts && turnstileWidgetIdRef.current) {
+      try { ts.reset(turnstileWidgetIdRef.current); } catch { /* нищо */ }
+    }
+  };
 
   // ==========================================================
   // ТЕЛЕФОН
@@ -493,7 +589,7 @@ export function Checkout() {
     setIsSubmitting(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // ЗАЩИТА: ако вече изпращаме — игнорираме второто натискане напълно
@@ -552,6 +648,9 @@ export function Checkout() {
     // Аварийно отключване, ако нещо съвсем се обърка
     submitLockTimerRef.current = setTimeout(unlockSubmit, 15000);
 
+    // 🛡️ Билетът от Cloudflare (обикновено е готов веднага; иначе чакаме до 5 сек.)
+    const turnstileToken = await getTurnstileToken();
+
     const currentTotal = Number(totalPrice);
     const currentQuantity = quantity;
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
@@ -587,6 +686,7 @@ export function Checkout() {
       isAutomat: delivery.isAutomat ? 'Да' : 'Не',
       // НОВО: връзка с изоставената количка (скриптът я маха, щом поръчката мине)
       leadId: leadIdRef.current,
+      turnstileToken,
     };
 
     const payload = JSON.stringify(orderData);
@@ -686,6 +786,9 @@ export function Checkout() {
     // Количката вече е поръчка — следващата е нова
     leadIdRef.current = newLeadId();
     lastAbandonSigRef.current = '';
+
+    // 🛡️ Билетът е използван → искаме нов за следваща поръчка
+    resetTurnstile();
 
     // ----- 4) Чистим формата -----
     setFormData({
@@ -1258,6 +1361,9 @@ export function Checkout() {
                     <Check className="w-3 h-3" /> Наложен платеж (при преглед)
                   </div>
                 </div>
+
+                {/* 🛡️ Cloudflare Turnstile — обикновено е невидим; показва се само ако Cloudflare поиска потвърждение */}
+                <div ref={turnstileBoxRef} className="flex justify-center min-w-0" />
 
                 <button
                   type="submit"
