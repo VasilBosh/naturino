@@ -137,7 +137,7 @@ function HeroBenefitsCard() {
                 <span className="text-white font-black text-sm">✓</span>
               </div>
 
-              <p className="text-white font-bold text-sm md:text-base leading-tight">
+              <p className="text-white font-bold text-sm md:text-base leading-tight text-left">
                 {item}
               </p>
             </div>
