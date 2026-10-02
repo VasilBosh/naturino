@@ -45,6 +45,7 @@ export interface CourierSelection {
 // ---------- Транслитерация латиница → кирилица ----------
 const TRANSLIT: [string, string][] = [
   ['sht', 'щ'], ['zh', 'ж'], ['ch', 'ч'], ['sh', 'ш'], ['ts', 'ц'],
+  ['kh', 'х'], ['ou', 'у'],
   ['ya', 'я'], ['yu', 'ю'], ['ay', 'ай'],
   ['a', 'а'], ['b', 'б'], ['v', 'в'], ['g', 'г'], ['d', 'д'], ['e', 'е'],
   ['z', 'з'], ['i', 'и'], ['y', 'й'], ['k', 'к'], ['l', 'л'], ['m', 'м'],
@@ -53,10 +54,15 @@ const TRANSLIT: [string, string][] = [
 ];
 
 function translit(input: string): string {
-  let s = input.toLowerCase();
+  const s = input.toLowerCase();
   let out = '';
   let i = 0;
+  const isLatConsonant = (c: string) => /[bcdfghjklmnpqrstvwxz]/.test(c);
   while (i < s.length) {
+    // 🔧 "y" между две съгласни е "ъ" (Kazanlyk → Казанлък, Tyrnovo → Търново)
+    if (s[i] === 'y' && isLatConsonant(s[i - 1] || '') && isLatConsonant(s[i + 1] || '')) {
+      out += 'ъ'; i += 1; continue;
+    }
     let matched = false;
     for (const [lat, cyr] of TRANSLIT) {
       if (s.startsWith(lat, i)) { out += cyr; i += lat.length; matched = true; break; }
@@ -70,6 +76,97 @@ function toCyrillic(q: string): string {
   return /[a-z]/i.test(q) ? translit(q) : q;
 }
 
+// =====================================================================
+// 🔧 УМНО РАЗПОЗНАВАНЕ НА НАСЕЛЕНО МЯСТО
+// Целта: клиентът да не може да остане с „написан, но неизбран“ град.
+//  • приема различни изписвания на латиница (Kazanlak / Kazanluk / Kazanlyk, Sofia / Sofiya)
+//  • избира града автоматично, когато няма никакво съмнение кой е
+//  • когато има няколко възможности — НЕ избира вместо клиента (за да не замине пратка в грешен град)
+// =====================================================================
+
+// Маха „гр.“, „с.“, „град“, „село“ отпред и всичко след запетая (идва от автоматично попълване)
+function cleanCityInput(raw: string): string {
+  let s = String(raw || '').split(',')[0].trim();
+  s = s.replace(/^(?:(?:гр|с|gr|s)\.\s*|(?:град|село|grad|selo|гр|с)\s+)/i, '');
+  return s.trim();
+}
+
+// „Скелет“ на името: изравнява буквите, които хората бъркат (я/иа, ю/иу, й/и, щ/шт, ъ/а/у)
+function foldCity(name: string, hard: 'а' | 'у'): string {
+  return name
+    .toLowerCase()
+    .replace(/[.\-–—'’"`]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/щ/g, 'шт')
+    .replace(/ь/g, 'й')
+    .replace(/я/g, 'иа')
+    .replace(/ю/g, 'иу')
+    .replace(/й/g, 'и')
+    .replace(/ъ/g, hard)
+    .replace(/и{2,}/g, 'и');
+}
+
+// Съвпада ли името на града с написаното (вече на кирилица)
+function cityMatches(name: string, cyrInput: string): { prefix: boolean; exact: boolean } {
+  const nA = foldCity(name, 'а'), qA = foldCity(cyrInput, 'а');
+  const nU = foldCity(name, 'у'), qU = foldCity(cyrInput, 'у');
+  return {
+    prefix: nA.startsWith(qA) || nU.startsWith(qU),
+    exact: nA === qA || nU === qU,
+  };
+}
+
+// Други възможни изписвания, които да пробваме, ако точното не намери нищо
+function cityQueryVariants(cyr: string): string[] {
+  const base = cyr.toLowerCase();
+  const out: string[] = [];
+  const add = (v: string) => { if (v !== base && v.length >= 2 && out.indexOf(v) === -1) out.push(v); };
+  const isCons = (c: string) => /[бвгджзклмнпрстфхцчшщ]/.test(c);
+
+  // София ← „софиа“, Смолян ← „смолиан“, Кюстендил ← „киустендил“
+  add(base.replace(/[ий]а/g, 'ия'));
+  add(base.replace(/[ий]а/g, 'я'));
+  add(base.replace(/[ий]у/g, 'ю'));
+
+  // „ъ“, написано като „а“ или „у“ (Казанлък ← „казанлак“, Търново ← „турново“)
+  const between: number[] = [];
+  const others: number[] = [];
+  for (let i = 0; i < base.length; i++) {
+    if (base[i] !== 'а' && base[i] !== 'у') continue;
+    const prev = base[i - 1] || '';
+    const next = base[i + 1] || '';
+    if (isCons(prev) && (next === '' || isCons(next))) between.push(i);
+    else others.push(i);
+  }
+  const withHard = (idx: number[]) => {
+    const chars = base.split('');
+    idx.forEach((i) => { chars[i] = 'ъ'; });
+    return chars.join('');
+  };
+  between.forEach((i) => add(withHard([i])));
+  if (between.length > 1) add(withHard(between)); // Гълъбово ← „галабово“
+  others.forEach((i) => add(withHard([i])));
+
+  return out.slice(0, 8);
+}
+
+// Кой град да изберем автоматично (или null = клиентът трябва да избере сам)
+function pickCityAuto(hits: CityHit[], raw: string, focused: boolean): CityHit | null {
+  if (hits.length === 0) return null;
+  const cyr = toCyrillic(cleanCityInput(raw)).toLowerCase();
+  if (cyr.length < 2) return null;
+  const exact = hits.filter((h) => cityMatches(h.name, cyr).exact);
+  if (focused) {
+    // Докато пише: само ако това е ЕДИНСТВЕНАТА възможност и е изписана цялата
+    return hits.length === 1 && exact.length === 1 ? hits[0] : null;
+  }
+  // Излязъл е от полето / автоматично попълване:
+  if (exact.length === 1) return exact[0];   // написал е цялото име и то е само едно
+  if (exact.length > 1) return null;         // няколко села/града с това име → избира клиентът
+  return hits.length === 1 ? hits[0] : null; // написал е началото и има само един такъв
+}
+
 // ---------- Тръба към Worker-а (с кеш) ----------
 let econtCitiesCache: CityHit[] | null = null;
 const officesCache = new Map<string, OfficeHit[]>();
@@ -81,21 +178,48 @@ async function getJSON(url: string) {
 }
 
 async function searchCities(courier: Courier, raw: string): Promise<CityHit[]> {
-  const cyr = toCyrillic(raw.trim());
+  const cyr = toCyrillic(cleanCityInput(raw)).toLowerCase();
   if (cyr.length < 2) return [];
-  const pref = cyr.toLowerCase();
+
+  // Точните съвпадения (цялото име) излизат най-отгоре
+  const exactFirst = (list: CityHit[]) => {
+    const ex = list.filter((c) => cityMatches(c.name, cyr).exact);
+    const rest = list.filter((c) => !cityMatches(c.name, cyr).exact);
+    return ex.concat(rest);
+  };
 
   if (courier === 'econt') {
     if (!econtCitiesCache) {
       const d = await getJSON(`${WORKER}/econt/cities`);
       econtCitiesCache = (d.cities || []) as CityHit[];
     }
-    return econtCitiesCache
-      .filter((c) => c.name.toLowerCase().startsWith(pref) || c.name.toLowerCase().startsWith(raw.trim().toLowerCase()))
-      .slice(0, 25);
+    return exactFirst(econtCitiesCache.filter((c) => cityMatches(c.name, cyr).prefix)).slice(0, 25);
   }
-  const d = await getJSON(`${WORKER}/speedy/cities?name=${encodeURIComponent(cyr)}`);
-  return (d.cities || []) as CityHit[];
+
+  const fetchSpeedy = async (name: string) => {
+    const d = await getJSON(`${WORKER}/speedy/cities?name=${encodeURIComponent(name)}`);
+    return (d.cities || []) as CityHit[];
+  };
+
+  // 1) Както е написано
+  const first = await fetchSpeedy(cyr);
+  if (first.length > 0) return first;
+
+  // 2) Нищо не излезе → пробваме другите възможни изписвания (ъ/а/у, ия/иа, ю/иу)
+  const variants = cityQueryVariants(cyr);
+  if (variants.length === 0) return [];
+  const lists = await Promise.all(variants.map((v) => fetchSpeedy(v).catch(() => [] as CityHit[])));
+  const seen = new Set<string>();
+  const merged: CityHit[] = [];
+  for (const list of lists) {
+    for (const c of list) {
+      const key = String(c.id);
+      if (seen.has(key) || !cityMatches(c.name, cyr).prefix) continue;
+      seen.add(key);
+      merged.push(c);
+    }
+  }
+  return exactFirst(merged).slice(0, 25);
 }
 
 async function getOffices(courier: Courier, cityId: number | string): Promise<OfficeHit[]> {
@@ -171,6 +295,9 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
   const [city, setCity] = useState<CityHit | null>(null);
   const [cityLoading, setCityLoading] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
+  const [citySearched, setCitySearched] = useState(false); // 🔧 приключило ли е търсенето за текущия текст
+  const [cityFocused, setCityFocused] = useState(false);   // 🔧 курсорът в полето за град ли е
+  const [cityNudge, setCityNudge] = useState(false);       // 🔧 клиентът е натиснал офис/улица без избран град
 
   const [offices, setOffices] = useState<OfficeHit[]>([]);
   const [office, setOffice] = useState<OfficeHit | null>(null);
@@ -191,12 +318,47 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
   const officeBoxRef = useRef<HTMLDivElement>(null);
   const streetBoxRef = useRef<HTMLDivElement>(null);
 
+  // 🔧 помощни за полето за град
+  const cityInputRef = useRef<HTMLInputElement>(null);
+  const cityFocusedRef = useRef(false);
+  const cityListPressRef = useRef(false); // в момента натиска ред от списъка
+  const cityStateRef = useRef({ city, cityHits, cityQuery, citySearched });
+  cityStateRef.current = { city, cityHits, cityQuery, citySearched };
+
+  const focusCityInput = () => setTimeout(() => cityInputRef.current?.focus(), 60);
+
+  // Клиентът натиска „офис“ или „улица“, без да е избрал град → водим го обратно в полето за град
+  const nudgeCity = () => {
+    setCityNudge(true);
+    const el = cityInputRef.current;
+    if (el) {
+      el.focus();
+      try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch { /* стари браузъри */ }
+    }
+    if (cityHits.length > 0) setCityOpen(true);
+  };
+
+  // Излизане от полето за град: ако е ясно кой град е — избираме го; иначе показваме предупреждение
+  const handleCityBlur = () => {
+    cityFocusedRef.current = false;
+    setTimeout(() => {
+      if (cityFocusedRef.current) return;      // върнал се е в полето
+      setCityFocused(false);
+      if (cityListPressRef.current) return;    // точно натиска ред от списъка
+      const st = cityStateRef.current;
+      if (st.city || !st.citySearched) return; // търсенето още върви → то ще реши само
+      const pick = pickCityAuto(st.cityHits, st.cityQuery, false);
+      if (pick) { setCity(pick); setCityOpen(false); }
+    }, 180);
+  };
+
   const focusStreetNo = () => setTimeout(() => document.getElementById('street-no')?.focus(), 60);
   const focusStreetInput = () => setTimeout(() => document.getElementById('street-input')?.focus(), 60);
 
   // Смяна на куриер → нулираме всичко надолу (типът остава "office")
   useEffect(() => {
     setCityQuery(''); setCity(null); setCityHits([]);
+    setCitySearched(false); setCityNudge(false);
     setOffices([]); setOffice(null); setOfficeOpen(false);
     setStreetQuery(''); setStreet(null); setStreetNo('');
     setStreetHits([]); setStreetSearched(false); setManualStreet(false);
@@ -219,14 +381,23 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
   useEffect(() => {
     if (city) return;
     const q = cityQuery;
-    if (toCyrillic(q.trim()).length < 2) { setCityHits([]); return; }
+    setCitySearched(false);
+    if (toCyrillic(cleanCityInput(q)).length < 2) { setCityHits([]); setCityLoading(false); return; }
     setCityLoading(true);
+    let alive = true; // 🔧 по-стар отговор не може да презапише по-нов
     const t = setTimeout(async () => {
-      try { setCityHits(await searchCities(courier, q)); setCityOpen(true); }
-      catch { setCityHits([]); }
-      finally { setCityLoading(false); }
+      let hits: CityHit[] = [];
+      try { hits = await searchCities(courier, q); } catch { hits = []; }
+      if (!alive) return;
+      setCityHits(hits);
+      setCitySearched(true);
+      setCityLoading(false);
+      // 🔧 ако е ясно кой град е — избираме го автоматично
+      const pick = pickCityAuto(hits, q, cityFocusedRef.current);
+      if (pick) { setCity(pick); setCityOpen(false); }
+      else if (cityFocusedRef.current) setCityOpen(true);
     }, 300);
-    return () => clearTimeout(t);
+    return () => { alive = false; clearTimeout(t); };
   }, [cityQuery, courier, city]);
 
   // Избран град + тип офис → зареждаме офисите
@@ -261,8 +432,15 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
       if (officeBoxRef.current && !officeBoxRef.current.contains(e.target as Node)) setOfficeOpen(false);
       if (streetBoxRef.current && !streetBoxRef.current.contains(e.target as Node)) setStreetOpen(false);
     };
+    const up = () => setTimeout(() => { cityListPressRef.current = false; }, 0);
     document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
+    document.addEventListener('pointerup', up);
+    document.addEventListener('pointercancel', up);
+    return () => {
+      document.removeEventListener('mousedown', h);
+      document.removeEventListener('pointerup', up);
+      document.removeEventListener('pointercancel', up);
+    };
   }, []);
 
   // Емит нагоре при всяка промяна
@@ -307,6 +485,12 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
   }, [courier, deliveryType, city, office, street, streetQuery, manualStreet, streetNo, note]);
 
 
+  // 🔧 Състояния на полето за град
+  const cityTyped = !city && toCyrillic(cleanCityInput(cityQuery)).length >= 2;
+  const cityNoHits = cityTyped && citySearched && !cityLoading && cityHits.length === 0;
+  const cityNeedsPick = cityTyped && citySearched && cityHits.length > 0;
+  const cityWarn = !city && ((cityNudge && !cityTyped) || cityNoHits || (cityNeedsPick && !cityFocused));
+
   // ---------- UI ----------
   return (
     <div className="space-y-4 min-w-0 w-full">
@@ -342,7 +526,7 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
           {city ? (
             <button
               type="button"
-              onClick={() => { setCity(null); setOffice(null); setCityQuery(''); }}
+              onClick={() => { setCity(null); setOffice(null); setCityQuery(''); focusCityInput(); }}
               title={`${city.name} (${city.region}) — ${city.postCode}`}
               className="w-full min-w-0 flex items-center justify-between gap-2 bg-white border border-emerald-300 ring-2 ring-emerald-400 h-12 text-base rounded-xl px-3 shadow-sm outline-none text-left"
             >
@@ -352,12 +536,25 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
           ) : (
             <>
               <input
+                id="city-input"
+                ref={cityInputRef}
                 value={cityQuery}
-                onChange={(e) => { setCity(null); setOffice(null); setCityQuery(e.target.value); }}
-                onFocus={() => cityHits.length && setCityOpen(true)}
+                onChange={(e) => { setCity(null); setOffice(null); setCityNudge(false); setCityQuery(e.target.value); }}
+                onFocus={() => { cityFocusedRef.current = true; setCityFocused(true); if (cityHits.length > 0) setCityOpen(true); }}
+                onBlur={handleCityBlur}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return;
+                  e.preventDefault(); // 🔧 Enter в това поле не изпраща поръчката
+                  const pick = pickCityAuto(cityHits, cityQuery, false);
+                  if (pick) { setCity(pick); setCityOpen(false); }
+                }}
                 placeholder="Напишете град или село"
                 autoComplete="new-password"
-                className="w-full min-w-0 bg-white border border-amber-200 h-12 text-base rounded-xl px-3 pr-9 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm outline-none"
+                className={`w-full min-w-0 bg-white h-12 text-base rounded-xl px-3 pr-9 focus:ring-2 shadow-sm outline-none ${
+                  cityWarn
+                    ? 'border border-red-300 ring-2 ring-red-200 focus:ring-red-300 focus:border-red-300'
+                    : 'border border-amber-200 focus:ring-amber-500 focus:border-amber-500'
+                }`}
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 pointer-events-none">
                 {cityLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
@@ -367,12 +564,15 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
         </div>
 
         {cityOpen && !city && cityHits.length > 0 && (
-          <ul className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-amber-200 bg-white shadow-xl">
+          <ul
+            onPointerDown={() => { cityListPressRef.current = true; }}
+            className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto rounded-xl border border-amber-200 bg-white shadow-xl"
+          >
             {cityHits.map((c) => (
               <li key={`${c.id}`}>
                 <button
                   type="button"
-                  onClick={() => { setCity(c); setCityOpen(false); }}
+                  onClick={() => { cityListPressRef.current = false; setCity(c); setCityOpen(false); }}
                   className="w-full text-left px-4 py-2.5 hover:bg-amber-50 flex items-center justify-between gap-2"
                 >
                   <span className="font-medium text-slate-800">{c.name} <span className="text-slate-400 text-sm">({c.region})</span></span>
@@ -381,6 +581,33 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
               </li>
             ))}
           </ul>
+        )}
+
+        {/* 🔧 Подсказки под полето за град — клиентът винаги знае какво се очаква */}
+        {!city && (
+          cityNudge && !cityTyped ? (
+            <p className="text-[11px] text-red-500 font-bold mt-1 ml-1 leading-snug">
+              ⚠️ Първо напишете населеното място тук и го изберете от списъка.
+            </p>
+          ) : cityNoHits ? (
+            <p className="text-[11px] text-red-500 font-bold mt-1 ml-1 leading-snug">
+              Не намираме такова населено място. Проверете изписването или напишете само първите 3–4 букви и изберете от списъка.
+            </p>
+          ) : cityNeedsPick ? (
+            cityFocused ? (
+              <p className="text-[11px] text-amber-700 font-semibold mt-1 ml-1 leading-snug">
+                👇 Изберете населеното място от списъка.
+              </p>
+            ) : (
+              <p className="text-[11px] text-red-500 font-bold mt-1 ml-1 leading-snug">
+                ⚠️ Изберете населеното място от списъка — само писането не е достатъчно. Натиснете полето, за да се покаже списъкът.
+              </p>
+            )
+          ) : (
+            <p className="text-[11px] text-slate-400 font-normal italic mt-1 ml-1 leading-tight">
+              Напишете първите 2–3 букви и изберете от списъка (може и на латиница).
+            </p>
+          )
         )}
       </div>
 
@@ -394,11 +621,11 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
           <button
             id="office-input"
             type="button"
-            disabled={!city}
-            onClick={() => setOfficeOpen((v) => !v)}
+            // 🔧 без избран град не „мълчи“, а връща клиента в полето за град
+            onClick={() => { if (!city) { nudgeCity(); return; } setOfficeOpen((v) => !v); }}
             title={office ? office.name : ''}
             className={`w-full min-w-0 flex items-center justify-between gap-2 bg-white border border-amber-200 h-12 text-base rounded-xl px-3 shadow-sm outline-none text-left ${
-              !city ? 'opacity-60 cursor-not-allowed' : 'hover:border-amber-300'
+              !city ? 'opacity-60' : 'hover:border-amber-300'
             } ${office ? 'ring-2 ring-emerald-400 border-emerald-300' : ''}`}
           >
             <span className={`min-w-0 truncate ${office ? 'text-slate-800 font-medium' : 'text-slate-400'}`}>
@@ -462,9 +689,12 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
                 <input
                   id="street-input"
                   value={streetQuery}
-                  disabled={!city}
+                  readOnly={!city}
                   onChange={(e) => setStreetQuery(e.target.value)}
-                  onFocus={() => !manualStreet && streetHits.length > 0 && setStreetOpen(true)}
+                  onFocus={() => {
+                    if (!city) { nudgeCity(); return; } // 🔧 няма град → обратно в полето за град
+                    if (!manualStreet && streetHits.length > 0) setStreetOpen(true);
+                  }}
                   placeholder={
                     !city ? 'Първо изберете населено място'
                     : manualStreet ? 'Напишете улица/квартал (само името, без номер)'
@@ -550,7 +780,8 @@ export function CourierPicker({ onChange }: { onChange: (s: CourierSelection) =>
             <input
               id="street-no"
               value={streetNo}
-              disabled={!city}
+              readOnly={!city}
+              onFocus={() => { if (!city) nudgeCity(); }}
               onChange={(e) => setStreetNo(e.target.value)}
               placeholder="напр. 12, бл. 3, вх. Б, ап. 15"
               autoComplete="new-password"

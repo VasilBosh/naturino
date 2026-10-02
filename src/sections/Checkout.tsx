@@ -99,34 +99,71 @@ export function Checkout() {
   // Обикновено е НЕВИДИМ. Показва се само ако Cloudflare поиска потвърждение.
   // Нищо тук не може да спре поръчката — ако няма билет, сървърът решава.
   // ==========================================================
-  const turnstileBoxRef = useRef<HTMLDivElement>(null);
+    const turnstileBoxRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const turnstileTokenRef = useRef('');
+  const startTurnstileRef = useRef<() => void>(() => {});
 
+  // ⚡ Turnstile НЕ се зарежда веднага, за да не бави отварянето на страницата.
+  // Тръгва при първото от трите:
+  //   1) 2,5 сек след като страницата е напълно заредена
+  //   2) когато посетителят наближи формата за поръчка
+  //   3) при натискане на „Поръчай“ (за всеки случай)
   useEffect(() => {
     let cancelled = false;
-    loadTurnstile()
-      .then(() => {
-        const ts = (window as any).turnstile;
-        if (cancelled || !ts || !turnstileBoxRef.current || turnstileWidgetIdRef.current) return;
-        turnstileWidgetIdRef.current = ts.render(turnstileBoxRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
-          appearance: 'interaction-only', // невидим, освен ако е нужно кликване
-          language: 'bg',
-          'refresh-expired': 'auto',      // билетът се подновява сам (важи 5 мин.)
-          callback: (token: string) => {
-            turnstileTokenRef.current = token;
-          },
-          'expired-callback': () => {
-            turnstileTokenRef.current = '';
-          },
+    let started = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const start = () => {
+      if (started || cancelled) return;
+      started = true;
+      loadTurnstile()
+        .then(() => {
+          const ts = (window as any).turnstile;
+          if (cancelled || !ts || !turnstileBoxRef.current || turnstileWidgetIdRef.current) return;
+          turnstileWidgetIdRef.current = ts.render(turnstileBoxRef.current, {
+            sitekey: TURNSTILE_SITE_KEY,
+            appearance: 'interaction-only', // невидим, освен ако е нужно кликване
+            language: 'bg',
+            'refresh-expired': 'auto',      // билетът се подновява сам (важи 5 мин.)
+            callback: (token: string) => {
+              turnstileTokenRef.current = token;
+            },
+            'expired-callback': () => {
+              turnstileTokenRef.current = '';
+            },
+          });
+        })
+        .catch(() => {
+          /* без Turnstile поръчката пак тръгва — сървърът решава какво да прави */
         });
-      })
-      .catch(() => {
-        /* без Turnstile поръчката пак тръгва — сървърът решава какво да прави */
-      });
+    };
+    startTurnstileRef.current = start;
+
+    // 1) 2,5 сек след пълното зареждане на страницата
+    const schedule = () => {
+      timer = setTimeout(start, 2500);
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+
+    // 2) или щом посетителят наближи формата (600px преди да се види)
+    let observer: IntersectionObserver | null = null;
+    if ('IntersectionObserver' in window && sectionRef.current) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((en) => en.isIntersecting)) start();
+        },
+        { rootMargin: '600px 0px' }
+      );
+      observer.observe(sectionRef.current);
+    }
+
     return () => {
       cancelled = true;
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('load', schedule);
+      if (observer) observer.disconnect();
       const ts = (window as any).turnstile;
       if (ts && turnstileWidgetIdRef.current) {
         try { ts.remove(turnstileWidgetIdRef.current); } catch { /* нищо */ }
@@ -138,6 +175,7 @@ export function Checkout() {
 
   // Взима билета. Ако още не е готов — чака до 5 сек. Никога не спира поръчката.
   const getTurnstileToken = async (maxWaitMs = 5000): Promise<string> => {
+        startTurnstileRef.current(); // 3) ако още не е тръгнал — пускаме го сега
     const started = Date.now();
     while (Date.now() - started < maxWaitMs) {
       let t = turnstileTokenRef.current;
