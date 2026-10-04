@@ -3,7 +3,6 @@ import ReactPixel from 'react-facebook-pixel';
 import Sertifikat from './sections/Sertifikat';
 import TrustBadges from './sections/TrustBadges';
 import ComparisonSection from './sections/ComparisonSection';
-import IntentPopup from './sections/IntentPopup';
 import TrustHero from './sections/TrustHero';
 import { ReviewsSlider } from './sections/ReviewsSlider';
 import { CheckoutSocialProof } from './sections/CheckoutSocialProof';
@@ -65,7 +64,6 @@ function LandingPage() {
       <TrustBadges />
       <Checkout />
       <CheckoutSocialProof />
-      <IntentPopup />
       {/* StickyCTA сам решава кога да се покаже (след 500px скрол) */}
       <StickyCTA />
     </>
