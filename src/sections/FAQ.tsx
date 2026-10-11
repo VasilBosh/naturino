@@ -75,7 +75,7 @@ export function FAQ() {
     <section 
       ref={sectionRef}
       id="faq"
-      className="section-padding bg-slate-50"
+      className="section-padding bg-slate-50 max-md:!pt-2"
     >
       <div className="container-custom">
         {/* Header */}

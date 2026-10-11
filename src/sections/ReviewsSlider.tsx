@@ -35,6 +35,12 @@ export function ReviewsSlider() {
       <div className="container-custom max-w-7xl mx-auto px-4">
         {/* Testimonials Slider (Auto-marquee с автентични картинки) */}
         <div className="reveal opacity-0 relative">
+
+        {/* Инструкция за мобилни устройства */}
+          <p className="block md:hidden text-center text-[11px] font-bold text-rose-500 italic mb-3 px-4 leading-relaxed animate-pulse">
+            Ако искате да спрете на даден отзив, просто го натиснете. За да преминете на следващ, натиснете на този текст.
+          </p>
+
           {/* Странично избледняване за визуален баланс */}
           <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
@@ -57,11 +63,6 @@ export function ReviewsSlider() {
               </div>
             ))}
           </div>
-
-          {/* Инструкция за мобилни устройства */}
-          <p className="block md:hidden text-center text-[11px] font-bold text-rose-500 italic mt-3 px-4 leading-relaxed animate-pulse">
-            Ако искате да спрете на даден отзив, просто го натиснете. За да преминете на следващ, натиснете на този текст.
-          </p>
         </div>
       </div>
 

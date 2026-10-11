@@ -38,7 +38,7 @@ export function SocialProof() {
     <section 
       ref={sectionRef}
       id="social-proof"
-      className="section-padding bg-slate-50 overflow-hidden py-12 md:py-20"
+      className="section-padding bg-slate-50 overflow-hidden py-12 pb-0 md:py-20"
     >
       <div className="container-custom max-w-7xl mx-auto px-4">
         {/* Header */}
@@ -84,7 +84,13 @@ export function SocialProof() {
         </div>
 
         {/* Testimonials Slider (Auto-marquee с автентични картинки) */}
-        <div className="reveal opacity-0 relative mb-20">
+        <div className="reveal opacity-0 relative">
+
+          {/* Инструкция за мобилни устройства */}
+          <p className="block md:hidden text-center text-[11px] font-bold text-rose-500 italic mb-3 px-4 leading-relaxed animate-pulse">
+            Ако искате да спрете на даден отзив, просто го натиснете. За да преминете на следващ, натиснете на този текст.
+          </p>
+
           {/* Странично избледняване за визуален баланс */}
           <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
@@ -107,15 +113,12 @@ export function SocialProof() {
               </div>
             ))}
           </div>
-
-            {/* Инструкция за мобилни устройства */}
-          <p className="block md:hidden text-center text-[11px] font-bold text-rose-500 italic mt-3 px-4 leading-relaxed animate-pulse">
-            Ако искате да спрете на даден отзив, просто го натиснете. За да преминете на следващ, натиснете на този текст.
-          </p>
-
         </div>
 
         {/* --- НОВА ИНТЕНЗИВНА СЕКЦИЯ: ФЕЙСБУК ДИСКУСИИ (100% ЕДНАКВИ ЗА ДЕСКТОП И МОБИЛНИ) --- */}
+
+            {false && (
+
         <div className="reveal opacity-0 mt-16 border-t border-slate-200 pt-12">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">
@@ -332,6 +335,9 @@ export function SocialProof() {
 
           </div>
         </div>
+
+            )}
+
         {/* --- КРАЙ НА НОВАТА СЕКЦИЯ --- */}
 
       </div>
@@ -342,7 +348,7 @@ export function SocialProof() {
           100% { transform: translateX(calc(-50% - 10px)); } /* 10px е половината от gap-5 */
         }
         .animate-scroll {
-          animation: scroll 50s linear infinite;
+          animation: scroll ${reviews.length * 4}s linear infinite;
         }
       `}} />
     </section>

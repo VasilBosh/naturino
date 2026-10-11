@@ -77,7 +77,7 @@ export function CheckoutSocialProof() {
           100% { transform: translateX(calc(-50% - 10px)); } /* 10px е половината от gap-5 */
         }
         .animate-scrollCheckout {
-          animation: scrollCheckout 50s linear infinite;
+          animation: scrollCheckout ${reviews.length * 4}s linear infinite;
         }
       `}} />
     </section>
