@@ -1,5 +1,233 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Shield, Star, Phone, Award, ShoppingCart, ChevronDown } from 'lucide-react';
+
+/* ============================================================
+   ГАЛЕРИЯ В ХЕРОТО
+   - Индекс 0 е винаги главната снимка (зарежда се веднага, тя е LCP).
+   - Останалите се зареждат чак EXTRA_IMAGES_DELAY_MS след като
+     страницата е заредена напълно (window "load").
+   ============================================================ */
+const GALLERY_IMAGES = [
+  {
+    src: '/images/product-main.webp',
+    alt: 'Naturino Kids - Натурална защита за Деца',
+    label: 'Продукт',
+  },
+  {
+    src: '/images/Naturino1.webp',
+    alt: 'Naturino Kids - състав на продукта',
+    label: 'Състав',
+  },
+  {
+    src: '/images/Naturino2.webp',
+    alt: 'Naturino Kids - дозиране и начин на прием',
+    label: 'Дозиране',
+  },
+];
+
+const EXTRA_IMAGES_DELAY_MS = 2500;
+
+type GalleryImageStatus = 'pending' | 'loaded' | 'error';
+
+function useDeferredGalleryImages(): GalleryImageStatus[] {
+  const [statuses, setStatuses] = useState<GalleryImageStatus[]>(() =>
+    GALLERY_IMAGES.map((_, index) => (index === 0 ? 'loaded' : 'pending'))
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    let timer: number | undefined;
+
+    const setStatus = (index: number, status: GalleryImageStatus) => {
+      if (cancelled) return;
+      setStatuses((prev) => prev.map((current, i) => (i === index ? status : current)));
+    };
+
+    const loadExtraImages = () => {
+      GALLERY_IMAGES.forEach((image, index) => {
+        if (index === 0) return;
+
+        const loader = new Image();
+        loader.decoding = 'async';
+        loader.onload = () => setStatus(index, 'loaded');
+        loader.onerror = () => setStatus(index, 'error');
+        loader.src = image.src;
+      });
+    };
+
+    const startTimer = () => {
+      timer = window.setTimeout(loadExtraImages, EXTRA_IMAGES_DELAY_MS);
+    };
+
+    if (document.readyState === 'complete') {
+      startTimer();
+    } else {
+      window.addEventListener('load', startTimer, { once: true });
+    }
+
+    return () => {
+      cancelled = true;
+      if (timer !== undefined) window.clearTimeout(timer);
+      window.removeEventListener('load', startTimer);
+    };
+  }, []);
+
+  return statuses;
+}
+
+function ProductGallery({
+  desktop = false,
+  activeIndex,
+  onSelect,
+  statuses,
+}: {
+  desktop?: boolean;
+  activeIndex: number;
+  onSelect: (index: number) => void;
+  statuses: GalleryImageStatus[];
+}) {
+  const frameRadius = desktop ? 'rounded-xl md:rounded-2xl' : 'rounded-xl';
+  const thumbSize = desktop ? 'w-[60px] h-[60px]' : 'w-[52px] h-[52px]';
+
+  return (
+    <>
+      {/* ГОЛЯМАТА РАМКА */}
+      <div className={`relative overflow-hidden ${frameRadius}`}>
+        {/* Главната снимка стои винаги в потока и държи размера на рамката */}
+        <img
+          src={GALLERY_IMAGES[0].src}
+          alt={GALLERY_IMAGES[0].alt}
+          width={1200}
+          height={1644}
+          className={`w-full h-auto block ${frameRadius}`}
+          loading="eager"
+          fetchPriority="high"
+        />
+
+        {/* Снимки 2 и 3 се слагат върху нея чак след като са заредени */}
+        {GALLERY_IMAGES.map((image, index) =>
+          index > 0 && statuses[index] === 'loaded' ? (
+            <img
+              key={image.src}
+              src={image.src}
+              alt={activeIndex === index ? image.alt : ''}
+              aria-hidden={activeIndex !== index}
+              decoding="async"
+              className={`absolute inset-0 w-full h-full object-contain bg-white transition-opacity duration-300 ${
+                activeIndex === index ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            />
+          ) : null
+        )}
+
+        <div className={`pointer-events-none absolute inset-0 ring-1 ring-white/20 ${frameRadius}`} />
+
+        {/* Блясъкът минава само върху главната снимка, за да не пречи на текста в 2 и 3 */}
+        {activeIndex === 0 && (
+          <div
+            className="hero-image-shine pointer-events-none absolute -top-[15%] bottom-[-15%] left-[-35%] w-[22%]"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.10) 80%, rgba(255,255,255,0) 100%)',
+              filter: 'blur(2px)',
+            }}
+          />
+        )}
+      </div>
+
+      {/* МИНИАТЮРИ + ЦЕНА */}
+      <div className="relative mt-3">
+        <div
+          className={`flex items-center ${desktop ? 'gap-2.5' : 'gap-2'}`}
+          role="group"
+          aria-label="Снимки на продукта"
+        >
+          {GALLERY_IMAGES.map((image, index) => {
+            const status = statuses[index];
+            const isActive = activeIndex === index;
+
+            if (status === 'error') return null;
+
+            if (status === 'pending') {
+              return (
+                <div
+                  key={image.src}
+                  aria-hidden="true"
+                  className={`shrink-0 rounded-xl bg-white/15 border border-white/20 animate-pulse ${thumbSize}`}
+                />
+              );
+            }
+
+            return (
+              <button
+                key={image.src}
+                type="button"
+                onClick={() => onSelect(index)}
+                aria-label={`Покажи снимка: ${image.label}`}
+                aria-pressed={isActive}
+                className={`relative shrink-0 rounded-xl bg-white transition-transform duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/70 ${thumbSize} ${
+                  isActive
+                    ? 'ring-2 ring-amber-400 scale-105 shadow-lg'
+                    : 'ring-1 ring-white/50 hover:scale-105 active:scale-95'
+                }`}
+              >
+                <span className="relative block h-full w-full overflow-hidden rounded-xl">
+                  <img
+                    src={image.src}
+                    alt=""
+                    width={120}
+                    height={120}
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+
+                  {!isActive && (
+                    <span
+                      className="hero-thumb-shine pointer-events-none absolute -top-[20%] -bottom-[20%] left-0 w-[45%]"
+                      style={{
+                        animationDelay: `${index * 0.3}s`,
+                        background:
+                          'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 100%)',
+                      }}
+                    />
+                  )}
+                </span>
+
+                {!isActive && (
+                  <span
+                    className="hero-thumb-ring pointer-events-none absolute -inset-[3px] rounded-[15px] border-2 border-amber-300"
+                    style={{ animationDelay: `${index * 0.3}s` }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Ценовият бадж застъпва долния десен ъгъл на снимката, както беше преди */}
+        <div
+          className={`absolute z-10 top-0 -translate-y-[70%] bg-amber-400 text-emerald-900 rounded-xl shadow-xl ${
+            desktop
+              ? 'px-3 py-1.5 md:px-4 md:py-2 border border-white/20 -right-7 md:-right-9'
+              : 'px-3 py-1.5 -right-7'
+          }`}
+        >
+          <p
+            className={`font-semibold uppercase ${
+              desktop ? 'text-[10px] md:text-xs tracking-wider' : 'text-[10px]'
+            }`}
+          >
+            Само сега
+          </p>
+
+          <p className={`font-black italic ${desktop ? 'text-lg md:text-xl' : 'text-lg'}`}>
+            23.90€
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function VideoBonusCard({ variant }: { variant: 'mobile' | 'desktop' }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -214,6 +442,10 @@ function ProductSparkles({ desktop = false }: { desktop?: boolean }) {
 }
 
 export function Hero() {
+  // Едно общо състояние за мобилната и десктоп галерията
+  const [activeImage, setActiveImage] = useState(0);
+  const galleryStatuses = useDeferredGalleryImages();
+
   const scrollToCheckout = () => {
     document.getElementById('checkout')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -296,8 +528,48 @@ export function Hero() {
           will-change: transform, opacity;
         }
 
+        /* МИНИАТЮРИ: лек проблясък + мек златист контур, за да личи, че се кликат */
+        @keyframes heroThumbShine {
+          0% {
+            transform: translateX(-160%) skewX(-20deg);
+            opacity: 0;
+          }
+          12% {
+            opacity: 0.95;
+          }
+          35%, 100% {
+            transform: translateX(260%) skewX(-20deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes heroThumbRing {
+          0%, 55%, 100% {
+            transform: scale(0.94);
+            opacity: 0;
+          }
+          25% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        .hero-thumb-shine {
+          opacity: 0;
+          animation: heroThumbShine 2.6s ease-in-out infinite;
+          will-change: transform, opacity;
+        }
+
+        .hero-thumb-ring {
+          opacity: 0;
+          animation: heroThumbRing 2.6s ease-in-out infinite;
+          will-change: transform, opacity;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          .hero-image-shine {
+          .hero-image-shine,
+          .hero-thumb-shine,
+          .hero-thumb-ring {
             animation: none !important;
           }
         }
@@ -419,7 +691,7 @@ export function Hero() {
               ))}
             </div>
 
-                        {/* MOBILE PRODUCT */}
+            {/* MOBILE PRODUCT */}
             <div className="block lg:hidden mb-6">
               <div className="relative max-w-[330px] mx-auto">
                 
@@ -427,31 +699,14 @@ export function Hero() {
 
                 <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20 shadow-2xl">
                   
-                  <div className="relative overflow-hidden rounded-xl">
-                    <img
-                      src="/images/product-main.webp"
-                      alt="Naturino Kids"
-                      width={1200}
-                      height={1644}
-                      className="w-full h-auto rounded-xl block"
-                      loading="eager"
-                      fetchPriority="high"
-                    />
+                  {/* Голяма снимка + миниатюри 1 / 2 / 3 + цена */}
+                  <ProductGallery
+                    activeIndex={activeImage}
+                    onSelect={setActiveImage}
+                    statuses={galleryStatuses}
+                  />
 
-                    <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/20" />
-
-                    <div
-                      className="hero-image-shine pointer-events-none absolute -top-[15%] bottom-[-15%] left-[-35%] w-[22%]"
-                      style={{
-                        background:
-                          'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.10) 80%, rgba(255,255,255,0) 100%)',
-                        filter: 'blur(2px)',
-                      }}
-                    />
-                  </div>
-
-
-                  <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3">
+                  <div className="mt-3 bg-white/10 backdrop-blur-sm rounded-2xl p-3">
                     <div className="flex items-center justify-center gap-3 mb-2">
                       <img
                         src="/logo/speedy-logo.webp"
@@ -484,19 +739,6 @@ export function Hero() {
                         🚚 Доставка 1-2 работни дни
                       </p>
                     </div>
-                  </div>
-
-                  <div
-                    className="absolute -right-4 bg-amber-400 text-emerald-900 px-3 py-1.5 rounded-xl shadow-xl"
-                    style={{ bottom: '124px' }}
-                  >
-                    <p className="text-[10px] font-semibold uppercase">
-                      Само сега
-                    </p>
-
-                    <p className="text-lg font-black italic">
-                      23.90€
-                    </p>
                   </div>
 
                   <ProductSparkles />
@@ -663,30 +905,16 @@ export function Hero() {
             <div className="relative">
               <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
               <div className="relative bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-3 md:p-4 border border-white/20 shadow-2xl">
-                <div className="relative overflow-hidden rounded-xl md:rounded-2xl">
-                  <img 
-                    src="/images/product-main.webp" 
-                    alt="Naturino Kids - Натурална защита за Деца"
-                    width={1200}
-                    height={1644}
-                    className="w-full h-auto rounded-xl md:rounded-2xl block"
-                    loading="eager"
-                    fetchPriority="high"
-                  />
 
-                  <div className="pointer-events-none absolute inset-0 rounded-xl md:rounded-2xl ring-1 ring-white/20" />
+                {/* Голяма снимка + миниатюри 1 / 2 / 3 + цена */}
+                <ProductGallery
+                  desktop
+                  activeIndex={activeImage}
+                  onSelect={setActiveImage}
+                  statuses={galleryStatuses}
+                />
 
-                  <div
-                    className="hero-image-shine pointer-events-none absolute -top-[15%] bottom-[-15%] left-[-35%] w-[22%]"
-                    style={{
-                      background:
-                        'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.10) 80%, rgba(255,255,255,0) 100%)',
-                      filter: 'blur(2px)',
-                    }}
-                  />
-                </div>
-
-                <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
+                <div className="mt-3 bg-white/10 backdrop-blur-sm rounded-2xl p-3 md:p-4">
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <img src="/logo/speedy-logo.webp" alt="Speedy" width={300} height={109} className="h-7 md:h-9 w-auto object-contain bg-white rounded px-2 py-1" />
                     <span className="text-white/60 text-xs">или</span>
@@ -703,10 +931,6 @@ export function Hero() {
                   </div>
                 </div>
 
-                <div className="absolute -right-4 md:-right-5 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-xl border border-white/20" style={{ bottom: '124px' }}>
-                  <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider">Само сега</p>
-                  <p className="text-lg md:text-xl font-black italic">23.90€</p>
-                </div>
                 <ProductSparkles desktop />
               </div>
             </div>
