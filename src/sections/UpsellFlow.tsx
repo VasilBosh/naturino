@@ -10,6 +10,9 @@ import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart } from 'lucide-react';
  *   за да може Apps Script да намери СЪЩИЯ ред и да обнови брой/сума + маркер в бележки.
  * - Използва същия SK ключ и същия URL като Checkout.
  *
+ * 🚚 НОВО: доставката (order.shippingFee) е САМО за показване — „спестявате X €“ и
+ *   „общо за плащане“. Към скрипта НЕ се праща и в таблицата НЕ се записва.
+ *
  * Продуктови снимки: public/upsell/kids-3pack.webp и public/upsell/adult.webp
  * Ако липсват — показва се резервен вид, нищо не се чупи.
  */
@@ -21,10 +24,13 @@ const GOOGLE_SCRIPT_URL =
 const BACKUP_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
 
+// wasPrice = 2 × 23,90 (редовната цена на двете опаковки)
 const UPSELL = { addQty: 2, addPrice: 44.9, wasPrice: 47.8, img: '/upsell/kids-3pack.webp', emoji: '🧴' };
+// Възрастният е на редовна цена 24,90 → при даунсела се печели САМО безплатната доставка
 const DOWNSELL = { addQty: 1, addPrice: 24.9, img: '/upsell/adult.webp', emoji: '🌿' };
 
-const eur = (n: number) => n.toFixed(2).replace('.', ',') + ' €';
+const round2 = (n: number) => Math.round(n * 100) / 100;
+const eur = (n: number) => round2(n).toFixed(2).replace('.', ',') + ' €';
 
 export type OrderSnapshot = {
   eventId: string;
@@ -34,6 +40,9 @@ export type OrderSnapshot = {
   // ъпсел/финализиращата заявка, за да може скриптът да ВЪЗСТАНОВИ поръчката,
   // ако първоначалният запис не е стигнал до таблицата.
   base?: Record<string, unknown>;
+  // 🚚 НОВО: цена и текст на доставката — САМО за показване
+  shippingFee?: number;
+  shippingLabel?: string;
 };
 
 const KEYFRAMES = `
@@ -112,6 +121,23 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
   // Гарантира, че към сървъра тръгва САМО ЕДНА финализираща заявка (един имейл).
   const sentRef = useRef(false);
+
+  // ==========================================================
+  // 🚚 НОВО: сметки само за показване (нищо от това не се праща към таблицата)
+  // ==========================================================
+  const shipFee = Number(order.shippingFee) || 0;                        // 2,50 / 3,75 / 4,50
+  const shipLabel = order.shippingLabel || 'Доставка';
+  const upsellProductSaving = round2(UPSELL.wasPrice - UPSELL.addPrice);  // 2,90
+  const upsellSaving = round2(upsellProductSaving + shipFee);             // 5,40 / 6,65 / 7,40
+  const downsellSaving = shipFee;                                         // само доставката
+
+  // Колко плаща клиентът при получаване, според пътя
+  const productTotalFor = (p: 'upsell' | 'downsell' | 'none') =>
+    p === 'upsell' ? order.total + UPSELL.addPrice
+      : p === 'downsell' ? order.total + DOWNSELL.addPrice
+      : order.total;
+  const payTotalFor = (p: 'upsell' | 'downsell' | 'none') =>
+    productTotalFor(p) + (p === 'none' ? shipFee : 0);
 
   // Праща обновяване/финализиране със ФИНАЛНИ стойности. quantity = брой ДЕТСКИ опаковки.
   // 'complete' = клиентът отказа/не реагира → тръгва базовият имейл, редовете НЕ се пипат.
@@ -244,10 +270,30 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 </div>
               </div>
 
-              <div className="mt-6 space-y-2.5">
+              {/* 🚚 НОВО: колко точно спестява клиентът */}
+              {shipFee > 0 && (
+                <div className="mt-5 rounded-2xl bg-emerald-50 ring-2 ring-emerald-200 px-4 py-3 text-center uf-pop">
+                  <p className="font-black text-emerald-700 text-[19px] leading-tight">
+                    🎉 Спестявате {eur(upsellSaving)}
+                  </p>
+                  <p className="text-[12px] text-emerald-700/80 font-semibold mt-1 leading-snug">
+                    {eur(upsellProductSaving)} отстъпка + <span className="line-through">{eur(shipFee)}</span> доставка → 0,00 €
+                  </p>
+                  <p className="text-[12px] text-slate-600 font-semibold mt-1.5">
+                    Общо за плащане при получаване: <b className="text-slate-900">{eur(payTotalFor('upsell'))}</b>
+                  </p>
+                </div>
+              )}
+
+              <div className="mt-5 space-y-2.5">
                 {[
                   { icon: ShieldCheck, t: '3 опаковки = 2 месеца защита без прекъсване' },
-                  { icon: Truck, t: 'Безплатна доставка за цялата поръчка' },
+                  {
+                    icon: Truck,
+                    t: shipFee > 0
+                      ? `Безплатна доставка за цялата поръчка (вместо ${eur(shipFee)})`
+                      : 'Безплатна доставка за цялата поръчка',
+                  },
                   { icon: Heart, t: 'Никога не оставаш без наличност в разгара на вирусите' },
                 ].map(({ icon: Icon, t }, i) => (
                   <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-rose-100">
@@ -266,7 +312,9 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 <Sparkles className="w-5 h-5 flex-shrink-0" />
                 <span className="flex flex-col items-center leading-tight text-center">
                   <span className="text-[17px] sm:text-lg">ДА! Добави още 2 опаковки</span>
-                  <span className="text-[12px] font-bold opacity-90">с безплатна доставка</span>
+                  <span className="text-[12px] font-bold opacity-90">
+                    {shipFee > 0 ? `и спестявам ${eur(upsellSaving)}` : 'с безплатна доставка'}
+                  </span>
                 </span>
               </button>
 
@@ -321,7 +369,19 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 </span>
               </div>
 
-              <div className="mt-6 space-y-2.5">
+              {/* 🚚 НОВО: при даунсела се печели само доставката */}
+              {shipFee > 0 && (
+                <div className="mt-5 rounded-2xl bg-emerald-50 ring-2 ring-emerald-200 px-4 py-3 text-center uf-pop">
+                  <p className="font-black text-emerald-700 text-[17px] leading-tight">
+                    🚚 Спестявате {eur(downsellSaving)} от доставката
+                  </p>
+                  <p className="text-[12px] text-slate-600 font-semibold mt-1.5">
+                    Общо за плащане при получаване: <b className="text-slate-900">{eur(payTotalFor('downsell'))}</b>
+                  </p>
+                </div>
+              )}
+
+              <div className="mt-5 space-y-2.5">
                 {[
                   { icon: Sparkles, t: 'Надградена формула: 13 билки и плодове в Тройна Имунна Архитектура™' },
                   { icon: Zap, t: 'С адаптогени Рейши, Шийтаке и Астрагал за повече енергия, устойчивост и по-малко стрес' },
@@ -348,7 +408,9 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
                 onClick={declineAll}
                 className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
               >
-                Не, благодаря — завърши поръчката
+                {shipFee > 0
+                  ? `Не, благодаря — завърши с доставка ${eur(shipFee)}`
+                  : 'Не, благодаря — завърши поръчката'}
               </button>
             </div>
           </div>
@@ -375,10 +437,36 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
             </div>
             <h2 className="text-3xl font-black text-slate-900">Успешна поръчка!</h2>
             <p className="text-slate-600 mt-3 leading-relaxed">
-              {path === 'upsell' && '3 опаковки Naturino Kids, с безплатна доставка. '}
+              {path === 'upsell' && `${order.quantity + UPSELL.addQty} опаковки Naturino Kids, с безплатна доставка. `}
               {path === 'downsell' && 'Поръчката ви с опаковката за възрастни, с безплатна доставка. '}
               Очаквайте обаждане за потвърждение на поръчката съвсем скоро.
             </p>
+
+            {/* 🚚 НОВО: точната сума за плащане при получаване */}
+            <div className="mt-6 rounded-2xl bg-slate-50 ring-1 ring-slate-200 px-4 py-3 text-left text-sm space-y-1.5">
+              <div className="flex justify-between gap-3 text-slate-600">
+                <span>Продукти</span>
+                <span className="font-bold text-slate-800 whitespace-nowrap">{eur(productTotalFor(path))}</span>
+              </div>
+              <div className="flex justify-between gap-3 text-slate-600">
+                <span>{path === 'none' ? shipLabel : 'Доставка'}</span>
+                {path === 'none' ? (
+                  <span className="font-bold text-slate-800 whitespace-nowrap">
+                    {shipFee > 0 ? eur(shipFee) : 'по тарифа'}
+                  </span>
+                ) : (
+                  <span className="font-black text-emerald-600 whitespace-nowrap">
+                    {shipFee > 0 && <span className="line-through text-slate-400 font-semibold mr-1.5">{eur(shipFee)}</span>}
+                    Безплатна
+                  </span>
+                )}
+              </div>
+              <div className="flex justify-between gap-3 border-t border-dashed border-slate-300 pt-2 mt-1">
+                <span className="font-black text-slate-900">Плащате при получаване</span>
+                <span className="font-black text-slate-900 text-base whitespace-nowrap">{eur(payTotalFor(path))}</span>
+              </div>
+            </div>
+
             <button
               onClick={onClose}
               className="mt-8 w-full py-4 rounded-2xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition"

@@ -9,6 +9,31 @@ import { CourierPicker, type CourierSelection } from '../components/CourierPicke
 // Максимално количество в една поръчка (защита срещу случайно натискане)
 const MAX_QUANTITY = 10;
 
+// ==========================================================
+// 🚚 НОВО: ЦЕНИ ЗА ДОСТАВКА — САМО ЗА ПОКАЗВАНЕ ПРЕД КЛИЕНТА
+// Показват се в чекаута, в ъпсела и в имейла.
+// В таблицата и към Tradefy НЕ се записват — там остава само цената на продуктите.
+// ⚠️ Ако смениш цена тук — смени я и в Apps Script (SHIPPING_...)
+//    и в Cloudflare воркъра за Tradefy (CONFIG.SHIPPING_...).
+// ==========================================================
+const SHIPPING = { automat: 2.5, office: 3.75, address: 4.5 } as const;
+
+// 23.9 -> "23,90 €"
+const eur = (n: number) => n.toFixed(2).replace('.', ',') + ' €';
+
+// Цена и текст на доставката според избора. null = още не е избрано докрай
+// (напр. избран е "до офис", но още не е посочен конкретен офис/автомат).
+const getShipping = (d: CourierSelection | null): { fee: number; label: string } | null => {
+  if (!d) return null;
+  if (d.deliveryType === 'address') return { fee: SHIPPING.address, label: 'Доставка до адрес' };
+  if (d.deliveryType === 'office' && d.officeId != null && String(d.officeId) !== '') {
+    return d.isAutomat
+      ? { fee: SHIPPING.automat, label: 'Доставка до автомат' }
+      : { fee: SHIPPING.office, label: 'Доставка до офис' };
+  }
+  return null;
+};
+
 // Google Apps Script адреси (същите като досега)
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOwqXeF_u9MKXtJVkYDnTKHCDfuzZLIEs45dwAiFdcv4YJFJ6UsBeRlzsVo5GlUSUU/exec';
 const BACKUP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
@@ -546,6 +571,11 @@ export function Checkout() {
   const pricePerUnit = isPromoValid ? 22.23 : 23.90; // 7% отстъпка от 23.90 е 22.23
   const totalPrice = (pricePerUnit * quantity).toFixed(2);
 
+  // 🚚 НОВО: доставка + общо дължимо — САМО за показване.
+  // Към таблицата, Tradefy и Facebook продължава да отива totalPrice (само продуктите).
+  const shipping = getShipping(delivery);
+  const grandTotal = Number(totalPrice) + (shipping ? shipping.fee : 0);
+
   // ==========================================================
   // ИЗОСТАВЕНИ КОЛИЧКИ (НОВО)
   // Щом клиентът е написал поне валиден телефон или имейл, пазим какво е попълнил
@@ -691,11 +721,15 @@ export function Checkout() {
 
     const currentTotal = Number(totalPrice);
     const currentQuantity = quantity;
+    // 🚚 НОВО: доставката към момента на поръчката (само за ъпсела/екрана „Благодаря“)
+    const currentShipping = getShipping(delivery);
     const eventId = 'order_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
 
     const isTestOrder = finalName.toLowerCase().includes('test');
 
     // ----- Данни за таблицата (същите ключове и същият ред както преди) -----
+    // ⚠️ total е САМО цената на продуктите — доставката НЕ влиза тук (иначе скриптът
+    //    ще отчете грешна сума и ще прати поръчката в „Карантина“).
     const orderData = {
       fullName: finalName,
       // Подрежда се само ако е разпознат; иначе влиза точно каквото е въведено.
@@ -819,7 +853,15 @@ export function Checkout() {
     // ----- 3) Отваряме Upsell веднага (не караме клиента да чака) -----
     // НОВО: подаваме и пълните данни на поръчката — ако първият запис се изгуби по пътя,
     // скриптът ще я възстанови от ъпсел/финализиращата заявка.
-    setFlowOrder({ eventId: eventId, quantity: currentQuantity, total: currentTotal, base: orderData });
+    // 🚚 НОВО: подаваме и доставката — само за показване в ъпсела („спестявате X €“).
+    setFlowOrder({
+      eventId: eventId,
+      quantity: currentQuantity,
+      total: currentTotal,
+      base: orderData,
+      shippingFee: currentShipping ? currentShipping.fee : 0,
+      shippingLabel: currentShipping ? currentShipping.label : '',
+    });
 
     // Количката вече е поръчка — следващата е нова
     leadIdRef.current = newLeadId();
@@ -1382,20 +1424,53 @@ export function Checkout() {
                     <div className="text-right">
                       <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
                       <p className={`font-bold ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
-                        {isPromoValid ? <span className="line-through text-slate-300 mr-1 text-xs">23.90</span> : null}
-                        {pricePerUnit.toFixed(2)} €
+                        {isPromoValid ? <span className="line-through text-slate-300 mr-1 text-xs">23,90</span> : null}
+                        {eur(pricePerUnit)}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Total Summary Box */}
+                {/* 🚚 НОВО: Обобщение — продукт + доставка + общо дължимо */}
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 border border-amber-200 shadow-inner mt-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-slate-600 font-medium">Общо:</span>
-                    <span className={`text-2xl font-black ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>{totalPrice} €</span>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-slate-600 font-medium">
+                        Naturino Kids × {quantity}
+                      </span>
+                      <span className="font-bold text-slate-800 whitespace-nowrap">{eur(Number(totalPrice))}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+                        <Truck className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                        {shipping ? shipping.label : 'Доставка'}
+                      </span>
+                      {shipping ? (
+                        <span className="font-bold text-slate-800 whitespace-nowrap">{eur(shipping.fee)}</span>
+                      ) : (
+                        <span className="text-slate-400 font-semibold whitespace-nowrap">от {eur(SHIPPING.automat)}</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
+
+                  {/* Подсказка с цените, докато доставката не е избрана докрай */}
+                  {!shipping && (
+                    <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-bold">
+                      <span className="bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">Автомат {eur(SHIPPING.automat)}</span>
+                      <span className="bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">Офис {eur(SHIPPING.office)}</span>
+                      <span className="bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">Адрес {eur(SHIPPING.address)}</span>
+                    </div>
+                  )}
+
+                  <div className="border-t border-dashed border-amber-200 mt-3 pt-3 flex items-center justify-between gap-3">
+                    <span className="text-slate-800 font-black">
+                      {shipping ? 'Общо дължимо:' : 'Общо без доставка:'}
+                    </span>
+                    <span className={`text-2xl font-black whitespace-nowrap ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      {eur(grandTotal)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold uppercase tracking-wider mt-1">
                     <Check className="w-3 h-3" /> Наложен платеж (при преглед)
                   </div>
                 </div>
@@ -1415,7 +1490,8 @@ export function Checkout() {
                       {isSubmitting ? 'ИЗПРАЩАМЕ...' : 'ПОРЪЧАЙ СЕГА'}
                     </span>
                     <span className="text-xs md:text-sm font-bold opacity-95">
-                      плащаш при получаване
+                      {/* 🚚 НОВО: щом доставката е избрана — показваме точната сума */}
+                      {shipping ? `плащаш ${eur(grandTotal)} при получаване` : 'плащаш при получаване'}
                     </span>
                   </span>
 
@@ -1475,7 +1551,7 @@ export function Checkout() {
               <div>
                 <h4 className="font-black text-slate-900 text-lg uppercase tracking-tight">Naturino Kids</h4>
                 <p className="text-slate-500 text-sm italic">100% Натурален билков екстракт</p>
-                <p className="text-emerald-600 font-bold text-xl mt-1">23.90 €</p>
+                <p className="text-emerald-600 font-bold text-xl mt-1">23,90 €</p>
               </div>
             </div>
           </div>
