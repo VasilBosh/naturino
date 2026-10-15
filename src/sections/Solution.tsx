@@ -359,8 +359,9 @@ export function Solution() {
             <div className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 md:mb-8">
 
               <p className="text-emerald-100 text-sm md:text-base lg:text-lg leading-relaxed text-center">
-                <strong className="text-white">Прием:</strong> сутрин и вечер преди ядене по 25 капки (1.2 мл)
+                <strong className="text-white">Прием:</strong> сутрин и вечер по 25 капки (1.2 мл)
                 в малко вода или сок, или директно под езика. Капките са с приятен, естествено сладък вкус.
+                При първи симптоми капките е добре да се приемат 3 пъти на ден до отшумяване на симптомите.
               </p>
 
             </div>
