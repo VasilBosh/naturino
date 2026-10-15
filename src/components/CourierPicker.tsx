@@ -819,7 +819,7 @@ function CourierCard({ active, onClick, emoji, label }: { active: boolean; onCli
       }`}
     >
       {active && (
-        <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-300 animate-in">
+        <span className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-300 animate-in">
           <Check className="w-3 h-3 text-white" strokeWidth={3} />
         </span>
       )}
@@ -839,7 +839,7 @@ function TypeCard({ active, onClick, icon, label }: { active: boolean; onClick: 
       }`}
     >
       {active && (
-        <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-300">
+        <span className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-300">
           <Check className="w-3 h-3 text-white" strokeWidth={3} />
         </span>
       )}
