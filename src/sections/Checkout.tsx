@@ -1538,7 +1538,7 @@ export function Checkout() {
                   </div>
                   <div>
                     <p className="font-bold text-slate-900">Сигурност</p>
-                    <p className="text-slate-600 text-sm">Плащате чак когато пратката е в ръцете ви и сте я прегледали.</p>
+                    <p className="text-slate-600 text-sm">Всяка пратка тръгва със застраховка и преглед. ВАЖНО!!! Моля проверявайте всяка пратка пред куриера!</p>
                   </div>
                 </div>
               </div>
