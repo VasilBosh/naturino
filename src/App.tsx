@@ -12,6 +12,7 @@ import { useEffect, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Hero } from './sections/Hero';
 import { Problem } from './sections/Problem';
+import { VideoTrust } from './sections/VideoTrust';
 import { Solution } from './sections/Solution';
 import { PharmacistReview } from './sections/PharmacistReview';
 import { Benefits } from './sections/Benefits';
@@ -50,6 +51,7 @@ function LandingPage() {
       <Hero />
       <TrustHero />
       <Problem />
+      <VideoTrust />
       <Solution />
       <ReviewsSlider />
       <ComparisonSection />
