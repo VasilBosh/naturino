@@ -651,7 +651,7 @@ export function Hero() {
 
             <h2 className="text-[35px] sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 md:mb-20 leading-tight">
               Спри безкрайното<br />
-              <span className="text-amber-300">боледуване на детето!</span>
+              <span className="text-amber-300">боледуване на детето още днес!</span>
             </h2>
 
             <div className="max-w-xl mx-auto lg:mx-0 mb-3 md:mb-2 lg:pt-0 lg:-mt-12">
