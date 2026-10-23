@@ -646,7 +646,7 @@ export function Hero() {
           <div className="flex-1 max-w-2xl text-center lg:text-left transform-gpu">
             <div className="inline-flex items-center gap-2 bg-amber-400 text-emerald-900 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6 shadow-lg">
               <Award className="w-3 h-3 md:w-4 md:h-4" />
-              <span>Бестселър 2024 • 57,000+ доволни родители</span>
+              <span>Бестселър 2025 • 57,000+ доволни родители</span>
             </div>
 
             <h2 className="text-[35px] sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-8 md:mb-20 leading-tight">
