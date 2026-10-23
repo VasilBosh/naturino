@@ -1,8 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Lock, Eye, Database, ShieldAlert } from 'lucide-react';
+import { setConsent } from '../utils/googleAds';
 
 export function Privacy() {
+  const [withdrawn, setWithdrawn] = useState(false);
+  const withdrawConsent = () => {
+    setConsent('denied');
+    setWithdrawn(true);
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -23,7 +30,7 @@ export function Privacy() {
           <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
             Политика за поверителност
           </h1>
-          <p className="text-slate-500 mb-10">Последна актуализация: 10 май 2026 г.</p>
+          <p className="text-slate-500 mb-10">Последна актуализация: 23 октомври 2026 г.</p>
           
           <div className="space-y-10 text-slate-600 leading-relaxed">
             
@@ -63,7 +70,7 @@ export function Privacy() {
               <ul className="list-disc ml-5 space-y-2">
                 <li>Изпълнение на договора за покупко-продажба и доставка на продуктите.</li>
                 <li>Комуникация с Вас относно Вашата поръчка.</li>
-                <li><strong>Маркетинг и анализ:</strong> Оптимизиране на нашите рекламни кампании чрез Facebook Pixel и Conversions API (CAPI).</li>
+                <li><strong>Маркетинг и анализ:</strong> Оптимизиране на нашите рекламни кампании чрез Facebook Pixel и Conversions API (CAPI), Google Ads, както и анализ на сайта чрез Microsoft Clarity.</li>
                 <li>Предотвратяване на измами и сигурност на сайта.</li>
               </ul>
             </section>
@@ -77,6 +84,32 @@ export function Privacy() {
               <p className="text-sm bg-white p-4 rounded-lg border border-slate-200 italic">
                 <strong>Важно:</strong> При извършване на поръчка, част от Вашите данни (имейл и телефон) се изпращат в криптиран вид (hashed) към Meta. Това ни помага да измерваме ефективността на нашите реклами и да виждаме кои потребители са завършили поръчка. Meta не съхранява тези данни в чист вид, а ги използва само за съпоставка с вече съществуващи профили.
               </p>
+            </section>
+
+            {/* 4а. Google Ads и бисквитки */}
+            <section className="border-l-4 border-blue-500 pl-6 py-2 bg-slate-50/50 p-4 rounded-r-2xl">
+              <h2 className="text-xl font-bold text-slate-900 mb-3">4а. Google Ads и бисквитки</h2>
+              <p className="mb-4">
+                Този сайт използва Google Ads (Google Ireland Limited), за да измерва кои реклами водят до поръчки и да показва рекламите ни на подходящи хора. Google Ads използва бисквитки само ако сте натиснали „Приемам“ в банера за бисквитки. Ако откажете, Google получава само сигнали без бисквитки, а поръчката Ви работи по същия начин.
+              </p>
+              <p className="text-sm bg-white p-4 rounded-lg border border-slate-200 italic mb-4">
+                <strong>Важно:</strong> При поръчка и дадено съгласие имейлът и телефонът Ви се изпращат към Google в криптиран вид (hashed), за да измерваме ефективността на рекламите (т.нар. „подобрени реализации“).
+              </p>
+              <p className="mb-4 text-sm">
+                Сайтът използва и Microsoft Clarity (Microsoft Corporation) за анализ на това как се използва страницата (кликове и скролване), с цел подобряване на сайта.
+              </p>
+              <button
+                type="button"
+                onClick={withdrawConsent}
+                className="text-sm font-bold text-blue-700 border-2 border-blue-500 rounded-xl px-5 py-2 hover:bg-blue-50 transition"
+              >
+                Оттегли съгласието за бисквитки
+              </button>
+              {withdrawn && (
+                <p className="mt-3 text-sm font-semibold text-emerald-700">
+                  ✓ Съгласието Ви е оттеглено. Google Ads вече няма да използва бисквитки.
+                </p>
+              )}
             </section>
 
             {/* 5. Куриерски услуги */}
@@ -98,6 +131,8 @@ export function Privacy() {
                 <li>Коригиране на неточни данни.</li>
                 <li><strong>Право „да бъдете забравени“</strong> (изтриване на Вашите данни от нашата система).</li>
                 <li>Ограничаване на обработването.</li>
+                <li>Преносимост на данните и възражение срещу обработването.</li>
+                <li><strong>Оттегляне на съгласието</strong> за бисквитки по всяко време (бутон в т. 4а), без това да засяга обработването преди оттеглянето.</li>
               </ul>
               <p className="mt-4 text-sm font-semibold text-slate-700">
                 За да упражните тези права, моля свържете се с нас на: info@naturinokids.bg

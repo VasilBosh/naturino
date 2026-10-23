@@ -1,11 +1,22 @@
 import { ShoppingCart, X, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { isCookieBannerOpen, BANNER_EVENT } from '../utils/googleAds';
 
 export function StickyCTA() {
   const [scrolledEnough, setScrolledEnough] = useState(false);   // скролнали ли сме > 500px
   const [checkoutInView, setCheckoutInView] = useState(false);   // вижда ли се чек аутът
   const [commentsVisible, setCommentsVisible] = useState(false); // вижда ли се секцията с коментари поне 20%
   const [isClosedByUser, setIsClosedByUser] = useState(false);   // затворен ли е ръчно с X
+  const [cookieBannerOpen, setCookieBannerOpenState] = useState(() => isCookieBannerOpen()); // отворена ли е лентата за бисквитки
+
+  // 0. Докато лентата за бисквитки е отворена — стикито се крие (тя заема мястото му).
+  //    Щом човекът избере в лентата — стикито се връща.
+  useEffect(() => {
+    const onBanner = () => setCookieBannerOpenState(isCookieBannerOpen());
+    window.addEventListener(BANNER_EVENT, onBanner);
+    onBanner();
+    return () => window.removeEventListener(BANNER_EVENT, onBanner);
+  }, []);
 
   // 1. Скрол прагът от 500px
   useEffect(() => {
@@ -47,10 +58,11 @@ export function StickyCTA() {
 
   // ЛОГИКА ЗА ПОКАЗВАНЕ:
   // - не е затворен ръчно
+  // - лентата за бисквитки НЕ е отворена в момента
   // - скролнали сме поне 500px
   // - НЕ сме на чек аута  ИЛИ  коментарите са 20% видими
   const shouldShow =
-    !isClosedByUser && scrolledEnough && (!checkoutInView || commentsVisible);
+    !isClosedByUser && !cookieBannerOpen && scrolledEnough && (!checkoutInView || commentsVisible);
 
   if (!shouldShow) return null;
 

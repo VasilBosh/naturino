@@ -23,6 +23,8 @@ import { Checkout } from './sections/Checkout';
 import { Footer } from './sections/Footer';
 import { FloatingChat } from './sections/FloatingChat';
 import { StickyCTA } from './sections/StickyCTA';
+import { CookieBanner } from './sections/CookieBanner';
+import { initGoogleAds } from './utils/googleAds';
 // Страниците с условия се зареждат чак когато някой ги отвори (олекотява началното зареждане)
 const Terms = lazy(() => import('./Pages/Terms').then((m) => ({ default: m.Terms })));
 const Privacy = lazy(() => import('./Pages/Privacy').then((m) => ({ default: m.Privacy })));
@@ -42,6 +44,9 @@ if (pixelId) {
   });
   ReactPixel.pageView();
 }
+
+// GOOGLE ADS — таг + съгласие по подразбиране (преди страницата да се нарисува)
+initGoogleAds();
 
 // КОМПОНЕНТ ЗА ГЛАВНАТА СТРАНИЦА
 function LandingPage() {
@@ -68,6 +73,7 @@ function LandingPage() {
       <CheckoutSocialProof />
       {/* StickyCTA сам решава кога да се покаже (след 500px скрол) */}
       <StickyCTA />
+      <CookieBanner />
     </>
   );
 }

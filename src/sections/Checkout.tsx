@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UpsellFlow, type OrderSnapshot } from './UpsellFlow';
 import { CourierPicker, type CourierSelection } from '../components/CourierPicker';
+import { trackGoogleAdsPurchase } from '../utils/googleAds';
 
 // Максимално количество в една поръчка (защита срещу случайно натискане)
 const MAX_QUANTITY = 10;
@@ -847,7 +848,17 @@ export function Checkout() {
       } else {
         console.warn('⏱️ Записът се бави — Purchase се праща без потвърждение.', eventId);
       }
-      firePurchase();
+        firePurchase();
+      
+        // Google Ads — същата покупка, същият eventId (без тестови поръчки)
+      if (!isTestOrder) {
+        trackGoogleAdsPurchase({
+          value: currentTotal,
+          transactionId: eventId,
+          email: finalEmail,
+          phone: finalPhone,
+        });
+      }
     });
 
     // ----- 3) Отваряме Upsell веднага (не караме клиента да чака) -----
@@ -1499,7 +1510,7 @@ export function Checkout() {
                 </button>
 
                 <p className="text-center text-[12px] md:text-xs text-slate-500 font-semibold leading-relaxed mt-2">
-                  Преглед преди плащане • Ще ви се обадим за потвърждение
+                  Преглед преди плащане • Всяка пратка е застрахована!
                 </p>
 
               </div>
