@@ -98,7 +98,7 @@ export function Solution() {
 
                 <div className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-white text-xs sm:text-sm font-black tracking-wide shadow-lg shadow-emerald-300/50">
                   <Sparkles className="w-4 h-4 animate-pulse" />
-                  УНИКАЛЕНИЯ МЕХАНИЗЪМ НА NATURINO KIDS
+                  УНИКАЛНИЯ МЕХАНИЗЪМ НА NATURINO KIDS
                 </div>
 
               </div>

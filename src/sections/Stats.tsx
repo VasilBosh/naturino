@@ -64,7 +64,7 @@ export const Stats = () => {
 
         {/* Bottom note — честно и просто */}
         <p className="text-center text-emerald-300/60 text-sm mt-8 font-medium">
-          Поръчки през всички канали — www.naturinokids.bg, Messanger, Viber, WhatsApp и партньорските ни физически обекти в страната
+          Поръчки през всички канали — www.naturinokids.bg, Messenger, Viber, WhatsApp и партньорските ни физически обекти в страната
         </p>
 
       </div>
