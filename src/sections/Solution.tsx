@@ -29,7 +29,7 @@ export function Solution() {
   const benefits = [
     'Подсилва имунитета естествено',
     'Защитава от вируси и бактерии',
-    'Подходящ за целогодишна употреба',
+    'Подходящ, както през зимните месеци,\n така и през останалите сезони',
     'Без странични ефекти',
     'Лесен за прием от деца',
     'Резултати още от първата седмица',
@@ -227,7 +227,7 @@ export function Solution() {
                     <Check className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </div>
 
-                  <span className="text-slate-700 text-sm md:text-base">
+                  <span className="text-slate-700 text-sm md:text-base whitespace-pre-line">
                     {benefit}
                   </span>
 
