@@ -87,11 +87,22 @@ const storeGroups: StoreGroup[] = [
     ],
   },
   {
+    city: 'Стара Загора',
+    count: 1,
+    stores: [
+      {
+        name: 'Аптеки „Такиев“',
+        address: 'бул. „Хан Тервел“ № 48-Б',
+        type: 'Аптека',
+      },
+    ],
+  },
+  {
     city: 'Пловдив',
     count: 2,
     stores: [
       {
-        name: 'Аптека Nova Farm',
+        name: 'Аптеки Nova Farm',
         address: 'Оазис 3, ж.к. Южен, ул. „Братя Шкорпил“ 15Д',
         type: 'Аптека',
       },
@@ -260,18 +271,18 @@ export function PharmacistReview() {
                   <div className="mt-3 flex flex-wrap items-end gap-x-3 gap-y-2 min-w-0">
 
                     <span className="shrink-0 text-3xl sm:text-5xl font-black leading-none text-amber-300">
-                      11
+                      12
                     </span>
 
                     <span className="min-w-0 text-xl sm:text-2xl font-black leading-tight break-words pb-1">
-                      обекта в 5 града
+                      обекта в 6 града
                     </span>
 
                   </div>
 
                   <p className="mt-4 w-full min-w-0 text-sm sm:text-base leading-relaxed text-emerald-100 break-words">
                     <strong className="text-white">
-                      10 обекта са налични сега,
+                      11 обекта са налични сега,
                     </strong>{' '}
                     а новият обект на Аптеки Апостолов в Пловдив се
                     присъединява към мрежата{' '}
@@ -527,7 +538,7 @@ export function PharmacistReview() {
                 </div>
 
                 <p className="mt-2 text-lg sm:text-xl font-black text-white break-words">
-                  11 партньорски обекта • 5 града
+                  12 партньорски обекта • 6 града
                 </p>
 
               </div>

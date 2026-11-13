@@ -669,7 +669,7 @@ export function Hero() {
               <p className="mt-3 text-base sm:text-lg md:text-xl text-emerald-100 leading-relaxed">
                 Вече можеш да откриеш Naturino Kids и на място — в{' '}
                 <strong className="text-amber-300">
-                  11 физически обекта в 5 града в страната.
+                  12 физически обекта в 6 града в страната.
                 </strong>
               </p>
 
