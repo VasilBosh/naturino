@@ -23,16 +23,16 @@ export function Ingredients() {
   }, []);
 
   const herbs = [
-    { name: 'Планински лимон', benefit: 'Изключително богат на витамин C и антиоксиданти, подпомага клетъчната защита', color: 'bg-yellow-100 text-yellow-700' },
-    { name: 'Черен бъз', benefit: 'Активира защитната реакция и повишава устойчивостта към инфекции', color: 'bg-purple-100 text-purple-700' },
-    { name: 'Арония', benefit: 'Богата на естествени антиоксиданти, които подпомагат здравето отвътре', color: 'bg-indigo-100 text-indigo-700' },
-    { name: 'Шипка', benefit: 'Богата на витамин C – повишава устойчивостта към болести', color: 'bg-red-100 text-red-700' },
-    { name: 'Мащерка', benefit: 'Подкрепя дихателната система и предпазва от външни агресори', color: 'bg-emerald-100 text-emerald-700' },
-    { name: 'Риган', benefit: 'Антибактериално действие – подкрепя имунната система в борбата срещу инфекции', color: 'bg-green-100 text-green-700' },
-    { name: 'Салвия', benefit: 'Притежава мощни антибактериални, антиоксидантни и противовъзпалителни свойства', color: 'bg-teal-100 text-teal-700' },
-    { name: 'Лайка', benefit: 'Подпомага възстановяването – има меко противовъзпалително действие', color: 'bg-amber-100 text-amber-700' },
-    { name: 'Бял равнец', benefit: 'Балансира имунния отговор и подпомага детоксикацията.', color: 'bg-orange-100 text-orange-700' },
-    { name: 'Джинджифил', benefit: 'Подпомага имунната устойчивост при сезонни вируси', color: 'bg-orange-100 text-orange-800' },
+    { name: 'Планински лимон', benefit: 'Изключително богат на витамин C и антиоксиданти, подпомага клетъчната защита', image: '/images/herbs/planinski-limon.webp' },
+    { name: 'Черен бъз', benefit: 'Активира защитната реакция и повишава устойчивостта към инфекции', image: '/images/herbs/cheren-baz.webp' },
+    { name: 'Арония', benefit: 'Богата на естествени антиоксиданти, които подпомагат здравето отвътре', image: '/images/herbs/aronia.webp' },
+    { name: 'Шипка', benefit: 'Богата на витамин C – повишава устойчивостта към болести', image: '/images/herbs/shipka.webp' },
+    { name: 'Мащерка', benefit: 'Подкрепя дихателната система и предпазва от външни агресори', image: '/images/herbs/mashterka.webp' },
+    { name: 'Риган', benefit: 'Антибактериално действие – подкрепя имунната система в борбата срещу инфекции', image: '/images/herbs/rigan.webp' },
+    { name: 'Салвия', benefit: 'Притежава мощни антибактериални, антиоксидантни и противовъзпалителни свойства', image: '/images/herbs/salvia.webp' },
+    { name: 'Лайка', benefit: 'Подпомага възстановяването – има меко противовъзпалително действие', image: '/images/herbs/laika.webp' },
+    { name: 'Бял равнец', benefit: 'Балансира имунния отговор и подпомага детоксикацията.', image: '/images/herbs/bial-ravnets.webp' },
+    { name: 'Джинджифил', benefit: 'Подпомага имунната устойчивост при сезонни вируси', image: '/images/herbs/dzhindzhifil.webp' },
   ];
 
   return (
@@ -64,8 +64,18 @@ export function Ingredients() {
               className="reveal opacity-0 card-hover bg-slate-50 rounded-xl md:rounded-2xl p-4 md:p-5 text-center border border-slate-100"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <div className={`w-10 h-10 md:w-12 md:h-12 ${herb.color} rounded-xl flex items-center justify-center mx-auto mb-2 md:mb-3`}>
-                <Leaf className="w-5 h-5 md:w-6 md:h-6" />
+              <div className="relative w-24 h-24 md:w-28 md:h-28 mx-auto mb-2 md:mb-3 rounded-full overflow-hidden bg-white ring-1 ring-slate-200 flex items-center justify-center">
+                <Leaf className="absolute w-8 h-8 text-emerald-300" aria-hidden="true" />
+                <img
+                  src={herb.image}
+                  alt={herb.name}
+                  width={320}
+                  height={320}
+                  loading="lazy"
+                  decoding="async"
+                  className="relative w-full h-full object-contain p-2"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
               </div>
               <h3 className="text-sm md:text-base font-bold text-slate-900 mb-1">{herb.name}</h3>
               <p className="text-xs md:text-sm text-slate-500">{herb.benefit}</p>
