@@ -6,9 +6,18 @@ import { Label } from '@/components/ui/label';
 import { UpsellFlow, type OrderSnapshot } from './UpsellFlow';
 import { CourierPicker, type CourierSelection } from '../components/CourierPicker';
 import { trackGoogleAdsPurchase } from '../utils/googleAds';
-
-// Максимално количество в една поръчка (защита срещу случайно натискане)
-const MAX_QUANTITY = 10;
+// 💶 Пакетни цени — единственото място с цените е utils/pricing.ts
+// (там е и MAX_QUANTITY — максимално количество в една поръчка)
+import {
+  MAX_QUANTITY,
+  FREE_SHIPPING_FROM_QTY,
+  priceFor,
+  regularPriceFor,
+  savingFor,
+  hasFreeShipping,
+  breakdownLabel,
+  SELECT_PACKAGE_EVENT,
+} from '../utils/pricing';
 
 // ==========================================================
 // 🚚 НОВО: ЦЕНИ ЗА ДОСТАВКА — САМО ЗА ПОКАЗВАНЕ ПРЕД КЛИЕНТА
@@ -458,7 +467,7 @@ export function Checkout() {
     if (touchedCountRef.current === 0) {
       touchedCountRef.current = 1;
       // Подгряваме снимките от ъпсела, за да се покажат мигновено след поръчката
-      ['/upsell/kids-3pack.webp', '/upsell/adult.webp'].forEach((src) => {
+      ['/images/product-main.webp', '/upsell/kids-3pack.webp', '/upsell/adult.webp'].forEach((src) => {
         const img = new Image();
         img.src = src;
       });
@@ -552,6 +561,18 @@ export function Checkout() {
     return () => window.removeEventListener('NaturinoApplyDiscount', handleAutoDiscount);
   }, []);
 
+  // 📦 НОВО: избор на пакет от секциите „Пакетни предложения“ → слагаме броя тук.
+  // Клиентът после може да добавя/маха шишенца с +/− (цената се смята наново).
+  useEffect(() => {
+    const handleSelectPackage = (e: Event) => {
+      const qty = Math.floor(Number((e as CustomEvent).detail));
+      if (!Number.isFinite(qty) || qty < 1) return;
+      setQuantity(Math.min(MAX_QUANTITY, qty));
+    };
+    window.addEventListener(SELECT_PACKAGE_EVENT, handleSelectPackage);
+    return () => window.removeEventListener(SELECT_PACKAGE_EVENT, handleSelectPackage);
+  }, []);
+
   // Чистим таймера за отключване на бутона, ако компонентът се маха
   useEffect(() => {
     return () => {
@@ -570,12 +591,21 @@ export function Checkout() {
   const isPromoValid = isStaticPromo || isDynamicPromo;
 
   const pricePerUnit = isPromoValid ? 22.23 : 23.90; // 7% отстъпка от 23.90 е 22.23
-  const totalPrice = (pricePerUnit * quantity).toFixed(2);
+
+  // 📦 НОВО: пакетни цени — 1 = 23,90 | 2 = 45,90 | 3 = 68,80 | 4 = 86,90 | 5 = 86,90 + 23,90 ...
+  // (промо кодът, ако някога се ползва, остава по старата цена на брой)
+  const totalPrice = isPromoValid
+    ? (pricePerUnit * quantity).toFixed(2)
+    : priceFor(quantity).toFixed(2);
+  const packSaving = isPromoValid ? 0 : savingFor(quantity);
+
+  // 🚚 Безплатна доставка от 3 шишенца нагоре
+  const freeShipping = hasFreeShipping(quantity);
 
   // 🚚 НОВО: доставка + общо дължимо — САМО за показване.
   // Към таблицата, Tradefy и Facebook продължава да отива totalPrice (само продуктите).
   const shipping = getShipping(delivery);
-  const grandTotal = Number(totalPrice) + (shipping ? shipping.fee : 0);
+  const grandTotal = Number(totalPrice) + (shipping && !freeShipping ? shipping.fee : 0);
 
   // ==========================================================
   // ИЗОСТАВЕНИ КОЛИЧКИ (НОВО)
@@ -1261,6 +1291,7 @@ export function Checkout() {
           {/* Order Form */}
           <div className="reveal opacity-0 min-w-0">
             <form
+              id="order-form"
               onSubmit={handleSubmit}
               className="bg-amber-50/50 rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-2xl shadow-amber-900/10 relative overflow-hidden min-w-0"
             >
@@ -1432,14 +1463,54 @@ export function Checkout() {
                         <Plus className="w-5 h-5" />
                       </button>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
-                      <p className={`font-bold ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
-                        {isPromoValid ? <span className="line-through text-slate-300 mr-1 text-xs">23,90</span> : null}
-                        {eur(pricePerUnit)}
-                      </p>
-                    </div>
+                    {isPromoValid ? (
+                      <div className="text-right">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold">Цена за брой</p>
+                        <p className="font-bold text-emerald-600">
+                          <span className="line-through text-slate-300 mr-1 text-xs">23,90</span>
+                          {eur(pricePerUnit)}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-right min-w-0">
+                        <p className="text-[10px] text-slate-400 uppercase font-bold">Цена</p>
+                        {packSaving > 0 && (
+                          <p className="line-through text-slate-400 text-xs font-bold leading-tight whitespace-nowrap">{eur(regularPriceFor(quantity))}</p>
+                        )}
+                        <p className="font-black text-amber-600 text-lg leading-tight whitespace-nowrap">
+                          {eur(Number(totalPrice))}
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  {/* 📦 НОВО: какъв пакет е избран и колко спестява */}
+                  {!isPromoValid && quantity > 1 && (
+                    <p className="text-[12px] font-bold text-slate-600 leading-snug">
+                      {breakdownLabel(quantity)}
+                      {packSaving > 0 && <span className="text-emerald-600"> • спестявате {eur(packSaving)}</span>}
+                    </p>
+                  )}
+
+                  {/* 🚚 НОВО: безплатна доставка от 3 шишенца */}
+                  {freeShipping ? (
+                    <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-emerald-700 text-sm font-black">
+                      <Truck className="w-4 h-4 flex-shrink-0" />
+                      🎉 Отключихте БЕЗПЛАТНА доставка!
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(FREE_SHIPPING_FROM_QTY)}
+                      className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-amber-800 text-[13px] font-bold text-left hover:bg-amber-100 transition-colors"
+                    >
+                      <Truck className="w-4 h-4 flex-shrink-0" />
+                      <span>
+                        Добавете още {FREE_SHIPPING_FROM_QTY - quantity} {FREE_SHIPPING_FROM_QTY - quantity === 1 ? 'опаковка' : 'опаковки'} и
+                        доставката е <strong>БЕЗПЛАТНА</strong> (общо {eur(priceFor(FREE_SHIPPING_FROM_QTY))})
+                      </span>
+                    </button>
+                  )}
                 </div>
 
                 {/* 🚚 НОВО: Обобщение — продукт + доставка + общо дължимо */}
@@ -1456,7 +1527,12 @@ export function Checkout() {
                         <Truck className="w-4 h-4 text-amber-600 flex-shrink-0" />
                         {shipping ? shipping.label : 'Доставка'}
                       </span>
-                      {shipping ? (
+                      {freeShipping ? (
+                        <span className="font-black text-emerald-600 whitespace-nowrap">
+                          {shipping && <span className="line-through text-slate-400 font-semibold mr-1.5">{eur(shipping.fee)}</span>}
+                          Безплатна
+                        </span>
+                      ) : shipping ? (
                         <span className="font-bold text-slate-800 whitespace-nowrap">{eur(shipping.fee)}</span>
                       ) : (
                         <span className="text-slate-400 font-semibold whitespace-nowrap">от {eur(SHIPPING.automat)}</span>
@@ -1465,7 +1541,7 @@ export function Checkout() {
                   </div>
 
                   {/* Подсказка с цените, докато доставката не е избрана докрай */}
-                  {!shipping && (
+                  {!shipping && !freeShipping && (
                     <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-bold">
                       <span className="bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">Автомат {eur(SHIPPING.automat)}</span>
                       <span className="bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2 py-0.5">Офис {eur(SHIPPING.office)}</span>
@@ -1475,7 +1551,7 @@ export function Checkout() {
 
                   <div className="border-t border-dashed border-amber-200 mt-3 pt-3 flex items-center justify-between gap-3">
                     <span className="text-slate-800 font-black">
-                      {shipping ? 'Общо дължимо:' : 'Общо без доставка:'}
+                      {shipping || freeShipping ? 'Общо дължимо:' : 'Общо без доставка:'}
                     </span>
                     <span className={`text-2xl font-black whitespace-nowrap ${isPromoValid ? 'text-emerald-600' : 'text-amber-600'}`}>
                       {eur(grandTotal)}
@@ -1502,7 +1578,7 @@ export function Checkout() {
                     </span>
                     <span className="text-xs md:text-sm font-bold opacity-95">
                       {/* 🚚 НОВО: щом доставката е избрана — показваме точната сума */}
-                      {shipping ? `плащаш ${eur(grandTotal)} при получаване` : 'плащаш при получаване'}
+                      {shipping || freeShipping ? `плащаш ${eur(grandTotal)} при получаване` : 'плащаш при получаване'}
                     </span>
                   </span>
 

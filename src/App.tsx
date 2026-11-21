@@ -20,6 +20,7 @@ import { Ingredients } from './sections/Ingredients';
 import { SocialProof } from './sections/SocialProof';
 import { FAQ } from './sections/FAQ';
 import { Checkout } from './sections/Checkout';
+import { Packages } from './sections/Packages';
 import { Footer } from './sections/Footer';
 import { FloatingChat } from './sections/FloatingChat';
 import { StickyCTA } from './sections/StickyCTA';
@@ -28,6 +29,9 @@ import { initGoogleAds } from './utils/googleAds';
 // Страниците с условия се зареждат чак когато някой ги отвори (олекотява началното зареждане)
 const Terms = lazy(() => import('./Pages/Terms').then((m) => ({ default: m.Terms })));
 const Privacy = lazy(() => import('./Pages/Privacy').then((m) => ({ default: m.Privacy })));
+// 🧪 Тестов преглед на upsell/downsell (/?upsell=3) — САМО в `npm run dev`.
+// В сайта след build този код изчезва напълно (import.meta.env.DEV е false).
+const OfferPreview = import.meta.env.DEV ? lazy(() => import('./dev/OfferPreview')) : null;
 import './App.css';
 
 // ==========================================================
@@ -58,22 +62,30 @@ function LandingPage() {
       <Problem />
       <VideoTrust />
       <Solution />
+      <Packages id="paketi-gore" />
       <ReviewsSlider />
       <ComparisonSection />
       <PharmacistReview />
       <Benefits />
       <Ingredients />
+      <Packages id="paketi-sredata" />
       <Sertifikat />
       <Story />
       <Stats />
       <SocialProof />
       <FAQ />     
       <TrustBadges />
+      <Packages id="paketi-chekaut" />
       <Checkout />
       <CheckoutSocialProof />
       {/* StickyCTA сам решава кога да се покаже (след 500px скрол) */}
       <StickyCTA />
       <CookieBanner />
+      {OfferPreview && (
+        <Suspense fallback={null}>
+          <OfferPreview />
+        </Suspense>
+      )}
     </>
   );
 }

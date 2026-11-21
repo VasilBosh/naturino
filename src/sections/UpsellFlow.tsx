@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Truck, Check, Sparkles, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { Check, Sparkles, Clock, Gift } from 'lucide-react';
+import { upsellFor, hasFreeShipping, DOWNSELL_PRICE } from '../utils/pricing';
 
 /**
  * UpsellFlow — попъп потокът след записана поръчка: Upsell → Downsell → Благодаря.
@@ -24,10 +25,20 @@ const GOOGLE_SCRIPT_URL =
 const BACKUP_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzKKvDPfL63m5k8XdrA9gwwI6Bp93i4YZAo_8sLIO1hqCwagTBWQssymHlwkZBun9zQsg/exec';
 
-// wasPrice = 2 × 23,90 (редовната цена на двете опаковки)
-const UPSELL = { addQty: 2, addPrice: 44.9, wasPrice: 47.8, img: '/upsell/kids-3pack.webp', emoji: '🧴' };
+// 📦 НОВО: upsell-ът се нагажда към поръчката и винаги води ЕДНО НИВО НАГОРЕ (виж utils/pricing.ts):
+//   1 бр. → +2 = пакет 3 (+44,90)   2 бр. → +2 = пакет 4 (+41,00)   3 бр. → +1 = пакет 4 (+18,10)
+//   4+ бр. → няма upsell → показва се направо downsell-ът
+const UPSELL_EMOJI = '🧴';
+// 📸 Снимката показва ТОЧНО толкова шишенца, колкото се ДОБАВЯТ (офертата, а не целия пакет)
+const UPSELL_IMG: Record<number, string> = { 1: '/images/product-main.webp', 2: '/upsell/kids-3pack.webp' };
+// ⏱️ ТАЙМЕР НА ОФЕРТАТА — колко секунди е видима всяка оферта (upsell и downsell).
+// Когато изтече, офертата НАИСТИНА изчезва: от upsell → downsell, от downsell → „Благодарим ви“.
+const OFFER_SECONDS = 120;        // 2 минути
+// От колко секунди нататък броячът става червен и мига
+const OFFER_URGENT_SECONDS = 60;  // последната минута
 // Възрастният е на редовна цена 24,90 → при даунсела се печели САМО безплатната доставка
-const DOWNSELL = { addQty: 1, addPrice: 24.9, img: '/upsell/adult.webp', emoji: '🌿' };
+// (ако поръчката вече е с безплатна доставка — просто се добавя в същата пратка)
+const DOWNSELL = { addQty: 1, addPrice: DOWNSELL_PRICE, img: '/upsell/adult.webp', emoji: '🌿' };
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const eur = (n: number) => round2(n).toFixed(2).replace('.', ',') + ' €';
@@ -61,45 +72,54 @@ const KEYFRAMES = `
 @keyframes uf_conf { to { transform:translateY(120px) rotate(360deg); opacity:0 } }
 `;
 
-/* ---------- Продуктов визуал със сигурен fallback ---------- */
-function ProductShot({
-  src,
-  emoji,
-  badge,
-  tone,
-}: {
-  src: string;
-  emoji: string;
-  badge?: string;
-  tone: string;
-}) {
+/* ---------- Снимка на офертата (компактна, със сигурен fallback) ---------- */
+function OfferShot({ src, emoji, badge, contain = false }: { src: string; emoji: string; badge: string; contain?: boolean }) {
   const [failed, setFailed] = useState(false);
   return (
-    <div className="relative mx-auto w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48">
-      <div className="absolute inset-0 rounded-[2rem] blur-2xl opacity-60" style={{ background: tone }} />
-      <div className="relative w-full h-full rounded-[2rem] overflow-hidden bg-white shadow-2xl ring-1 ring-black/5 flex items-center justify-center">
+    <div className="relative w-[104px] h-[104px] sm:w-32 sm:h-32 flex-shrink-0 uf-floaty">
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-amber-200 to-rose-200 blur-xl opacity-70" />
+      <div className="relative w-full h-full rounded-3xl overflow-hidden bg-white shadow-xl ring-1 ring-black/5 flex items-center justify-center">
         {!failed && src ? (
-          <img src={src} alt="" onError={() => setFailed(true)} className="w-full h-full object-cover" />
+          <img src={src} alt="" onError={() => setFailed(true)} className={`w-full h-full ${contain ? 'object-contain p-1.5' : 'object-cover'}`} />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-7xl" style={{ background: tone }}>
-            <span className="drop-shadow-lg">{emoji}</span>
-          </div>
+          <span className="text-5xl">{emoji}</span>
         )}
       </div>
-      {badge && (
-        <div className="absolute -top-3 -right-3 bg-white rounded-2xl px-3 py-1.5 shadow-xl ring-1 ring-black/5">
-          <span className="font-black text-lg bg-gradient-to-br from-rose-600 to-amber-500 bg-clip-text text-transparent">
-            {badge}
-          </span>
-        </div>
-      )}
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 uf-stamp">
-        <div className="flex items-center gap-1.5 bg-amber-400 text-[#2b1a00] font-black text-[11px] uppercase tracking-wide px-3 py-1.5 rounded-full shadow-lg ring-2 ring-white">
-          <Truck className="w-3.5 h-3.5" />
-          Безплатна доставка
-        </div>
+      <div className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-9 h-9 flex items-center justify-center font-black text-sm shadow-lg ring-2 ring-white">
+        {badge}
       </div>
     </div>
+  );
+}
+
+/* ---------- Горна лента: поръчката Е ПРИЕТА + брояч ---------- */
+function OfferTop({ secondsLeft, label }: { secondsLeft: number; label: string }) {
+  const urgent = secondsLeft <= OFFER_URGENT_SECONDS;
+  const mmss = `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')}`; // 2:00 … 0:00
+  return (
+    <>
+      <div className="bg-emerald-600 text-white px-4 py-2.5 text-center">
+        <p className="font-black text-[20px] leading-tight flex items-center justify-center gap-1.5">
+          <Check className="w-4 h-4 flex-shrink-0" strokeWidth={3} /> Поръчката ви е приета успешно!
+        </p>
+        <p className="text-[13px] text-white/85 font-semibold">Ще се свържем с вас за потвърждение</p>
+      </div>
+      <div className="h-1.5 bg-rose-100">
+        <div
+          className={`h-full ${urgent ? 'bg-red-500' : 'bg-gradient-to-r from-rose-500 to-amber-400'}`}
+          style={{ width: `${(secondsLeft / OFFER_SECONDS) * 100}%`, transition: 'width 1s linear' }}
+        />
+      </div>
+      <div className="flex items-center justify-center pt-3">
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[15px] font-black uppercase tracking-wide ${
+            urgent ? 'bg-red-600 text-white animate-pulse' : 'bg-rose-100 text-rose-700'
+          }`}
+        >
+                    <Clock className="w-5 h-5" /> {label} · <span className="text-[22px] leading-none tabular-nums">{mmss}</span>
+        </span>
+      </div>
+    </>
   );
 }
 
@@ -115,8 +135,19 @@ function Modal({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: () => void }) {
-  const [step, setStep] = useState<'upsell' | 'downsell' | 'thankyou'>('upsell');
+export function UpsellFlow({
+  order,
+  onClose,
+  preview = false,
+}: {
+  order: OrderSnapshot;
+  onClose: () => void;
+  // 🧪 Само за тестовия преглед (src/dev/OfferPreview.tsx): НИЩО не се изпраща към таблиците
+  preview?: boolean;
+}) {
+  // Офертата за тази поръчка (null при 4+ шишенца → започваме направо от downsell-а)
+  const up = upsellFor(order.quantity);
+  const [step, setStep] = useState<'upsell' | 'downsell' | 'thankyou'>(up ? 'upsell' : 'downsell');
   const [path, setPath] = useState<'upsell' | 'downsell' | 'none'>('none');
 
   // Гарантира, че към сървъра тръгва САМО ЕДНА финализираща заявка (един имейл).
@@ -126,24 +157,27 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
   // 🚚 НОВО: сметки само за показване (нищо от това не се праща към таблицата)
   // ==========================================================
   const shipFee = Number(order.shippingFee) || 0;                        // 2,50 / 3,75 / 4,50
-  const shipLabel = order.shippingLabel || 'Доставка';
-  const upsellProductSaving = round2(UPSELL.wasPrice - UPSELL.addPrice);  // 2,90
-  const upsellSaving = round2(upsellProductSaving + shipFee);             // 5,40 / 6,65 / 7,40
-  const downsellSaving = shipFee;                                         // само доставката
+  // 📦 НОВО: от 3 шишенца доставката вече е безплатна още в основната поръчка
+  const baseFree = hasFreeShipping(order.quantity);
+  const shipSaving = baseFree ? 0 : shipFee;                             // доставка, която офертата спестява
+  const upsellProductSaving = up ? round2(up.wasPrice - up.addPrice) : 0; // 2,90 / 6,80 / 5,80
+  const upsellSaving = round2(upsellProductSaving + shipSaving);
+  const upsellPct = up && up.wasPrice > 0 ? Math.round((upsellProductSaving / up.wasPrice) * 100) : 0;
 
-  // Колко плаща клиентът при получаване, според пътя
-  const productTotalFor = (p: 'upsell' | 'downsell' | 'none') =>
-    p === 'upsell' ? order.total + UPSELL.addPrice
-      : p === 'downsell' ? order.total + DOWNSELL.addPrice
-      : order.total;
-  const payTotalFor = (p: 'upsell' | 'downsell' | 'none') =>
-    productTotalFor(p) + (p === 'none' ? shipFee : 0);
+  // За благодарствения екран: краен брой детски опаковки и докъде
+  const finalKidsQty = path === 'upsell' && up ? up.targetQty : order.quantity;
+  const baseCity = typeof order.base?.city === 'string' ? order.base.city : '';
+  const shipPlace = [order.shippingLabel || '', baseCity].filter(Boolean).join(', ');
 
   // Праща обновяване/финализиране със ФИНАЛНИ стойности. quantity = брой ДЕТСКИ опаковки.
   // 'complete' = клиентът отказа/не реагира → тръгва базовият имейл, редовете НЕ се пипат.
   const sendUpdate = (action: 'upsell' | 'downsell' | 'complete', quantity: number, total: number) => {
     if (sentRef.current) return; // вече е изпратено веднъж — не дублираме
     sentRef.current = true;
+    if (preview) {
+      console.info('🧪 Тестов режим — НЕ се изпраща:', action, quantity, total);
+      return;
+    }
     const payload = {
       SK: 'id:9307307573',
       action,
@@ -179,8 +213,10 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
 
 
   const acceptUpsell = () => {
-    // Upsell: +2 ДЕТСКИ опаковки → детският брой расте с 2
-    sendUpdate('upsell', order.quantity + UPSELL.addQty, order.total + UPSELL.addPrice);
+    // Upsell: до следващия пакет → детският брой расте с up.addQty
+    // (Apps Script смята сумата сам от таблицата — по същото правило)
+    if (!up) return;
+    sendUpdate('upsell', up.targetQty, order.total + up.addPrice);
     setPath('upsell');
     setStep('thankyou');
   };
@@ -199,8 +235,8 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
     setStep('thankyou');
   };
 
-  // ЗАЩИТА СРЕЩУ ЗАГУБЕН ИМЕЙЛ: ако клиентът стигне до Upsell/Downsell и не натисне нищо
-  // в рамките на 60 сек → автоматично се финализира (базов имейл към клиента и админа).
+  // ЗАЩИТА СРЕЩУ ЗАГУБЕН ИМЕЙЛ: ако клиентът стигне до Upsell/Downsell и не натисне нищо,
+  // броячът (OFFER_SECONDS) изтича → автоматично се финализира (базов имейл към клиента и админа).
   // Ако през това време натисне оферта или откаже — sendUpdate е защитен, няма двоен имейл.
   // НОВО: ако клиентът затвори страницата по време на ъпсела — финализираме веднага,
   // иначе поръчката оставаше без имейл (60-секундният таймер не успяваше да тръгне).
@@ -213,12 +249,25 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ⏱️ БРОЯЧ НА ОФЕРТАТА: OFFER_SECONDS за всеки екран. При 0 офертата изтича:
+  // upsell → downsell, downsell → финализиране (базов имейл) и „Благодарим ви“.
+  // Смята се по часовника (Date.now), затова е точен и ако телефонът приспи страницата.
+  const [secondsLeft, setSecondsLeft] = useState(OFFER_SECONDS);
   useEffect(() => {
     if (step !== 'upsell' && step !== 'downsell') return;
-    const timer = setTimeout(() => {
-      declineAll();
-    }, 60000);
-    return () => clearTimeout(timer);
+    setSecondsLeft(OFFER_SECONDS);
+    const started = Date.now();
+    const id = setInterval(() => {
+      if (sentRef.current) { clearInterval(id); return; } // клиентът вече е избрал
+      const left = Math.max(0, OFFER_SECONDS - Math.floor((Date.now() - started) / 1000));
+      setSecondsLeft(left);
+      if (left === 0) {
+        clearInterval(id);
+        if (step === 'upsell') setStep('downsell');
+        else declineAll();
+      }
+    }, 250);
+    return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
@@ -227,103 +276,64 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
       <style>{KEYFRAMES}</style>
 
       {/* ---------- UPSELL ---------- */}
-      {step === 'upsell' && (
+      {step === 'upsell' && up && (
         <Modal>
           <div className="bg-gradient-to-b from-[#fff1f5] to-white rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl">
-            <div className="relative bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white text-center py-2.5 px-4 overflow-hidden">
-              <span className="relative z-10 inline-flex items-center gap-1.5 font-black text-[13px] uppercase tracking-wide">
-                <Zap className="w-4 h-4" /> Само сега на тази цена
-              </span>
-            </div>
+            <OfferTop secondsLeft={secondsLeft} label="Еднократна оферта" />
 
-            <div className="px-5 sm:px-6 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-7">
-              <div className="mx-auto mb-3 flex items-center justify-center gap-1.5 bg-rose-100 text-rose-700 rounded-full px-3.5 py-1 w-max max-w-full">
-                <span className="font-black text-[11px] sm:text-[12px] uppercase tracking-wide text-center">🧒 Naturino Kids · за деца 18м+</span>
-              </div>
-
-              <h2 className="text-center text-[22px] sm:text-[26px] leading-tight font-black text-[#231018]">
-                Изчакай! Добави още <span className="text-rose-600">2 детски опаковки</span>
+            <div className="px-5 pt-2.5 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-6">
+              <h2 className="text-center text-[21px] sm:text-2xl leading-[1.15] font-black text-[#231018]">
+                Добави още <span className="text-rose-600">{up.addQty === 1 ? '1 шишенце' : `${up.addQty} шишенца`}</span> на <span className="whitespace-nowrap">по-ниска цена</span>
               </h2>
-              <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-1.5 mb-6">
-                И вземи <b className="text-amber-600">БЕЗПЛАТНА</b> доставка за цялата поръчка!
+              <p className="text-center text-[18px] text-slate-600 font-semibold mt-1">
+                {shipSaving > 0 ? (
+                  <>…и отключи <b className="text-emerald-600">БЕЗПЛАТНА доставка</b> за цялата поръчка 🚚</>
+                ) : (
+                  <>Тази цена я има <b className="text-rose-600">само сега</b>, само на този екран</>
+                )}
               </p>
 
-              <div className="uf-floaty">
-                <ProductShot
-                  src={UPSELL.img}
-                  emoji={UPSELL.emoji}
-                  badge={`×${UPSELL.addQty}`}
-                  tone="linear-gradient(135deg,#fecdd3,#fed7aa)"
-                />
-              </div>
-
-              <div className="mt-8 sm:mt-9 flex items-end justify-center gap-3">
-                <div className="text-center">
-                  <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Само +</p>
-                  <p className="text-[42px] sm:text-5xl font-black text-[#231018] leading-none">{eur(UPSELL.addPrice)}</p>
-                </div>
-                <div className="pb-1.5">
-                  <span className="line-through text-slate-400 font-bold">{eur(UPSELL.wasPrice)}</span>
-                  <span className="block mt-1 text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    + безплатна доставка
-                  </span>
-                </div>
-              </div>
-
-              {/* 🚚 НОВО: колко точно спестява клиентът */}
-              {shipFee > 0 && (
-                <div className="mt-5 rounded-2xl bg-emerald-50 ring-2 ring-emerald-200 px-4 py-3 text-center uf-pop">
-                  <p className="font-black text-emerald-700 text-[19px] leading-tight">
-                    🎉 Спестявате {eur(upsellSaving)}
-                  </p>
-                  <p className="text-[12px] text-emerald-700/80 font-semibold mt-1 leading-snug">
-                    {eur(upsellProductSaving)} отстъпка + <span className="line-through">{eur(shipFee)}</span> доставка → 0,00 €
-                  </p>
-                  <p className="text-[12px] text-slate-600 font-semibold mt-1.5">
-                    Общо за плащане при получаване: <b className="text-slate-900">{eur(payTotalFor('upsell'))}</b>
-                  </p>
-                </div>
-              )}
-
-              <div className="mt-5 space-y-2.5">
-                {[
-                  { icon: ShieldCheck, t: '3 опаковки = 2 месеца защита без прекъсване' },
-                  {
-                    icon: Truck,
-                    t: shipFee > 0
-                      ? `Безплатна доставка за цялата поръчка (вместо ${eur(shipFee)})`
-                      : 'Безплатна доставка за цялата поръчка',
-                  },
-                  { icon: Heart, t: 'Никога не оставаш без наличност в разгара на вирусите' },
-                ].map(({ icon: Icon, t }, i) => (
-                  <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-rose-100">
-                    <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-4 h-4 text-rose-600" />
-                    </div>
-                    <p className="text-[13.5px] text-slate-700 font-medium leading-snug pt-1">{t}</p>
+              <div className="mt-3 flex items-center gap-4">
+                <OfferShot src={UPSELL_IMG[up.addQty] || UPSELL_IMG[2]} contain={up.addQty === 1} emoji={UPSELL_EMOJI} badge={`+${up.addQty}`} />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="line-through text-slate-400 font-bold text-[15px]">{eur(up.wasPrice)}</span>
+                    {upsellPct >= 10 && (
+                      <span className="bg-rose-600 text-white text-[11px] font-black px-1.5 py-0.5 rounded-md">-{upsellPct}%</span>
+                    )}
                   </div>
-                ))}
+                  <p className="text-[38px] sm:text-[42px] font-black text-[#231018] leading-none mt-0.5">{eur(up.addPrice)}</p>
+                  <p className="mt-1.5 text-[14px] font-black text-emerald-700 leading-tight">🎉 Спестявате {eur(upsellSaving)}</p>
+                  {shipSaving > 0 && (
+                    <p className="text-[11.5px] font-bold text-emerald-700/80 leading-tight">
+                      вкл. <span className="line-through">{eur(shipSaving)}</span> доставка → 0,00 €
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[11.5px] font-bold text-slate-600">
+                <span className="bg-white ring-1 ring-rose-100 rounded-full px-2.5 py-1">📦 Към същата пратка</span>
+                <span className="bg-white ring-1 ring-rose-100 rounded-full px-2.5 py-1">🚚 Безплатна доставка </span>
+                <span className="bg-white ring-1 ring-rose-100 rounded-full px-2.5 py-1">💶 Плащате при получаване</span>
               </div>
 
               <button
                 onClick={acceptUpsell}
-                className="uf-shimmer relative overflow-hidden w-full mt-5 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
+                className="uf-shimmer relative overflow-hidden w-full mt-3.5 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-5 h-5 flex-shrink-0" />
                 <span className="flex flex-col items-center leading-tight text-center">
-                  <span className="text-[17px] sm:text-lg">ДА! Добави още 2 опаковки</span>
-                  <span className="text-[12px] font-bold opacity-90">
-                    {shipFee > 0 ? `и спестявам ${eur(upsellSaving)}` : 'с безплатна доставка'}
-                  </span>
+                  <span className="text-[16px] sm:text-lg whitespace-nowrap">ДА! Добави към поръчката</span>
+                  <span className="text-[12px] font-bold opacity-90">само +{eur(up.addPrice)} · спестявам {eur(upsellSaving)}</span>
                 </span>
               </button>
 
-              {/* Отказ — добавен само лек контур, за да се разпознава като бутон */}
               <button
                 onClick={() => setStep('downsell')}
-                className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
+                className="w-full mt-2 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-[13px] font-semibold transition"
               >
-                Не, благодаря — продължи без офертата
+                Не, благодаря — поръчката ми остава както е
               </button>
             </div>
           </div>
@@ -334,83 +344,61 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
       {step === 'downsell' && (
         <Modal>
           <div className="bg-gradient-to-b from-[#eefaf3] to-white rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl">
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white text-center py-2.5 px-4">
-              <span className="inline-flex items-center gap-1.5 font-black text-[13px] uppercase tracking-wide">
-                <Heart className="w-4 h-4" /> Специално и за вас
-              </span>
-            </div>
+            <OfferTop secondsLeft={secondsLeft} label="Последна оферта" />
 
-            <div className="px-5 sm:px-6 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-7">
-              <div className="mx-auto mb-3 flex items-center justify-center gap-1.5 bg-emerald-100 text-emerald-700 rounded-full px-3.5 py-1 w-max max-w-full">
-                <span className="font-black text-[11px] sm:text-[12px] uppercase tracking-wide text-center">🧑 Naturino · за възрастни 12+</span>
-              </div>
-
-              <h2 className="text-center text-[22px] sm:text-[26px] leading-tight font-black text-[#0f2a20]">
-                Вземи един брой за възрастни и се убеди в силата <span className="text-emerald-600">на 13-те билки</span>
+            <div className="px-5 pt-2.5 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-6">
+              <h2 className="text-center text-[24px] sm:text-2xl leading-[1.15] font-black text-[#eab308]">
+                Вземи сега <span className="text-emerald-600">Naturino за възрастни с надградена формула с 13 билки и плодове</span>
               </h2>
-              <p className="text-center text-slate-500 text-[13px] sm:text-sm mt-1.5 mb-5">
-                Надградената формула за възрастни — с безплатна доставка за цялата поръчка!
+              <p className="text-center text-[13px] text-slate-600 font-semibold mt-1">
+                {shipSaving > 0 ? (
+                  <span className="block text-[12px] leading-tight font-black text-red-600 animate-pulse">…и ОТКЛЮЧИ БЕЗПЛАТНА ДОСТАВКА ЗА ЦЯЛАТА ПОРЪЧКА 🚚</span>
+                ) : (
+                  <>В същата пратка — <b className="text-emerald-600">без доплащане за доставка</b></>
+                )}
               </p>
 
-              <div className="mx-auto mb-1 flex items-center justify-center gap-2 bg-emerald-600 text-white rounded-full px-4 py-1.5 w-max shadow-lg shadow-emerald-600/25">
-                <Sparkles className="w-4 h-4" />
-                <span className="font-black text-sm tracking-tight">13 билки и плодове</span>
-              </div>
-
-              <div className="uf-floaty">
-                <ProductShot src={DOWNSELL.img} emoji={DOWNSELL.emoji} badge="+1" tone="linear-gradient(135deg,#a7f3d0,#99f6e4)" />
-              </div>
-
-              <div className="mt-8 sm:mt-9 text-center">
-                <p className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Само +</p>
-                <p className="text-[42px] sm:text-5xl font-black text-[#0f2a20] leading-none">{eur(DOWNSELL.addPrice)}</p>
-                <span className="inline-block mt-2 text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                  + Безплатна доставка за цялата поръчка
-                </span>
-              </div>
-
-              {/* 🚚 НОВО: при даунсела се печели само доставката */}
-              {shipFee > 0 && (
-                <div className="mt-5 rounded-2xl bg-emerald-50 ring-2 ring-emerald-200 px-4 py-3 text-center uf-pop">
-                  <p className="font-black text-emerald-700 text-[17px] leading-tight">
-                    🚚 Спестявате {eur(downsellSaving)} от доставката
-                  </p>
-                  <p className="text-[12px] text-slate-600 font-semibold mt-1.5">
-                    Общо за плащане при получаване: <b className="text-slate-900">{eur(payTotalFor('downsell'))}</b>
-                  </p>
+              <div className="mt-3 flex items-center gap-4">
+                <OfferShot src={DOWNSELL.img} emoji={DOWNSELL.emoji} badge="+1" />
+                <div className="min-w-0">
+                  <span className="inline-flex items-center gap-1 bg-emerald-600 text-white text-[11px] font-black px-2 py-0.5 rounded-md">
+                    <Gift className="w-3 h-3" /> 13 билки и плодове
+                  </span>
+                  <p className="text-[38px] sm:text-[42px] font-black text-[#0f2a20] leading-none mt-1">{eur(DOWNSELL.addPrice)}</p>
+                  {shipSaving > 0 ? (
+                    <p className="mt-1.5 text-[13px] font-black text-emerald-700 leading-tight">
+                      🚚 Спестявате {eur(shipSaving)} от доставката
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-[12.5px] font-bold text-slate-600 leading-tight">🧑 За възрастни и деца 12+</p>
+                  )}
                 </div>
-              )}
+              </div>
 
-              <div className="mt-5 space-y-2.5">
-                {[
-                  { icon: Sparkles, t: 'Надградена формула: 13 билки и плодове в Тройна Имунна Архитектура™' },
-                  { icon: Zap, t: 'С адаптогени Рейши, Шийтаке и Астрагал за повече енергия, устойчивост и по-малко стрес' },
-                  { icon: ShieldCheck, t: 'Работи на 5 нива: имунитет, енергия, фокус, възстановяване, спокойствие' },
-                ].map(({ icon: Icon, t }, i) => (
-                  <div key={i} className="flex items-start gap-3 bg-white rounded-2xl p-3 ring-1 ring-emerald-100">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <p className="text-[13.5px] text-slate-700 font-medium leading-snug pt-1">{t}</p>
-                  </div>
-                ))}
+              <div className="mt-3 flex flex-wrap justify-center gap-1.5 text-[11.5px] font-bold text-slate-600">
+                <span className="bg-white ring-1 ring-emerald-100 rounded-full px-2.5 py-1">🍄 Рейши · Шийтаке · Астрагал</span>
+                <span className="bg-white ring-1 ring-emerald-100 rounded-full px-2.5 py-1">⚡ Енергия и устойчивост</span>
+                <span className="bg-white ring-1 ring-emerald-100 rounded-full px-2.5 py-1">📦 В същата пратка</span>
               </div>
 
               <button
                 onClick={acceptDownsell}
-                className="uf-shimmer relative overflow-hidden w-full mt-5 py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[16px] sm:text-lg leading-tight shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
+                className="uf-shimmer relative overflow-hidden w-full mt-3.5 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black shadow-xl shadow-emerald-500/30 transition active:scale-[.98] flex items-center justify-center gap-2"
               >
-                <Sparkles className="w-5 h-5 flex-shrink-0" /> ДА! Взимам с безплатна доставка
+                <Sparkles className="w-5 h-5 flex-shrink-0" />
+                <span className="flex flex-col items-center leading-tight text-center">
+                  <span className="text-[16px] sm:text-lg whitespace-nowrap">ДА! Добави и за мен</span>
+                  <span className="text-[12px] font-bold opacity-90">
+                    само +{eur(DOWNSELL.addPrice)}{shipSaving > 0 ? ' · доставката става безплатна' : ''}
+                  </span>
+                </span>
               </button>
 
-              {/* Отказ — добавен само лек контур, за да се разпознава като бутон */}
               <button
                 onClick={declineAll}
-                className="w-full mt-3 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-sm font-semibold transition"
+                className="w-full mt-2 py-2 rounded-2xl border border-slate-300 text-slate-400 hover:text-slate-600 text-[13px] font-semibold transition"
               >
-                {shipFee > 0
-                  ? `Не, благодаря — завърши с доставка ${eur(shipFee)}`
-                  : 'Не, благодаря — завърши поръчката'}
+                Не, благодаря — поръчката ми остава както е
               </button>
             </div>
           </div>
@@ -435,37 +423,17 @@ export function UpsellFlow({ order, onClose }: { order: OrderSnapshot; onClose: 
             <div className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-200 uf-pop">
               <Check className="w-10 h-10 text-white" strokeWidth={3} />
             </div>
-            <h2 className="text-3xl font-black text-slate-900">Успешна поръчка!</h2>
+            <h2 className="text-3xl font-black text-slate-900">Благодарим ви!</h2>
             <p className="text-slate-600 mt-3 leading-relaxed">
-              {path === 'upsell' && `${order.quantity + UPSELL.addQty} опаковки Naturino Kids, с безплатна доставка. `}
-              {path === 'downsell' && 'Поръчката ви с опаковката за възрастни, с безплатна доставка. '}
-              Очаквайте обаждане за потвърждение на поръчката съвсем скоро.
+              Поръчката ви е приета. Очаквайте обаждане за потвърждение съвсем скоро.
             </p>
 
-            {/* 🚚 НОВО: точната сума за плащане при получаване */}
-            <div className="mt-6 rounded-2xl bg-slate-50 ring-1 ring-slate-200 px-4 py-3 text-left text-sm space-y-1.5">
-              <div className="flex justify-between gap-3 text-slate-600">
-                <span>Продукти</span>
-                <span className="font-bold text-slate-800 whitespace-nowrap">{eur(productTotalFor(path))}</span>
-              </div>
-              <div className="flex justify-between gap-3 text-slate-600">
-                <span>{path === 'none' ? shipLabel : 'Доставка'}</span>
-                {path === 'none' ? (
-                  <span className="font-bold text-slate-800 whitespace-nowrap">
-                    {shipFee > 0 ? eur(shipFee) : 'по тарифа'}
-                  </span>
-                ) : (
-                  <span className="font-black text-emerald-600 whitespace-nowrap">
-                    {shipFee > 0 && <span className="line-through text-slate-400 font-semibold mr-1.5">{eur(shipFee)}</span>}
-                    Безплатна
-                  </span>
-                )}
-              </div>
-              <div className="flex justify-between gap-3 border-t border-dashed border-slate-300 pt-2 mt-1">
-                <span className="font-black text-slate-900">Плащате при получаване</span>
-                <span className="font-black text-slate-900 text-base whitespace-nowrap">{eur(payTotalFor(path))}</span>
-              </div>
-            </div>
+            {/* Кратко: колко опаковки и докъде (подробностите са в имейла) */}
+            <p className="mt-6 text-[13px] text-slate-500 font-semibold leading-snug">
+              📦 {finalKidsQty} {finalKidsQty === 1 ? 'опаковка' : 'опаковки'} Naturino Kids
+              {path === 'downsell' && ' + 1 за възрастни'}
+              {shipPlace && ` · ${shipPlace}`}
+            </p>
 
             <button
               onClick={onClose}
