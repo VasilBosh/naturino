@@ -212,7 +212,7 @@ export default function VideoTrust() {
     <section
       id="video"
       ref={sectionRef}
-      className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 py-14 sm:py-20"
+      className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 py-10 sm:py-20"
     >
       {/* мек светъл ореол зад видеото */}
       <div

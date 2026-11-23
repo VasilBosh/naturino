@@ -56,7 +56,7 @@ export const ComparisonSection: React.FC = () => {
   const currentData = options.find(o => o.id === activeTab) || options[0];
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-b from-white to-emerald-50/40 font-sans overflow-hidden">
+    <section className="py-10 md:py-16 px-4 bg-gradient-to-b from-white to-emerald-50/40 font-sans overflow-hidden">
       <div className="max-w-5xl mx-auto">
         
         {/* Хедър - Грабващ вниманието и спиращ скрола */}

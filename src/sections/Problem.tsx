@@ -86,7 +86,7 @@ export function Problem() {
     <section
       id="problem"
       ref={sectionRef}
-      className="relative overflow-hidden bg-white py-14 sm:py-16 lg:py-24"
+      className="relative overflow-hidden bg-white py-10 sm:py-16 lg:py-24"
     >
       {/* Background decoration */}
       <div className="pointer-events-none absolute inset-0">

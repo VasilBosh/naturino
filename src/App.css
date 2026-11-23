@@ -135,8 +135,8 @@ html {
    =============================== */
 
 .section-padding {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: 2.5rem; /* телефон: еднакво 40px за всички секции */
+  padding-bottom: 2.5rem;
 }
 
 @media (min-width: 768px) {

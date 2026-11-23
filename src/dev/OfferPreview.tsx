@@ -42,7 +42,7 @@ export default function OfferPreview() {
           eventId: 'preview',
           quantity: qty,
           total: priceFor(qty),
-          base: { city: 'София' },
+          base: { city: 'София', courier: 'ЕКОНТ', officeAddress: 'Офис София Младост 1 — бул. „Александър Малинов“ 51, София 1784' }, // примерен адрес
           shippingFee: ship.fee,
           shippingLabel: ship.label,
         }}

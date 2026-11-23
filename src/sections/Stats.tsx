@@ -1,6 +1,6 @@
 export const Stats = () => {
   return (
-    <section className="relative py-14 bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden border-y border-white/10">
+    <section className="relative py-10 md:py-14 bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 overflow-hidden border-y border-white/10">
 
       {/* Subtle ambient glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

@@ -17,6 +17,11 @@ import {
   hasFreeShipping,
   breakdownLabel,
   SELECT_PACKAGE_EVENT,
+  nextQty,
+  prevQty,
+  normalizeQty,
+  isPromoActive,
+  PROMO_PACK,
 } from '../utils/pricing';
 
 // ==========================================================
@@ -82,6 +87,9 @@ const loadTurnstile = (): Promise<void> => {
 export function Checkout() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [quantity, setQuantity] = useState(1);
+  // 📦 НОВО: размер на избрания пакет (2, 3 или 5 = 4+1) → поле „Брой пакети“ (3 пакета 4+1 = 15 бр.)
+  const [packSize, setPackSize] = useState<number | null>(null);
+  const [packInput, setPackInput] = useState('1');
   const [delivery, setDelivery] = useState<CourierSelection | null>(null);
 
   // 🔧 ПРОМЯНА 1: беше useState(false) — сега пази КОНКРЕТНОТО съобщение за грешка,
@@ -567,7 +575,10 @@ export function Checkout() {
     const handleSelectPackage = (e: Event) => {
       const qty = Math.floor(Number((e as CustomEvent).detail));
       if (!Number.isFinite(qty) || qty < 1) return;
-      setQuantity(Math.min(MAX_QUANTITY, qty));
+      const q = normalizeQty(qty); // 🎄 по време на офертата 4 → 5 (подаръкът се добавя сам)
+      setQuantity(q);
+      setPackSize(q);
+      setPackInput('1');
     };
     window.addEventListener(SELECT_PACKAGE_EVENT, handleSelectPackage);
     return () => window.removeEventListener(SELECT_PACKAGE_EVENT, handleSelectPackage);
@@ -921,6 +932,7 @@ export function Checkout() {
     setDelivery(null);
     setPickerKey((k) => k + 1);
     setQuantity(1);
+    setPackSize(null);
     setEmailNote(null);
     setPhoneNote(null);
     setDeliveryError(null);
@@ -1447,17 +1459,28 @@ export function Checkout() {
                         type="button"
                         aria-label="Намали количеството"
                         disabled={quantity <= 1}
-                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        onClick={() => {
+                          // 🎄 по време на офертата „−“ от 5 връща на 3 (4 се прескача)
+                          const q = prevQty(quantity);
+                          setQuantity(q);
+                          setPackInput(packSize ? String(Math.max(1, Math.floor(q / packSize))) : '1');
+                        }}
                         className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-amber-50 text-amber-600 transition-colors active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <Minus className="w-5 h-5" />
                       </button>
-                      <span className="font-black text-xl text-slate-800 w-6 text-center">{quantity}</span>
+                      <span className="font-black text-xl text-slate-800 w-8 text-center">{quantity}</span>
                       <button
                         type="button"
                         aria-label="Увеличи количеството"
                         disabled={quantity >= MAX_QUANTITY}
-                        onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
+                        onClick={() => {
+                          // 🎄 по време на офертата „+“ от 3 скача на 5 (4+1 подарък)
+                          const q = nextQty(quantity);
+                          setQuantity(q);
+                          if (isPromoActive() && q === PROMO_PACK) setPackSize(PROMO_PACK);
+                          setPackInput(packSize ? String(Math.max(1, Math.floor(q / packSize))) : '1');
+                        }}
                         className="w-10 h-10 rounded-lg flex items-center justify-center hover:bg-amber-50 text-amber-600 transition-colors active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-5 h-5" />
@@ -1483,6 +1506,64 @@ export function Checkout() {
                       </div>
                     )}
                   </div>
+
+                  {/* 📦 НОВО: брой пакети — напр. 3 × 4+1 = 15 шишенца (показва се, ако е избран пакет) */}
+                  {!isPromoValid && packSize && packSize > 1 && quantity % packSize === 0 && (
+                    <div className="flex items-center justify-between gap-2 rounded-xl bg-white border border-amber-200 px-3 py-2">
+                      <span className="text-[13px] font-bold text-slate-700 leading-tight">
+                        Брой пакети{' '}
+                        <b className="text-amber-700 whitespace-nowrap">
+                          {packSize === PROMO_PACK && isPromoActive() ? '4+1 🎁' : `по ${packSize} бр.`}
+                        </b>
+                        :
+                      </span>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          aria-label="По-малко пакети"
+                          disabled={quantity <= packSize}
+                          onClick={() => {
+                            const n = Math.max(1, Math.floor(quantity / packSize) - 1);
+                            setQuantity(normalizeQty(packSize * n));
+                            setPackInput(String(n));
+                          }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-700 disabled:opacity-30"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          max={Math.floor(MAX_QUANTITY / packSize)}
+                          value={packInput}
+                          onChange={(e) => {
+                            setPackInput(e.target.value);
+                            const n = Math.floor(Number(e.target.value));
+                            if (Number.isFinite(n) && n >= 1) {
+                              setQuantity(normalizeQty(packSize * Math.min(n, Math.floor(MAX_QUANTITY / packSize))));
+                            }
+                          }}
+                          onBlur={() => setPackInput(String(Math.floor(quantity / packSize)))}
+                          aria-label="Брой пакети"
+                          className="w-12 h-8 rounded-lg border border-amber-200 text-center font-black text-slate-800 text-base"
+                        />
+                        <button
+                          type="button"
+                          aria-label="Повече пакети"
+                          disabled={quantity + packSize > MAX_QUANTITY}
+                          onClick={() => {
+                            const n = Math.min(Math.floor(MAX_QUANTITY / packSize), Math.floor(quantity / packSize) + 1);
+                            setQuantity(normalizeQty(packSize * n));
+                            setPackInput(String(n));
+                          }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-700 disabled:opacity-30"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* 📦 НОВО: какъв пакет е избран и колко спестява */}
                   {!isPromoValid && quantity > 1 && (

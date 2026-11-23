@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, Sparkles, Clock, Gift } from 'lucide-react';
-import { upsellFor, hasFreeShipping, DOWNSELL_PRICE } from '../utils/pricing';
+import { upsellFor, hasFreeShipping, DOWNSELL_PRICE, isPromoActive, PROMO_PACK } from '../utils/pricing';
 
 /**
  * UpsellFlow — попъп потокът след записана поръчка: Upsell → Downsell → Благодаря.
@@ -30,7 +30,11 @@ const BACKUP_SCRIPT_URL =
 //   4+ бр. → няма upsell → показва се направо downsell-ът
 const UPSELL_EMOJI = '🧴';
 // 📸 Снимката показва ТОЧНО толкова шишенца, колкото се ДОБАВЯТ (офертата, а не целия пакет)
-const UPSELL_IMG: Record<number, string> = { 1: '/images/product-main.webp', 2: '/upsell/kids-3pack.webp' };
+const UPSELL_IMG: Record<number, string> = {
+  1: '/images/product-main.webp',
+  2: '/upsell/kids-3pack.webp',
+  3: '/images/packages/paket-3.webp', // 🎄 2 бр. → +3 = 4+1 по време на коледната оферта
+};
 // ⏱️ ТАЙМЕР НА ОФЕРТАТА — колко секунди е видима всяка оферта (upsell и downsell).
 // Когато изтече, офертата НАИСТИНА изчезва: от upsell → downsell, от downsell → „Благодарим ви“.
 const OFFER_SECONDS = 120;        // 2 минути
@@ -163,11 +167,21 @@ export function UpsellFlow({
   const upsellProductSaving = up ? round2(up.wasPrice - up.addPrice) : 0; // 2,90 / 6,80 / 5,80
   const upsellSaving = round2(upsellProductSaving + shipSaving);
   const upsellPct = up && up.wasPrice > 0 ? Math.round((upsellProductSaving / up.wasPrice) * 100) : 0;
+  // 🎄 upsell-ът стига до пакет 4+1 → едното от добавените шишенца е подарък
+  const upsellGift = !!up && isPromoActive() && up.targetQty === PROMO_PACK;
 
   // За благодарствения екран: краен брой детски опаковки и докъде
   const finalKidsQty = path === 'upsell' && up ? up.targetQty : order.quantity;
-  const baseCity = typeof order.base?.city === 'string' ? order.base.city : '';
-  const shipPlace = [order.shippingLabel || '', baseCity].filter(Boolean).join(', ');
+  const baseStr = (k: string) => {
+    const v = order.base?.[k];
+    return typeof v === 'string' ? v.trim() : '';
+  };
+  const baseCity = baseStr('city');
+  // Пълният адрес, който клиентът е въвел (офис/автомат + адрес или улица №, град, пощ. код).
+  // Бележката „(ръчно въведен адрес — да се потвърди…)“ е само за таблицата — не я показваме на клиента.
+  const shipAddress = baseStr('officeAddress').replace(/\s*\(ръчно въведен адрес[^)]*\)\s*$/, '') || baseCity;
+  const shipCourier = baseStr('courier');
+  const shipHeading = [order.shippingLabel || '', shipCourier].filter(Boolean).join(' · ');
 
   // Праща обновяване/финализиране със ФИНАЛНИ стойности. quantity = брой ДЕТСКИ опаковки.
   // 'complete' = клиентът отказа/не реагира → тръгва базовият имейл, редовете НЕ се пипат.
@@ -304,6 +318,9 @@ export function UpsellFlow({
                   </div>
                   <p className="text-[38px] sm:text-[42px] font-black text-[#231018] leading-none mt-0.5">{eur(up.addPrice)}</p>
                   <p className="mt-1.5 text-[14px] font-black text-emerald-700 leading-tight">🎉 Спестявате {eur(upsellSaving)}</p>
+                  {upsellGift && (
+                    <p className="text-[13px] font-black text-red-600 leading-tight">🎁 едното е ПОДАРЪК (4+1)</p>
+                  )}
                   {shipSaving > 0 && (
                     <p className="text-[11.5px] font-bold text-emerald-700/80 leading-tight">
                       вкл. <span className="line-through">{eur(shipSaving)}</span> доставка → 0,00 €
@@ -432,8 +449,13 @@ export function UpsellFlow({
             <p className="mt-6 text-[13px] text-slate-500 font-semibold leading-snug">
               📦 {finalKidsQty} {finalKidsQty === 1 ? 'опаковка' : 'опаковки'} Naturino Kids
               {path === 'downsell' && ' + 1 за възрастни'}
-              {shipPlace && ` · ${shipPlace}`}
             </p>
+            {(shipHeading || shipAddress) && (
+              <div className="mt-3 mx-auto max-w-sm rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-[13px] leading-snug">
+                {shipHeading && <p className="font-bold text-slate-700">🚚 {shipHeading}</p>}
+                {shipAddress && <p className="mt-1 text-slate-600 font-semibold break-words">{shipAddress}</p>}
+              </div>
+            )}
 
             <button
               onClick={onClose}
